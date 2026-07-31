@@ -19,6 +19,7 @@ import {
 } from './notionTools.js';
 import {
   generateDailyRun, getFactoryRuns, getFactoryRun, FACTORY_THEMES, getThemeForDay, OUTPUT_ROOT,
+  generateMultiThemeRun, generateThreeThemePackage, getMultiThemeRuns, getMultiThemeRun,
 } from './factory/generator.js';
 import { db } from './db.js';
 
@@ -248,6 +249,25 @@ app.get('/api/factory/runs/:id', (req, res) => {
 app.post('/api/factory/run', (req, res) => {
   const theme = req.body.theme;
   const run = generateDailyRun(theme);
+  res.json(run);
+});
+app.post('/api/factory/run-three', (_req, res) => {
+  const run = generateThreeThemePackage();
+  res.json(run);
+});
+app.post('/api/factory/run-multi', (req, res) => {
+  const themes = req.body.themes as string[] | undefined;
+  const suffix = req.body.folderSuffix as string | undefined;
+  if (!themes?.length) {
+    return res.status(400).json({ error: 'themes array required' });
+  }
+  const run = generateMultiThemeRun(themes as import('./factory/themes.js').FactoryTheme[], suffix);
+  res.json(run);
+});
+app.get('/api/factory/multi-runs', (_req, res) => res.json(getMultiThemeRuns()));
+app.get('/api/factory/multi-runs/:id', (req, res) => {
+  const run = getMultiThemeRun(req.params.id);
+  if (!run) return res.status(404).json({ error: 'Run not found' });
   res.json(run);
 });
 app.get('/api/factory/output-root', (_req, res) => res.json({ path: OUTPUT_ROOT }));

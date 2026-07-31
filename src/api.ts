@@ -85,4 +85,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ theme }),
     }),
+  runFactoryThree: () =>
+    request<import('./types/factory').MultiThemeRun>('/factory/run-three', { method: 'POST' }),
+  getMultiThemeRuns: () => request<import('./types/factory').MultiThemeRun[]>('/factory/multi-runs'),
 };

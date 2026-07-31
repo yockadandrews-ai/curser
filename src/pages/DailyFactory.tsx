@@ -4,7 +4,7 @@ import {
   FileText, ChevronDown, ChevronUp, Calendar,
 } from 'lucide-react';
 import { api } from '../api';
-import type { DailyRun } from '../types/factory';
+import type { DailyRun, MultiThemeRun } from '../types/factory';
 
 const THEMES = [
   'Conversion & Revenue',
@@ -49,6 +49,8 @@ export default function DailyFactory() {
   const [activeRun, setActiveRun] = useState<DailyRun | null>(null);
   const [selectedTheme, setSelectedTheme] = useState('');
   const [suggestedTheme, setSuggestedTheme] = useState('');
+  const [multiRun, setMultiRun] = useState<MultiThemeRun | null>(null);
+  const [viewMode, setViewMode] = useState<'single' | 'multi'>('multi');
   const [generating, setGenerating] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -69,11 +71,24 @@ export default function DailyFactory() {
 
   useEffect(() => { refresh(); }, [refresh]);
 
+  const handleGenerateThree = async () => {
+    setGenerating(true);
+    try {
+      const run = await api.runFactoryThree();
+      setMultiRun(run);
+      setViewMode('multi');
+      await refresh();
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   const handleGenerate = async () => {
     setGenerating(true);
     try {
       const run = await api.runFactory(selectedTheme);
       setActiveRun(run);
+      setViewMode('single');
       await refresh();
     } finally {
       setGenerating(false);
@@ -126,13 +141,84 @@ export default function DailyFactory() {
             ))}
           </select>
         </div>
-        <button onClick={handleGenerate} disabled={generating} className="btn-primary flex items-center gap-2">
+        <button onClick={handleGenerateThree} disabled={generating} className="btn-primary flex items-center gap-2 bg-orange-600 hover:bg-orange-500">
+          {generating ? <Loader2 size={16} className="animate-spin" /> : <Factory size={16} />}
+          Run 3 Themes (15 Apps)
+        </button>
+        <button onClick={handleGenerate} disabled={generating} className="btn-secondary flex items-center gap-2">
           {generating ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
-          Run Daily Factory
+          Single Theme
         </button>
       </div>
 
-      {activeRun && (
+      {viewMode === 'multi' && multiRun && (
+        <>
+          <div className="card border-orange-600/30">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-sm text-gray-400">Multi-theme package · {multiRun.date}</p>
+                <p className="font-semibold text-white flex items-center gap-2 mt-1">
+                  <FolderOpen size={18} className="text-orange-400" />
+                  {multiRun.folderPath}/
+                </p>
+              </div>
+              <QualityBadge passed={multiRun.qualityPassed} />
+            </div>
+            <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
+              <div><span className="text-gray-500">Apps</span><p className="text-white font-semibold">{multiRun.totalApps}</p></div>
+              <div><span className="text-gray-500">Proposals</span><p className="text-white font-semibold">{multiRun.totalProposals}</p></div>
+              <div><span className="text-gray-500">Themes</span><p className="text-white font-semibold">{multiRun.themes.length}</p></div>
+            </div>
+          </div>
+
+          {multiRun.themes.map(themeRun => (
+            <div key={themeRun.id}>
+              <h2 className="font-semibold text-white mb-3 flex items-center gap-2">
+                <span className="text-orange-400">{themeRun.theme}</span>
+                <span className="text-xs text-gray-500 font-normal">{themeRun.apps.length} apps</span>
+              </h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 mb-6">
+                {themeRun.apps.map((app, i) => (
+                  <div key={app.appName} className="card text-sm py-3">
+                    <span className="text-orange-400 text-xs font-bold">#{i + 1}</span>
+                    <h3 className="font-medium text-white mt-1">{app.appName}</h3>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{app.oneLinePromise}</p>
+                    <p className="text-xs text-money-400 mt-2">{app.suggestedPricing}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <div className="card">
+            <h3 className="font-semibold text-white mb-3">Output Folder Structure</h3>
+            <pre className="text-xs text-gray-400 font-mono bg-dark-800/50 p-4 rounded-lg">{`${multiRun.folderPath}/
+├── 01_Conversion_Revenue/
+│   ├── Apps.md
+│   ├── Proposals/ (5 singles)
+│   └── Suite_Proposal.md
+├── 02_Margin_Operations/
+│   ├── Apps.md
+│   ├── Proposals/
+│   └── Suite_Proposal.md
+├── 03_Acquisition_Lead_Systems/
+│   ├── Apps.md
+│   ├── Proposals/
+│   └── Suite_Proposal.md
+└── Master_Notes_for_Cursor.md`}</pre>
+            <p className="text-xs text-gray-500 mt-2">Written to <code className="text-orange-400">output/{multiRun.folderPath}/</code></p>
+          </div>
+        </>
+      )}
+
+      {viewMode === 'multi' && !multiRun && (
+        <div className="card text-center py-12 text-gray-500">
+          <Factory size={40} className="mx-auto mb-3 opacity-50" />
+          <p>Click <strong className="text-orange-400">Run 3 Themes</strong> for the full 15-app package</p>
+        </div>
+      )}
+
+      {viewMode === 'single' && activeRun && (
         <>
           {/* Run summary */}
           <div className="card border-money-600/30">

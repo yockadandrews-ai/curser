@@ -41,6 +41,18 @@ export interface DailyRun {
   createdAt: string;
 }
 
+export interface MultiThemeRun {
+  id: string;
+  date: string;
+  folderPath: string;
+  themes: DailyRun[];
+  masterNotes: string;
+  totalApps: number;
+  totalProposals: number;
+  qualityPassed: boolean;
+  createdAt: string;
+}
+
 export interface FactoryThemesResponse {
   themes: string[];
   suggestedToday: string;
