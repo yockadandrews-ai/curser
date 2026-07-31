@@ -1,0 +1,65 @@
+const BASE = '/api';
+
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || 'Request failed');
+  }
+  return res.json();
+}
+
+export const api = {
+  getStats: () => request<import('./types').Stats>('/stats'),
+  getActivity: (limit = 50) => request<import('./types').Activity[]>(`/activity?limit=${limit}`),
+
+  getProducts: () => request<import('./types').Product[]>('/products'),
+  getTopProducts: (limit = 5) => request<import('./types').Product[]>(`/products/top?limit=${limit}`),
+  addProduct: (data: { name: string; cost: number; sellPrice: number; category?: string }) =>
+    request<import('./types').Product>('/products', { method: 'POST', body: JSON.stringify(data) }),
+  deleteProduct: (id: string) => request<{ ok: boolean }>(`/products/${id}`, { method: 'DELETE' }),
+
+  getSales: () => request<import('./types').Sale[]>('/sales'),
+  addSale: (data: { productId: string; quantity: number }) =>
+    request<import('./types').Sale>('/sales', { method: 'POST', body: JSON.stringify(data) }),
+
+  getExpenses: () => request<import('./types').Expense[]>('/expenses'),
+  addExpense: (data: { description: string; amount: number }) =>
+    request<import('./types').Expense>('/expenses', { method: 'POST', body: JSON.stringify(data) }),
+
+  getContent: () => request<import('./types').GeneratedContent[]>('/content'),
+  generateContent: (productId: string, platforms?: string[]) =>
+    request<import('./types').GeneratedContent[]>('/content/generate', {
+      method: 'POST',
+      body: JSON.stringify({ productId, platforms }),
+    }),
+  previewContent: (productId: string, platforms?: string[]) =>
+    request<import('./types').GeneratedContent[]>('/content/preview', {
+      method: 'POST',
+      body: JSON.stringify({ productId, platforms }),
+    }),
+
+  discoverProducts: (niche?: string, limit = 5) =>
+    request<import('./types').Product[]>('/discover', {
+      method: 'POST',
+      body: JSON.stringify({ niche, limit }),
+    }),
+
+  getAutopilotStatus: () => request<import('./types').AutopilotStatus>('/autopilot/status'),
+  getAutopilotSettings: () => request<import('./types').AutopilotSettings>('/autopilot/settings'),
+  updateAutopilotSettings: (settings: import('./types').AutopilotSettings) =>
+    request<import('./types').AutopilotSettings>('/autopilot/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    }),
+  runAutopilot: () =>
+    request<import('./types').AutopilotStatus['lastRunResult']>('/autopilot/run', { method: 'POST' }),
+  startAutopilot: () => request<import('./types').AutopilotStatus>('/autopilot/start', { method: 'POST' }),
+  stopAutopilot: () => request<import('./types').AutopilotStatus>('/autopilot/stop', { method: 'POST' }),
+
+  publishPosts: () => request<unknown[]>('/post/publish', { method: 'POST' }),
+  getSocialStatus: () => request<{ mode: string; tiktok: boolean; instagram: boolean; twitter: boolean; openai: boolean }>('/post/status'),
+};

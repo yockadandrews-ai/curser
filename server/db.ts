@@ -1,0 +1,346 @@
+import Database from 'better-sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/autopilot.db');
+
+export interface Product {
+  id: string;
+  name: string;
+  cost: number;
+  sellPrice: number;
+  category: string;
+  source: 'manual' | 'discovered';
+  viralScore: number;
+  affiliateLink?: string;
+  imageUrl?: string;
+  createdAt: string;
+}
+
+export interface Sale {
+  id: string;
+  productId: string;
+  quantity: number;
+  revenue: number;
+  profit: number;
+  createdAt: string;
+}
+
+export interface Expense {
+  id: string;
+  description: string;
+  amount: number;
+  createdAt: string;
+}
+
+export interface GeneratedContent {
+  id: string;
+  productId: string;
+  platform: string;
+  hook: string;
+  caption: string;
+  hashtags: string;
+  viralScore: number;
+  status: 'draft' | 'queued' | 'posted' | 'failed';
+  createdAt: string;
+  postedAt?: string;
+}
+
+export interface Activity {
+  id: string;
+  type: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface AutopilotSettings {
+  enabled: boolean;
+  intervalMinutes: number;
+  autoDiscover: boolean;
+  autoGenerate: boolean;
+  autoPost: boolean;
+  platforms: string[];
+  niche: string;
+  lastRunAt?: string;
+}
+
+const db = new Database(dbPath);
+db.pragma('journal_mode = WAL');
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS products (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    cost REAL NOT NULL,
+    sell_price REAL NOT NULL,
+    category TEXT DEFAULT 'general',
+    source TEXT DEFAULT 'manual',
+    viral_score REAL DEFAULT 0,
+    affiliate_link TEXT,
+    image_url TEXT,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS sales (
+    id TEXT PRIMARY KEY,
+    product_id TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    revenue REAL NOT NULL,
+    profit REAL NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS expenses (
+    id TEXT PRIMARY KEY,
+    description TEXT NOT NULL,
+    amount REAL NOT NULL,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS content (
+    id TEXT PRIMARY KEY,
+    product_id TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    hook TEXT NOT NULL,
+    caption TEXT NOT NULL,
+    hashtags TEXT NOT NULL,
+    viral_score REAL DEFAULT 0,
+    status TEXT DEFAULT 'draft',
+    created_at TEXT NOT NULL,
+    posted_at TEXT,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS activity (
+    id TEXT PRIMARY KEY,
+    type TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+`);
+
+function getSetting<T>(key: string, defaultValue: T): T {
+  const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
+  if (!row) return defaultValue;
+  try {
+    return JSON.parse(row.value) as T;
+  } catch {
+    return defaultValue;
+  }
+}
+
+function setSetting(key: string, value: unknown): void {
+  db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, JSON.stringify(value));
+}
+
+export function getAutopilotSettings(): AutopilotSettings {
+  return getSetting<AutopilotSettings>('autopilot', {
+    enabled: true,
+    intervalMinutes: 5,
+    autoDiscover: true,
+    autoGenerate: true,
+    autoPost: true,
+    platforms: ['tiktok', 'instagram', 'twitter'],
+    niche: 'side hustle',
+  });
+}
+
+export function saveAutopilotSettings(settings: AutopilotSettings): void {
+  setSetting('autopilot', settings);
+}
+
+export function getProducts(): Product[] {
+  return db.prepare('SELECT * FROM products ORDER BY viral_score DESC, created_at DESC').all().map(row => mapProduct(row as Record<string, unknown>));
+}
+
+export function getProduct(id: string): Product | undefined {
+  const row = db.prepare('SELECT * FROM products WHERE id = ?').get(id) as Record<string, unknown> | undefined;
+  return row ? mapProduct(row) : undefined;
+}
+
+export function addProduct(product: Omit<Product, 'createdAt'> & { createdAt?: string }): Product {
+  const createdAt = product.createdAt || new Date().toISOString();
+  db.prepare(`
+    INSERT INTO products (id, name, cost, sell_price, category, source, viral_score, affiliate_link, image_url, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    product.id, product.name, product.cost, product.sellPrice, product.category,
+    product.source, product.viralScore, product.affiliateLink || null, product.imageUrl || null, createdAt
+  );
+  return { ...product, createdAt } as Product;
+}
+
+export function updateProduct(id: string, updates: Partial<Product>): Product | undefined {
+  const existing = getProduct(id);
+  if (!existing) return undefined;
+  const merged = { ...existing, ...updates, id };
+  db.prepare(`
+    UPDATE products SET name=?, cost=?, sell_price=?, category=?, source=?, viral_score=?, affiliate_link=?, image_url=?
+    WHERE id=?
+  `).run(merged.name, merged.cost, merged.sellPrice, merged.category, merged.source, merged.viralScore, merged.affiliateLink || null, merged.imageUrl || null, id);
+  return merged;
+}
+
+export function deleteProduct(id: string): void {
+  db.prepare('DELETE FROM products WHERE id = ?').run(id);
+}
+
+export function getSales(): Sale[] {
+  return db.prepare('SELECT * FROM sales ORDER BY created_at DESC').all().map(row => mapSale(row as Record<string, unknown>));
+}
+
+export function addSale(sale: Omit<Sale, 'createdAt'> & { createdAt?: string }): Sale {
+  const createdAt = sale.createdAt || new Date().toISOString();
+  db.prepare('INSERT INTO sales (id, product_id, quantity, revenue, profit, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    .run(sale.id, sale.productId, sale.quantity, sale.revenue, sale.profit, createdAt);
+  return { ...sale, createdAt } as Sale;
+}
+
+export function getExpenses(): Expense[] {
+  return db.prepare('SELECT * FROM expenses ORDER BY created_at DESC').all().map(row => mapExpense(row as Record<string, unknown>));
+}
+
+export function addExpense(expense: Omit<Expense, 'createdAt'> & { createdAt?: string }): Expense {
+  const createdAt = expense.createdAt || new Date().toISOString();
+  db.prepare('INSERT INTO expenses (id, description, amount, created_at) VALUES (?, ?, ?, ?)')
+    .run(expense.id, expense.description, expense.amount, createdAt);
+  return { ...expense, createdAt } as Expense;
+}
+
+export function getContent(): GeneratedContent[] {
+  return db.prepare('SELECT * FROM content ORDER BY created_at DESC').all().map(row => mapContent(row as Record<string, unknown>));
+}
+
+export function addContent(content: Omit<GeneratedContent, 'createdAt'> & { createdAt?: string }): GeneratedContent {
+  const createdAt = content.createdAt || new Date().toISOString();
+  db.prepare(`
+    INSERT INTO content (id, product_id, platform, hook, caption, hashtags, viral_score, status, created_at, posted_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(
+    content.id, content.productId, content.platform, content.hook, content.caption,
+    content.hashtags, content.viralScore, content.status, createdAt, content.postedAt || null
+  );
+  return { ...content, createdAt } as GeneratedContent;
+}
+
+export function updateContentStatus(id: string, status: GeneratedContent['status'], postedAt?: string): void {
+  db.prepare('UPDATE content SET status = ?, posted_at = ? WHERE id = ?').run(status, postedAt || null, id);
+}
+
+export function getActivity(limit = 50): Activity[] {
+  return db.prepare('SELECT * FROM activity ORDER BY created_at DESC LIMIT ?').all(limit).map(row => mapActivity(row as Record<string, unknown>));
+}
+
+export function logActivity(type: string, message: string): Activity {
+  const activity: Activity = {
+    id: crypto.randomUUID(),
+    type,
+    message,
+    createdAt: new Date().toISOString(),
+  };
+  db.prepare('INSERT INTO activity (id, type, message, created_at) VALUES (?, ?, ?, ?)')
+    .run(activity.id, activity.type, activity.message, activity.createdAt);
+  return activity;
+}
+
+export function getStats() {
+  const products = getProducts();
+  const sales = getSales();
+  const expenses = getExpenses();
+  const content = getContent();
+
+  const totalRevenue = sales.reduce((s, x) => s + x.revenue, 0);
+  const totalProfit = sales.reduce((s, x) => s + x.profit, 0);
+  const totalExpenses = expenses.reduce((s, x) => s + x.amount, 0);
+  const netProfit = totalProfit - totalExpenses;
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const monthlySales = sales.filter(s => s.createdAt >= monthStart);
+  const monthlyProfit = monthlySales.reduce((s, x) => s + x.profit, 0);
+
+  const postedCount = content.filter(c => c.status === 'posted').length;
+  const queuedCount = content.filter(c => c.status === 'queued').length;
+
+  return {
+    totalRevenue,
+    totalProfit,
+    totalExpenses,
+    netProfit,
+    monthlyProfit,
+    totalSales: sales.length,
+    productsTracked: products.length,
+    contentGenerated: content.length,
+    postsPublished: postedCount,
+    postsQueued: queuedCount,
+    topProducts: products.slice(0, 5),
+  };
+}
+
+function mapProduct(row: Record<string, unknown>): Product {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    cost: row.cost as number,
+    sellPrice: row.sell_price as number,
+    category: row.category as string,
+    source: row.source as Product['source'],
+    viralScore: row.viral_score as number,
+    affiliateLink: row.affiliate_link as string | undefined,
+    imageUrl: row.image_url as string | undefined,
+    createdAt: row.created_at as string,
+  };
+}
+
+function mapSale(row: Record<string, unknown>): Sale {
+  return {
+    id: row.id as string,
+    productId: row.product_id as string,
+    quantity: row.quantity as number,
+    revenue: row.revenue as number,
+    profit: row.profit as number,
+    createdAt: row.created_at as string,
+  };
+}
+
+function mapExpense(row: Record<string, unknown>): Expense {
+  return {
+    id: row.id as string,
+    description: row.description as string,
+    amount: row.amount as number,
+    createdAt: row.created_at as string,
+  };
+}
+
+function mapContent(row: Record<string, unknown>): GeneratedContent {
+  return {
+    id: row.id as string,
+    productId: row.product_id as string,
+    platform: row.platform as string,
+    hook: row.hook as string,
+    caption: row.caption as string,
+    hashtags: row.hashtags as string,
+    viralScore: row.viral_score as number,
+    status: row.status as GeneratedContent['status'],
+    createdAt: row.created_at as string,
+    postedAt: row.posted_at as string | undefined,
+  };
+}
+
+function mapActivity(row: Record<string, unknown>): Activity {
+  return {
+    id: row.id as string,
+    type: row.type as string,
+    message: row.message as string,
+    createdAt: row.created_at as string,
+  };
+}
+
+export { db };
