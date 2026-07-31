@@ -1,9 +1,9 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { Zap, DollarSign, Sparkles, Rocket, Wrench } from 'lucide-react';
+import { Zap, DollarSign, Sparkles, Rocket, BookOpen } from 'lucide-react';
 import AutoPilot from './pages/AutoPilot';
 import RealEarnings from './pages/RealEarnings';
 import ViralCashGenerator from './pages/ViralCashGenerator';
-import SgosTools from './pages/SgosTools';
+import NotionTools from './pages/NotionTools';
 
 function NavItem({ to, icon: Icon, label }: { to: string; icon: typeof Zap; label: string }) {
   return (
@@ -39,21 +39,21 @@ export default function App() {
 
         <nav className="flex flex-col gap-1">
           <NavItem to="/" icon={Zap} label="Money Autopilot" />
-          <NavItem to="/sgos-tools" icon={Wrench} label="SGOS Tools" />
+          <NavItem to="/notion-tools" icon={BookOpen} label="Notion Tools" />
           <NavItem to="/earnings" icon={DollarSign} label="Real Earnings" />
           <NavItem to="/viral" icon={Sparkles} label="Viral Cash Generator" />
         </nav>
 
         <div className="mt-auto card text-xs text-gray-500">
           <p className="text-money-400 font-semibold mb-1">🟢 Engine Running</p>
-          <p>Autopilot discovers products, generates content, and posts automatically.</p>
+          <p>Autopilot handles affiliate products. Notion tools are tracked separately.</p>
         </div>
       </aside>
 
       <main className="flex-1 ml-64 p-6 overflow-auto">
         <Routes>
           <Route path="/" element={<AutoPilot />} />
-          <Route path="/sgos-tools" element={<SgosTools />} />
+          <Route path="/notion-tools" element={<NotionTools />} />
           <Route path="/earnings" element={<RealEarnings />} />
           <Route path="/viral" element={<ViralCashGenerator />} />
         </Routes>

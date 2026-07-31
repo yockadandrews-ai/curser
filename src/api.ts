@@ -23,7 +23,14 @@ export const api = {
     const qs = params.toString();
     return request<import('./types').Product[]>(`/products${qs ? `?${qs}` : ''}`);
   },
-  getSgosInventory: () => request<import('./types').SgosInventory>('/tools/sgos'),
+  getNotionTools: () => request<import('./types').NotionTool[]>('/notion-tools'),
+  getNotionInventory: () => request<import('./types').NotionInventory>('/notion-tools/inventory'),
+  addNotionTool: (data: { name: string; description?: string; category?: string; sellPrice?: number | null; cost?: number | null; stock?: number; notionUrl?: string }) =>
+    request<import('./types').NotionTool>('/notion-tools', { method: 'POST', body: JSON.stringify(data) }),
+  importNotionTools: (names: string[]) =>
+    request<{ imported: number; tools: import('./types').NotionTool[] }>('/notion-tools/import', {
+      method: 'POST', body: JSON.stringify({ names }),
+    }),
   getTopProducts: (limit = 5) => request<import('./types').Product[]>(`/products/top?limit=${limit}`),
   addProduct: (data: { name: string; cost: number; sellPrice: number; category?: string }) =>
     request<import('./types').Product>('/products', { method: 'POST', body: JSON.stringify(data) }),

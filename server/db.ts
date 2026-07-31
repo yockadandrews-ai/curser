@@ -176,14 +176,15 @@ export function saveAutopilotSettings(settings: AutopilotSettings): void {
 }
 
 export function getProducts(filters?: { productType?: string; brand?: string }): Product[] {
-  let rows = db.prepare('SELECT * FROM products ORDER BY viral_score DESC, created_at DESC').all().map(row => mapProduct(row as Record<string, unknown>));
+  // Affiliate/autopilot products only — Notion tools live in a separate table
+  let rows = db.prepare(`
+    SELECT * FROM products
+    WHERE brand != 'sgos' AND product_type != 'tool'
+    ORDER BY viral_score DESC, created_at DESC
+  `).all().map(row => mapProduct(row as Record<string, unknown>));
   if (filters?.productType) rows = rows.filter(p => p.productType === filters.productType);
   if (filters?.brand) rows = rows.filter(p => p.brand === filters.brand);
   return rows;
-}
-
-export function getSgosToolsFromDb(): Product[] {
-  return getProducts({ productType: 'tool', brand: 'sgos' });
 }
 
 export function getProduct(id: string): Product | undefined {
@@ -312,9 +313,6 @@ export function getStats() {
   const postedCount = content.filter(c => c.status === 'posted').length;
   const queuedCount = content.filter(c => c.status === 'queued').length;
 
-  const sgosTools = products.filter(p => p.brand === 'sgos');
-  const topTools = sgosTools.sort((a, b) => (b.unitsSold ?? 0) - (a.unitsSold ?? 0)).slice(0, 5);
-
   return {
     totalRevenue,
     totalProfit,
@@ -323,13 +321,10 @@ export function getStats() {
     monthlyProfit,
     totalSales: sales.length,
     productsTracked: products.length,
-    sgosToolsCount: sgosTools.length,
-    sgosToolsSold: sgosTools.reduce((s, t) => s + (t.unitsSold ?? 0), 0),
     contentGenerated: content.length,
     postsPublished: postedCount,
     postsQueued: queuedCount,
     topProducts: products.slice(0, 5),
-    topTools,
   };
 }
 

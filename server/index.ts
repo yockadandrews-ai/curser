@@ -7,20 +7,25 @@ import {
   getProducts, getProduct, addProduct, updateProduct, deleteProduct,
   getSales, addSale, getExpenses, addExpense,
   getContent, addContent, getActivity, getStats,
-  getAutopilotSettings, saveAutopilotSettings, recordToolSale,
+  getAutopilotSettings, saveAutopilotSettings,
 } from './db.js';
 import { discoverTopProducts, getTopProducts } from './services/productDiscovery.js';
 import { generateContentForProduct, generateAndSaveContent, generateWithAI } from './services/contentGenerator.js';
 import { publishQueuedPosts, getSocialStatus } from './services/socialPoster.js';
 import { runAutopilotCycle, getAutopilotStatus, startAutopilotScheduler, stopAutopilotScheduler } from './autopilot.js';
-import { seedSgosTools, getSgosInventorySummary } from './data/sgosTools.js';
+import {
+  getNotionTools, getNotionTool, addNotionTool, updateNotionTool, deleteNotionTool,
+  importNotionTools, getNotionInventorySummary, recordNotionToolSale, cleanupMixedSgosProducts,
+} from './notionTools.js';
+import { db } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Load SGOS tools inventory on startup
-seedSgosTools();
+// Remove SGOS tools that were incorrectly mixed into affiliate products
+const removed = cleanupMixedSgosProducts(db);
+if (removed > 0) console.log(`[Cleanup] Removed ${removed} SGOS tools from affiliate products (now separate)`);
 
 app.use(cors());
 app.use(express.json());
@@ -38,7 +43,52 @@ app.get('/api/products', (req, res) => {
   const brand = req.query.brand as string | undefined;
   res.json(getProducts({ productType, brand }));
 });
-app.get('/api/tools/sgos', (_req, res) => res.json(getSgosInventorySummary()));
+app.get('/api/tools/sgos', (_req, res) => res.json(getNotionInventorySummary()));
+
+// Notion / Kimi3 tools inventory — completely separate from Money Autopilot products
+app.get('/api/notion-tools', (_req, res) => res.json(getNotionTools()));
+app.get('/api/notion-tools/inventory', (_req, res) => res.json(getNotionInventorySummary()));
+app.post('/api/notion-tools', (req, res) => {
+  const { name, description, category, sellPrice, cost, stock, notionUrl } = req.body;
+  if (!name) return res.status(400).json({ error: 'name required' });
+  const tool = addNotionTool({
+    id: uuidv4(),
+    name,
+    description,
+    category,
+    sellPrice: sellPrice != null ? Number(sellPrice) : null,
+    cost: cost != null ? Number(cost) : null,
+    stock: stock != null ? Number(stock) : 0,
+    notionUrl,
+  });
+  res.json(tool);
+});
+app.put('/api/notion-tools/:id', (req, res) => {
+  const tool = updateNotionTool(req.params.id, req.body);
+  if (!tool) return res.status(404).json({ error: 'Not found' });
+  res.json(tool);
+});
+app.delete('/api/notion-tools/:id', (req, res) => {
+  deleteNotionTool(req.params.id);
+  res.json({ ok: true });
+});
+app.post('/api/notion-tools/import', (req, res) => {
+  const { names } = req.body;
+  if (!Array.isArray(names)) return res.status(400).json({ error: 'names array required' });
+  const imported = importNotionTools(names);
+  res.json({ imported: imported.length, tools: imported });
+});
+app.post('/api/notion-tools/:id/sell', (req, res) => {
+  const tool = getNotionTool(req.params.id);
+  if (!tool) return res.status(404).json({ error: 'Tool not found' });
+  if (tool.sellPrice == null) return res.status(400).json({ error: 'No price set for this tool yet' });
+  const qty = Number(req.body.quantity) || 1;
+  const revenue = tool.sellPrice * qty;
+  const profit = ((tool.sellPrice ?? 0) - (tool.cost ?? 0)) * qty;
+  const sale = addSale({ id: uuidv4(), productId: req.params.id, quantity: qty, revenue, profit });
+  recordNotionToolSale(req.params.id, qty);
+  res.json(sale);
+});
 app.get('/api/products/top', (req, res) => {
   const limit = parseInt(req.query.limit as string) || 5;
   res.json(getTopProducts(limit));
@@ -89,19 +139,9 @@ app.post('/api/sales', (req, res) => {
   const product = getProduct(productId);
   if (!product) return res.status(404).json({ error: 'Product not found' });
   const qty = Number(quantity) || 1;
-
-  if (product.productType === 'tool' && product.stock != null && product.stock < qty) {
-    return res.status(400).json({ error: `Insufficient stock. Only ${product.stock} left.` });
-  }
-
   const revenue = product.sellPrice * qty;
   const profit = (product.sellPrice - product.cost) * qty;
   const sale = addSale({ id: uuidv4(), productId, quantity: qty, revenue, profit });
-
-  if (product.productType === 'tool') {
-    recordToolSale(productId, qty);
-  }
-
   res.json(sale);
 });
 

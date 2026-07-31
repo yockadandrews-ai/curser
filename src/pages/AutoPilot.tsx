@@ -165,8 +165,8 @@ export default function AutoPilot() {
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Monthly Profit" value={`$${(stats?.monthlyProfit ?? 0).toFixed(2)}`} icon={TrendingUp} sub="This month" />
-        <StatCard label="SGOS Tools Sold" value={String(stats?.sgosToolsSold ?? 0)} icon={Package} sub={`${stats?.sgosToolsCount ?? 0} tools in catalog`} />
         <StatCard label="Net Profit" value={`$${(stats?.netProfit ?? 0).toFixed(2)}`} icon={DollarSign} sub="All time" />
+        <StatCard label="Products Tracked" value={String(stats?.productsTracked ?? 0)} icon={Package} sub="Affiliate only" />
         <StatCard label="Posts Published" value={String(stats?.postsPublished ?? 0)} icon={Send} sub={`${stats?.postsQueued ?? 0} queued`} />
       </div>
 
@@ -176,7 +176,7 @@ export default function AutoPilot() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-white flex items-center gap-2">
               <Target size={18} className="text-money-400" />
-              Top Sellers (SGOS Tools First)
+              Top 5 Winning Products
             </h2>
             <button onClick={handleDiscover} disabled={running} className="text-xs btn-secondary py-1 px-2">
               Auto-Discover
@@ -192,19 +192,13 @@ export default function AutoPilot() {
             <div className="space-y-3">
               {topProducts.map((p, i) => {
                 const profit = p.sellPrice - p.cost;
-                const isTool = p.productType === 'tool' && p.brand === 'sgos';
                 return (
                   <div key={p.id} className="flex items-center gap-3 p-3 bg-dark-800/50 rounded-lg">
                     <span className="text-money-400 font-bold w-6">#{i + 1}</span>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white truncate flex items-center gap-2">
-                        {p.name}
-                        {isTool && <span className="badge-green text-xs">SGOS</span>}
-                      </p>
+                      <p className="font-medium text-white truncate">{p.name}</p>
                       <p className="text-xs text-gray-500">
-                        {isTool
-                          ? `$${p.sellPrice.toFixed(0)}/tool · ${p.unitsSold ?? 0} sold · ${p.stock ?? 0} stock`
-                          : `$${p.cost.toFixed(2)} → $${p.sellPrice.toFixed(2)} · $${profit.toFixed(2)} profit`}
+                        ${p.cost.toFixed(2)} → ${p.sellPrice.toFixed(2)} · ${profit.toFixed(2)} profit
                       </p>
                     </div>
                     <div className="text-right">

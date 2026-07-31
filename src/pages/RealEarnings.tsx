@@ -141,18 +141,12 @@ export default function RealEarnings() {
                 {products.map(p => {
                   const profit = p.sellPrice - p.cost;
                   const margin = p.cost > 0 ? ((profit / p.cost) * 100).toFixed(0) : '∞';
-                  const isTool = p.productType === 'tool' && p.brand === 'sgos';
                   return (
                     <tr key={p.id} className="border-b border-gray-800/50 hover:bg-dark-800/30">
-                      <td className="py-3 font-medium text-white">
-                        {p.name}
-                        {isTool && <span className="ml-2 badge-green text-xs">SGOS tool</span>}
-                      </td>
+                      <td className="py-3 font-medium text-white">{p.name}</td>
                       <td className="py-3 text-right text-gray-400">${p.cost.toFixed(2)}</td>
-                      <td className="py-3 text-right text-gray-300">${p.sellPrice.toFixed(2)}{isTool ? '/tool' : ''}</td>
-                      <td className="py-3 text-right text-money-400">
-                        {isTool ? `${p.unitsSold ?? 0} sold` : `$${profit.toFixed(2)} (${margin}%)`}
-                      </td>
+                      <td className="py-3 text-right text-gray-300">${p.sellPrice.toFixed(2)}</td>
+                      <td className="py-3 text-right text-money-400">${profit.toFixed(2)} ({margin}%)</td>
                       <td className="py-3 text-right"><span className="badge-green">{p.viralScore}</span></td>
                       <td className="py-3 text-right">
                         <span className={p.source === 'discovered' ? 'badge-blue' : 'badge-yellow'}>{p.source}</span>

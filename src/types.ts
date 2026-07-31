@@ -60,21 +60,33 @@ export interface Stats {
   monthlyProfit: number;
   totalSales: number;
   productsTracked: number;
-  sgosToolsCount?: number;
-  sgosToolsSold?: number;
   contentGenerated: number;
   postsPublished: number;
   postsQueued: number;
   topProducts: Product[];
-  topTools?: Product[];
 }
 
-export interface SgosInventory {
+export interface NotionTool {
+  id: string;
+  name: string;
+  description?: string;
+  category?: string;
+  sellPrice?: number | null;
+  cost?: number | null;
+  stock?: number;
+  unitsSold?: number;
+  notionUrl?: string;
+  createdAt: string;
+}
+
+export interface NotionInventory {
   totalTools: number;
+  pricedTools: number;
+  unpricedTools: number;
   totalStock: number;
   totalSold: number;
-  totalRevenuePotential: number;
-  tools: Product[];
+  hasPriceList: boolean;
+  tools: NotionTool[];
 }
 
 export interface AutopilotSettings {
