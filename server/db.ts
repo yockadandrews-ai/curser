@@ -8,11 +8,16 @@ const dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/autopilot
 export interface Product {
   id: string;
   name: string;
+  description?: string;
   cost: number;
   sellPrice: number;
   category: string;
-  source: 'manual' | 'discovered';
+  productType: 'tool' | 'product';
+  brand: 'sgos' | 'other';
+  source: 'manual' | 'discovered' | 'inventory';
   viralScore: number;
+  stock?: number;
+  unitsSold?: number;
   affiliateLink?: string;
   imageUrl?: string;
   createdAt: string;
@@ -79,6 +84,11 @@ db.exec(`
     viral_score REAL DEFAULT 0,
     affiliate_link TEXT,
     image_url TEXT,
+    product_type TEXT DEFAULT 'product',
+    brand TEXT DEFAULT 'other',
+    stock INTEGER DEFAULT 0,
+    units_sold INTEGER DEFAULT 0,
+    description TEXT DEFAULT '',
     created_at TEXT NOT NULL
   );
 
@@ -126,6 +136,15 @@ db.exec(`
   );
 `);
 
+// Migrate existing DB — add SGOS tool columns if missing
+const productCols = db.prepare("PRAGMA table_info(products)").all() as { name: string }[];
+const colNames = new Set(productCols.map(c => c.name));
+if (!colNames.has('product_type')) db.exec("ALTER TABLE products ADD COLUMN product_type TEXT DEFAULT 'product'");
+if (!colNames.has('brand')) db.exec("ALTER TABLE products ADD COLUMN brand TEXT DEFAULT 'other'");
+if (!colNames.has('stock')) db.exec("ALTER TABLE products ADD COLUMN stock INTEGER DEFAULT 0");
+if (!colNames.has('units_sold')) db.exec("ALTER TABLE products ADD COLUMN units_sold INTEGER DEFAULT 0");
+if (!colNames.has('description')) db.exec("ALTER TABLE products ADD COLUMN description TEXT DEFAULT ''");
+
 function getSetting<T>(key: string, defaultValue: T): T {
   const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
   if (!row) return defaultValue;
@@ -156,8 +175,15 @@ export function saveAutopilotSettings(settings: AutopilotSettings): void {
   setSetting('autopilot', settings);
 }
 
-export function getProducts(): Product[] {
-  return db.prepare('SELECT * FROM products ORDER BY viral_score DESC, created_at DESC').all().map(row => mapProduct(row as Record<string, unknown>));
+export function getProducts(filters?: { productType?: string; brand?: string }): Product[] {
+  let rows = db.prepare('SELECT * FROM products ORDER BY viral_score DESC, created_at DESC').all().map(row => mapProduct(row as Record<string, unknown>));
+  if (filters?.productType) rows = rows.filter(p => p.productType === filters.productType);
+  if (filters?.brand) rows = rows.filter(p => p.brand === filters.brand);
+  return rows;
+}
+
+export function getSgosToolsFromDb(): Product[] {
+  return getProducts({ productType: 'tool', brand: 'sgos' });
 }
 
 export function getProduct(id: string): Product | undefined {
@@ -168,11 +194,14 @@ export function getProduct(id: string): Product | undefined {
 export function addProduct(product: Omit<Product, 'createdAt'> & { createdAt?: string }): Product {
   const createdAt = product.createdAt || new Date().toISOString();
   db.prepare(`
-    INSERT INTO products (id, name, cost, sell_price, category, source, viral_score, affiliate_link, image_url, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO products (id, name, cost, sell_price, category, source, viral_score, affiliate_link, image_url, created_at,
+      product_type, brand, stock, units_sold, description)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     product.id, product.name, product.cost, product.sellPrice, product.category,
-    product.source, product.viralScore, product.affiliateLink || null, product.imageUrl || null, createdAt
+    product.source, product.viralScore, product.affiliateLink || null, product.imageUrl || null, createdAt,
+    product.productType || 'product', product.brand || 'other',
+    product.stock ?? 0, product.unitsSold ?? 0, product.description || ''
   );
   return { ...product, createdAt } as Product;
 }
@@ -182,10 +211,24 @@ export function updateProduct(id: string, updates: Partial<Product>): Product | 
   if (!existing) return undefined;
   const merged = { ...existing, ...updates, id };
   db.prepare(`
-    UPDATE products SET name=?, cost=?, sell_price=?, category=?, source=?, viral_score=?, affiliate_link=?, image_url=?
+    UPDATE products SET name=?, cost=?, sell_price=?, category=?, source=?, viral_score=?, affiliate_link=?, image_url=?,
+      product_type=?, brand=?, stock=?, units_sold=?, description=?
     WHERE id=?
-  `).run(merged.name, merged.cost, merged.sellPrice, merged.category, merged.source, merged.viralScore, merged.affiliateLink || null, merged.imageUrl || null, id);
+  `).run(
+    merged.name, merged.cost, merged.sellPrice, merged.category, merged.source, merged.viralScore,
+    merged.affiliateLink || null, merged.imageUrl || null,
+    merged.productType || 'product', merged.brand || 'other',
+    merged.stock ?? 0, merged.unitsSold ?? 0, merged.description || '', id
+  );
   return merged;
+}
+
+export function recordToolSale(productId: string, quantity: number): Product | undefined {
+  const product = getProduct(productId);
+  if (!product) return undefined;
+  const newStock = Math.max(0, (product.stock ?? 0) - quantity);
+  const newSold = (product.unitsSold ?? 0) + quantity;
+  return updateProduct(productId, { stock: newStock, unitsSold: newSold });
 }
 
 export function deleteProduct(id: string): void {
@@ -269,6 +312,9 @@ export function getStats() {
   const postedCount = content.filter(c => c.status === 'posted').length;
   const queuedCount = content.filter(c => c.status === 'queued').length;
 
+  const sgosTools = products.filter(p => p.brand === 'sgos');
+  const topTools = sgosTools.sort((a, b) => (b.unitsSold ?? 0) - (a.unitsSold ?? 0)).slice(0, 5);
+
   return {
     totalRevenue,
     totalProfit,
@@ -277,10 +323,13 @@ export function getStats() {
     monthlyProfit,
     totalSales: sales.length,
     productsTracked: products.length,
+    sgosToolsCount: sgosTools.length,
+    sgosToolsSold: sgosTools.reduce((s, t) => s + (t.unitsSold ?? 0), 0),
     contentGenerated: content.length,
     postsPublished: postedCount,
     postsQueued: queuedCount,
     topProducts: products.slice(0, 5),
+    topTools,
   };
 }
 
@@ -288,11 +337,16 @@ function mapProduct(row: Record<string, unknown>): Product {
   return {
     id: row.id as string,
     name: row.name as string,
+    description: (row.description as string) || undefined,
     cost: row.cost as number,
     sellPrice: row.sell_price as number,
     category: row.category as string,
+    productType: (row.product_type as Product['productType']) || 'product',
+    brand: (row.brand as Product['brand']) || 'other',
     source: row.source as Product['source'],
     viralScore: row.viral_score as number,
+    stock: row.stock as number | undefined,
+    unitsSold: row.units_sold as number | undefined,
     affiliateLink: row.affiliate_link as string | undefined,
     imageUrl: row.image_url as string | undefined,
     createdAt: row.created_at as string,

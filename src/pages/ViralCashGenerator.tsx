@@ -158,9 +158,10 @@ export default function ViralCashGenerator() {
               >
                 {products.map(p => {
                   const pProfit = p.sellPrice - p.cost;
+                  const isTool = p.productType === 'tool' && p.brand === 'sgos';
                   return (
                     <option key={p.id} value={p.id}>
-                      {p.name} — ${pProfit.toFixed(2)} profit (score: {p.viralScore})
+                      {isTool ? '🛠️ ' : ''}{p.name} — {isTool ? `$${p.sellPrice.toFixed(0)}/tool` : `$${pProfit.toFixed(2)} profit`} (score: {p.viralScore})
                     </option>
                   );
                 })}

@@ -13,22 +13,45 @@ const HOOKS = [
   'I tested this for 30 days — here are the results',
 ];
 
+const TOOL_HOOKS = [
+  'This tool literally runs your business while you sleep',
+  'POV: You finally found the tool that prints money',
+  'Stop doing this manually — use this instead',
+  'I made $${profit} this week with ONE tool',
+  'Why is nobody talking about this tool??',
+  'This SGOS tool changed my entire side hustle',
+];
+
 const CAPTION_TEMPLATES: Record<string, (p: Product, profit: number) => string> = {
-  tiktok: (p, profit) =>
-    `${p.name} is literally printing money right now 💰\n\n` +
-    `Cost: $${p.cost.toFixed(2)} → Sell: $${p.sellPrice.toFixed(2)}\n` +
-    `Profit per sale: $${profit.toFixed(2)} 🔥\n\n` +
-    `Link in bio 👆 #sidehustle #makemoneyonline`,
-  instagram: (p, profit) =>
-    `✨ ${p.name} ✨\n\n` +
-    `This product has a ${Math.round((profit / p.cost) * 100)}% profit margin!\n\n` +
-    `💵 Buy: $${p.cost.toFixed(2)}\n💰 Sell: $${p.sellPrice.toFixed(2)}\n📈 Profit: $${profit.toFixed(2)}/sale\n\n` +
-    `Drop a 🔥 if you want the supplier link!`,
-  twitter: (p, profit) =>
-    `Just found a product doing $${profit.toFixed(0)} profit per sale:\n\n` +
-    `${p.name}\n` +
-    `Cost: $${p.cost.toFixed(2)} | Sell: $${p.sellPrice.toFixed(2)}\n\n` +
-    `This is the kind of margin that builds real income. 🧵`,
+  tiktok: (p, profit) => {
+    if (p.productType === 'tool') {
+      return `🛠️ ${p.name} — $${p.sellPrice.toFixed(0)}/tool\n\n${p.description || 'The tool side hustlers are using to automate income.'}\n\n` +
+        `${(p.stock ?? 0) > 0 ? `${p.stock} left in stock — grab yours 👆` : 'Get yours now 👆'}\n\n#sgos #sidehustle #tools`;
+    }
+    return `${p.name} is literally printing money right now 💰\n\n` +
+      `Cost: $${p.cost.toFixed(2)} → Sell: $${p.sellPrice.toFixed(2)}\n` +
+      `Profit per sale: $${profit.toFixed(2)} 🔥\n\n` +
+      `Link in bio 👆 #sidehustle #makemoneyonline`;
+  },
+  instagram: (p, profit) => {
+    if (p.productType === 'tool') {
+      return `✨ SGOS Tool: ${p.name} ✨\n\n${p.description || ''}\n\n` +
+        `💰 Price: $${p.sellPrice.toFixed(2)} per tool\n📦 ${p.unitsSold ?? 0} sold · ${p.stock ?? 0} in stock\n\n` +
+        `Comment "TOOL" for the link!`;
+    }
+    const marginPct = p.cost > 0 ? Math.round((profit / p.cost) * 100) : 100;
+    return `✨ ${p.name} ✨\n\nThis product has a ${marginPct}% profit margin!\n\n` +
+      `💵 Buy: $${p.cost.toFixed(2)}\n💰 Sell: $${p.sellPrice.toFixed(2)}\n📈 Profit: $${profit.toFixed(2)}/sale\n\n` +
+      `Drop a 🔥 if you want the supplier link!`;
+  },
+  twitter: (p, profit) => {
+    if (p.productType === 'tool') {
+      return `New SGOS tool drop 🛠️\n\n${p.name} — $${p.sellPrice.toFixed(0)}/tool\n${p.description || ''}\n\n${p.unitsSold ?? 0} sold so far. Link in bio.`;
+    }
+    return `Just found a product doing $${profit.toFixed(0)} profit per sale:\n\n` +
+      `${p.name}\nCost: $${p.cost.toFixed(2)} | Sell: $${p.sellPrice.toFixed(2)}\n\n` +
+      `This is the kind of margin that builds real income. 🧵`;
+  },
   facebook: (p, profit) =>
     `🚀 Product Alert: ${p.name}\n\n` +
     `I've been researching profitable products and this one stands out:\n\n` +
@@ -79,7 +102,8 @@ export function generateContentForProduct(product: Product, platforms: string[])
 
   for (const platform of platforms) {
     const template = CAPTION_TEMPLATES[platform] || CAPTION_TEMPLATES.tiktok;
-    const hook = pickRandom(HOOKS).replace('${profit}', profit.toFixed(0));
+    const hooks = product.productType === 'tool' ? TOOL_HOOKS : HOOKS;
+    const hook = pickRandom(hooks).replace('${profit}', profit.toFixed(0));
     const caption = template(product, profit);
     const tags = (HASHTAG_SETS[platform] || HASHTAG_SETS.tiktok).join(' ');
     const viralScore = calculateContentViralScore(product, platform);

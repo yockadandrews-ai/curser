@@ -16,7 +16,14 @@ export const api = {
   getStats: () => request<import('./types').Stats>('/stats'),
   getActivity: (limit = 50) => request<import('./types').Activity[]>(`/activity?limit=${limit}`),
 
-  getProducts: () => request<import('./types').Product[]>('/products'),
+  getProducts: (filters?: { type?: string; brand?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.type) params.set('type', filters.type);
+    if (filters?.brand) params.set('brand', filters.brand);
+    const qs = params.toString();
+    return request<import('./types').Product[]>(`/products${qs ? `?${qs}` : ''}`);
+  },
+  getSgosInventory: () => request<import('./types').SgosInventory>('/tools/sgos'),
   getTopProducts: (limit = 5) => request<import('./types').Product[]>(`/products/top?limit=${limit}`),
   addProduct: (data: { name: string; cost: number; sellPrice: number; category?: string }) =>
     request<import('./types').Product>('/products', { method: 'POST', body: JSON.stringify(data) }),

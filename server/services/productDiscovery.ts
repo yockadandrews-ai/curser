@@ -96,6 +96,8 @@ export async function discoverTopProducts(niche: string, limit = 5): Promise<Pro
       cost: candidate.cost,
       sellPrice: candidate.sellPrice,
       category: candidate.category,
+      productType: 'product',
+      brand: 'other',
       source: 'discovered',
       viralScore: candidate.viralScore,
       affiliateLink: candidate.affiliateLink,
@@ -108,11 +110,20 @@ export async function discoverTopProducts(niche: string, limit = 5): Promise<Pro
 }
 
 export function getTopProducts(limit = 5): Product[] {
-  return getProducts()
-    .sort((a: Product, b: Product) => {
-      const marginA = a.sellPrice - a.cost;
-      const marginB = b.sellPrice - b.cost;
-      return (b.viralScore + marginB) - (a.viralScore + marginA);
-    })
-    .slice(0, limit);
+  const sgosTools = getProducts().filter(p => p.brand === 'sgos' && p.productType === 'tool');
+  const others = getProducts().filter(p => !(p.brand === 'sgos' && p.productType === 'tool'));
+
+  const sortedTools = sgosTools.sort((a: Product, b: Product) => {
+    const scoreA = a.viralScore + (a.unitsSold ?? 0) * 2;
+    const scoreB = b.viralScore + (b.unitsSold ?? 0) * 2;
+    return scoreB - scoreA;
+  });
+
+  const sortedOthers = others.sort((a: Product, b: Product) => {
+    const marginA = a.sellPrice - a.cost;
+    const marginB = b.sellPrice - b.cost;
+    return (b.viralScore + marginB) - (a.viralScore + marginA);
+  });
+
+  return [...sortedTools, ...sortedOthers].slice(0, limit);
 }

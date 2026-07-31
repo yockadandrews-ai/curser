@@ -1,11 +1,16 @@
 export interface Product {
   id: string;
   name: string;
+  description?: string;
   cost: number;
   sellPrice: number;
   category: string;
-  source: 'manual' | 'discovered';
+  productType: 'tool' | 'product';
+  brand: 'sgos' | 'other';
+  source: 'manual' | 'discovered' | 'inventory';
   viralScore: number;
+  stock?: number;
+  unitsSold?: number;
   affiliateLink?: string;
   imageUrl?: string;
   createdAt: string;
@@ -55,10 +60,21 @@ export interface Stats {
   monthlyProfit: number;
   totalSales: number;
   productsTracked: number;
+  sgosToolsCount?: number;
+  sgosToolsSold?: number;
   contentGenerated: number;
   postsPublished: number;
   postsQueued: number;
   topProducts: Product[];
+  topTools?: Product[];
+}
+
+export interface SgosInventory {
+  totalTools: number;
+  totalStock: number;
+  totalSold: number;
+  totalRevenuePotential: number;
+  tools: Product[];
 }
 
 export interface AutopilotSettings {

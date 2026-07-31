@@ -7,16 +7,20 @@ import {
   getProducts, getProduct, addProduct, updateProduct, deleteProduct,
   getSales, addSale, getExpenses, addExpense,
   getContent, addContent, getActivity, getStats,
-  getAutopilotSettings, saveAutopilotSettings,
+  getAutopilotSettings, saveAutopilotSettings, recordToolSale,
 } from './db.js';
 import { discoverTopProducts, getTopProducts } from './services/productDiscovery.js';
 import { generateContentForProduct, generateAndSaveContent, generateWithAI } from './services/contentGenerator.js';
 import { publishQueuedPosts, getSocialStatus } from './services/socialPoster.js';
 import { runAutopilotCycle, getAutopilotStatus, startAutopilotScheduler, stopAutopilotScheduler } from './autopilot.js';
+import { seedSgosTools, getSgosInventorySummary } from './data/sgosTools.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Load SGOS tools inventory on startup
+seedSgosTools();
 
 app.use(cors());
 app.use(express.json());
@@ -29,7 +33,12 @@ app.get('/api/activity', (req, res) => {
 });
 
 // Products
-app.get('/api/products', (_req, res) => res.json(getProducts()));
+app.get('/api/products', (req, res) => {
+  const productType = req.query.type as string | undefined;
+  const brand = req.query.brand as string | undefined;
+  res.json(getProducts({ productType, brand }));
+});
+app.get('/api/tools/sgos', (_req, res) => res.json(getSgosInventorySummary()));
 app.get('/api/products/top', (req, res) => {
   const limit = parseInt(req.query.limit as string) || 5;
   res.json(getTopProducts(limit));
@@ -40,7 +49,7 @@ app.get('/api/products/:id', (req, res) => {
   res.json(product);
 });
 app.post('/api/products', (req, res) => {
-  const { name, cost, sellPrice, category, affiliateLink, imageUrl } = req.body;
+  const { name, cost, sellPrice, category, affiliateLink, imageUrl, productType, brand, stock, description } = req.body;
   if (!name || cost == null || sellPrice == null) {
     return res.status(400).json({ error: 'name, cost, sellPrice required' });
   }
@@ -52,6 +61,10 @@ app.post('/api/products', (req, res) => {
     cost: Number(cost),
     sellPrice: Number(sellPrice),
     category: category || 'general',
+    productType: productType || 'product',
+    brand: brand || 'other',
+    stock: stock != null ? Number(stock) : 0,
+    description,
     source: 'manual',
     viralScore,
     affiliateLink,
@@ -76,9 +89,19 @@ app.post('/api/sales', (req, res) => {
   const product = getProduct(productId);
   if (!product) return res.status(404).json({ error: 'Product not found' });
   const qty = Number(quantity) || 1;
+
+  if (product.productType === 'tool' && product.stock != null && product.stock < qty) {
+    return res.status(400).json({ error: `Insufficient stock. Only ${product.stock} left.` });
+  }
+
   const revenue = product.sellPrice * qty;
   const profit = (product.sellPrice - product.cost) * qty;
   const sale = addSale({ id: uuidv4(), productId, quantity: qty, revenue, profit });
+
+  if (product.productType === 'tool') {
+    recordToolSale(productId, qty);
+  }
+
   res.json(sale);
 });
 
