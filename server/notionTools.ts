@@ -132,7 +132,13 @@ export function recordNotionToolSale(id: string, quantity = 1): NotionTool | und
 
 /** Remove SGOS tools that were incorrectly mixed into the affiliate products table */
 export function cleanupMixedSgosProducts(dbMain: Database.Database): number {
-  const result = dbMain.prepare("DELETE FROM products WHERE brand = 'sgos' OR product_type = 'tool'").run();
+  const ids = dbMain.prepare("SELECT id FROM products WHERE brand = 'sgos' OR product_type = 'tool'").all() as { id: string }[];
+  if (ids.length === 0) return 0;
+  const idList = ids.map(r => r.id);
+  const placeholders = idList.map(() => '?').join(',');
+  dbMain.prepare(`DELETE FROM content WHERE product_id IN (${placeholders})`).run(...idList);
+  dbMain.prepare(`DELETE FROM sales WHERE product_id IN (${placeholders})`).run(...idList);
+  const result = dbMain.prepare(`DELETE FROM products WHERE id IN (${placeholders})`).run(...idList);
   return result.changes;
 }
 
