@@ -141,7 +141,8 @@ Start with any single portal at standalone pricing. Upgrade to the full OS anyti
 }
 
 function runQualityGate(app: AppDefinition): QualityCheck {
-  const hasMetric = /\d+%|\d+x|\d+–\d+|\d+-\d+|\$\d|higher|faster|more|reduce|reduced|increase|better|safer|improve/i.test(app.successMetric);
+  const hasMetric = /\d+%|\d+x|\d+[\s–-]\d+|\$\d+|\d+\s*\+|\d+\s*(hrs|hours|days|weeks|min)/i.test(app.successMetric)
+    || /higher|faster|more|reduce|reduced|increase|better|safer|improve|minutes vs/i.test(app.successMetric);
   const hasPricing = /\$|credits|\/mo|per-/i.test(app.suggestedPricing);
   const explainable = app.oneLinePromise.length < 140;
 
@@ -391,6 +392,17 @@ export function generateThreeThemePackage(): MultiThemeRun {
     'Margin & Operations',
     'Acquisition & Lead Systems',
   ]);
+}
+
+/** Generate all five themes — full Sovereign Growth OS daily factory output */
+export function generateFiveThemePackage(): MultiThemeRun {
+  return generateMultiThemeRun([
+    'Conversion & Revenue',
+    'Margin & Operations',
+    'Acquisition & Lead Systems',
+    'Governance & Trust',
+    'Growth Infrastructure',
+  ], 'Five_Themes');
 }
 
 export { FACTORY_THEMES, getThemeForDay } from './themes.js';

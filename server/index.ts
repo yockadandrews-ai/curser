@@ -19,7 +19,7 @@ import {
 } from './notionTools.js';
 import {
   generateDailyRun, getFactoryRuns, getFactoryRun, FACTORY_THEMES, getThemeForDay, OUTPUT_ROOT,
-  generateMultiThemeRun, generateThreeThemePackage, getMultiThemeRuns, getMultiThemeRun,
+  generateMultiThemeRun, generateThreeThemePackage, generateFiveThemePackage, getMultiThemeRuns, getMultiThemeRun,
 } from './factory/generator.js';
 import { db } from './db.js';
 
@@ -253,6 +253,10 @@ app.post('/api/factory/run', (req, res) => {
 });
 app.post('/api/factory/run-three', (_req, res) => {
   const run = generateThreeThemePackage();
+  res.json(run);
+});
+app.post('/api/factory/run-five', (_req, res) => {
+  const run = generateFiveThemePackage();
   res.json(run);
 });
 app.post('/api/factory/run-multi', (req, res) => {
