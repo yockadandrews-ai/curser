@@ -1,9 +1,10 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { Zap, DollarSign, Sparkles, Rocket, BookOpen } from 'lucide-react';
+import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory } from 'lucide-react';
 import AutoPilot from './pages/AutoPilot';
 import RealEarnings from './pages/RealEarnings';
 import ViralCashGenerator from './pages/ViralCashGenerator';
 import NotionTools from './pages/NotionTools';
+import DailyFactory from './pages/DailyFactory';
 
 function NavItem({ to, icon: Icon, label }: { to: string; icon: typeof Zap; label: string }) {
   return (
@@ -39,6 +40,7 @@ export default function App() {
 
         <nav className="flex flex-col gap-1">
           <NavItem to="/" icon={Zap} label="Money Autopilot" />
+          <NavItem to="/factory" icon={Factory} label="Daily Factory" />
           <NavItem to="/notion-tools" icon={BookOpen} label="Notion Tools" />
           <NavItem to="/earnings" icon={DollarSign} label="Real Earnings" />
           <NavItem to="/viral" icon={Sparkles} label="Viral Cash Generator" />
@@ -53,6 +55,7 @@ export default function App() {
       <main className="flex-1 ml-64 p-6 overflow-auto">
         <Routes>
           <Route path="/" element={<AutoPilot />} />
+          <Route path="/factory" element={<DailyFactory />} />
           <Route path="/notion-tools" element={<NotionTools />} />
           <Route path="/earnings" element={<RealEarnings />} />
           <Route path="/viral" element={<ViralCashGenerator />} />

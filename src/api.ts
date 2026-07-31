@@ -76,4 +76,13 @@ export const api = {
 
   publishPosts: () => request<unknown[]>('/post/publish', { method: 'POST' }),
   getSocialStatus: () => request<{ mode: string; tiktok: boolean; instagram: boolean; twitter: boolean; openai: boolean }>('/post/status'),
+
+  getFactoryThemes: () => request<import('./types/factory').FactoryThemesResponse>('/factory/themes'),
+  getFactoryRuns: () => request<import('./types/factory').DailyRun[]>('/factory/runs'),
+  getFactoryRun: (id: string) => request<import('./types/factory').DailyRun>(`/factory/runs/${id}`),
+  runFactory: (theme?: string) =>
+    request<import('./types/factory').DailyRun>('/factory/run', {
+      method: 'POST',
+      body: JSON.stringify({ theme }),
+    }),
 };

@@ -17,6 +17,9 @@ import {
   getNotionTools, getNotionTool, addNotionTool, updateNotionTool, deleteNotionTool,
   importNotionTools, getNotionInventorySummary, recordNotionToolSale, cleanupMixedSgosProducts,
 } from './notionTools.js';
+import {
+  generateDailyRun, getFactoryRuns, getFactoryRun, FACTORY_THEMES, getThemeForDay, OUTPUT_ROOT,
+} from './factory/generator.js';
 import { db } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -231,6 +234,23 @@ app.post('/api/autopilot/stop', (_req, res) => {
   stopAutopilotScheduler();
   res.json(getAutopilotStatus());
 });
+
+// Daily Factory — 5 apps + 5 proposals per day
+app.get('/api/factory/themes', (_req, res) => {
+  res.json({ themes: FACTORY_THEMES, suggestedToday: getThemeForDay() });
+});
+app.get('/api/factory/runs', (_req, res) => res.json(getFactoryRuns()));
+app.get('/api/factory/runs/:id', (req, res) => {
+  const run = getFactoryRun(req.params.id);
+  if (!run) return res.status(404).json({ error: 'Run not found' });
+  res.json(run);
+});
+app.post('/api/factory/run', (req, res) => {
+  const theme = req.body.theme;
+  const run = generateDailyRun(theme);
+  res.json(run);
+});
+app.get('/api/factory/output-root', (_req, res) => res.json({ path: OUTPUT_ROOT }));
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');
