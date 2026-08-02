@@ -65,6 +65,33 @@ PLATE: {{plate}} | TIER-{{tier}}
 LOC: {{location}}
 ACTION: {{instructions}}
 TIME: {{time}} UTC`,
+
+  MTG: `[SGOS ALERT] TYPE: MTG
+PLATE: {{plate}} | TIER-{{tier}}
+DECODE: {{notes}}
+ACTION: {{instructions}}
+TIME: {{time}} UTC
+Reply: PKG-OK | DRV-IN | HOLD | ABORT`,
+
+  GIFT: `[SGOS ALERT] TYPE: GIFT
+PLATE: {{plate}} | TIER-{{tier}}
+DECODE: {{notes}}
+ACTION: {{instructions}}
+TIME: {{time}} UTC
+Reply: PKG-OK | DRV-IN | HOLD | ABORT`,
+
+  WITNESS: `[SGOS ALERT] TYPE: WITNESS
+PLATE: {{plate}} | TIER-{{tier}}
+DECODE: {{notes}}
+ACTION: {{instructions}}
+TIME: {{time}} UTC`,
+
+  'PKG-MTG': `[SGOS ALERT] TYPE: PKG/MTG
+PLATE: {{plate}} | TIER-{{tier}}
+DECODE: {{notes}}
+ACTION: {{instructions}}
+TIME: {{time}} UTC
+Reply: PKG-OK | DRV-IN | HOLD | ABORT`,
 };
 
 function applyTemplate(template: string, vars: Record<string, string | number | undefined | null>): string {
@@ -108,6 +135,7 @@ export async function buildFieldTagSms(
     location: plate.location,
     contact: plate.contact,
     instructions: plate.instructions ?? plate.notes,
+    notes: plate.notes,
     zone: plate.zone,
     time: ts,
     ownerName: plate.ownerName,
