@@ -36,4 +36,16 @@
   .badge-yellow {
     @apply badge bg-yellow-900/50 text-yellow-400 border border-yellow-700;
   }
+  .sgos-input {
+    @apply bg-sgos-900 border border-sgos-800 rounded-xl px-4 py-3 text-gray-100 focus:outline-none focus:border-sgos-accent w-full placeholder:text-gray-600;
+  }
+  .sgos-btn-primary {
+    @apply bg-sgos-accent hover:bg-orange-500 text-white font-semibold px-4 py-3 rounded-xl transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
 }

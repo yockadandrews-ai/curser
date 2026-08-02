@@ -18,6 +18,13 @@ export default {
           900: '#0f0f1a',
           950: '#0a0a12',
         },
+        sgos: {
+          600: '#c45c26',
+          800: '#1c1410',
+          900: '#120e0c',
+          950: '#0a0806',
+          accent: '#e8732a',
+        },
       },
       animation: {
         pulse_slow: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

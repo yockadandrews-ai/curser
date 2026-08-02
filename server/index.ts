@@ -22,6 +22,7 @@ import {
   generateMultiThemeRun, generateThreeThemePackage, generateFiveThemePackage, getMultiThemeRuns, getMultiThemeRun,
 } from './factory/generator.js';
 import { db } from './db.js';
+import sgosRoutes from './sgos/routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -275,6 +276,9 @@ app.get('/api/factory/multi-runs/:id', (req, res) => {
   res.json(run);
 });
 app.get('/api/factory/output-root', (_req, res) => res.json({ path: OUTPUT_ROOT }));
+
+// SGOS Field Operations
+app.use('/api/sgos', sgosRoutes);
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');

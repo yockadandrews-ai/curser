@@ -1,10 +1,18 @@
-import { Routes, Route, NavLink } from 'react-router-dom';
-import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory } from 'lucide-react';
+import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory, Radio } from 'lucide-react';
 import AutoPilot from './pages/AutoPilot';
 import RealEarnings from './pages/RealEarnings';
 import ViralCashGenerator from './pages/ViralCashGenerator';
 import NotionTools from './pages/NotionTools';
 import DailyFactory from './pages/DailyFactory';
+import SGOSLayout from './pages/sgos/SGOSLayout';
+import CommandCenter from './pages/sgos/CommandCenter';
+import FieldTag from './pages/sgos/FieldTag';
+import BatchLog from './pages/sgos/BatchLog';
+import Dispatch from './pages/sgos/Dispatch';
+import Ack from './pages/sgos/Ack';
+import ActivityLog from './pages/sgos/ActivityLog';
+import SgosSettingsPage from './pages/sgos/SgosSettings';
 
 function NavItem({ to, icon: Icon, label }: { to: string; icon: typeof Zap; label: string }) {
   return (
@@ -24,7 +32,7 @@ function NavItem({ to, icon: Icon, label }: { to: string; icon: typeof Zap; labe
   );
 }
 
-export default function App() {
+function AutopilotShell() {
   return (
     <div className="min-h-screen flex">
       <aside className="w-64 bg-dark-900 border-r border-gray-800 p-4 flex flex-col gap-2 fixed h-full">
@@ -40,6 +48,7 @@ export default function App() {
 
         <nav className="flex flex-col gap-1">
           <NavItem to="/" icon={Zap} label="Money Autopilot" />
+          <NavItem to="/sgos" icon={Radio} label="SGOS Field Ops" />
           <NavItem to="/factory" icon={Factory} label="Daily Factory" />
           <NavItem to="/notion-tools" icon={BookOpen} label="Notion Tools" />
           <NavItem to="/earnings" icon={DollarSign} label="Real Earnings" />
@@ -63,4 +72,27 @@ export default function App() {
       </main>
     </div>
   );
+}
+
+export default function App() {
+  const location = useLocation();
+  const isSgos = location.pathname.startsWith('/sgos');
+
+  if (isSgos) {
+    return (
+      <Routes>
+        <Route path="/sgos" element={<SGOSLayout />}>
+          <Route index element={<CommandCenter />} />
+          <Route path="field-tag" element={<FieldTag />} />
+          <Route path="batch-log" element={<BatchLog />} />
+          <Route path="dispatch" element={<Dispatch />} />
+          <Route path="ack" element={<Ack />} />
+          <Route path="logs" element={<ActivityLog />} />
+          <Route path="settings" element={<SgosSettingsPage />} />
+        </Route>
+      </Routes>
+    );
+  }
+
+  return <AutopilotShell />;
 }
