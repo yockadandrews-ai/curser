@@ -31,6 +31,14 @@ export const api = {
     request<{ imported: number; tools: import('./types').NotionTool[] }>('/notion-tools/import', {
       method: 'POST', body: JSON.stringify({ names }),
     }),
+  seedNotionCatalog: (force = false) =>
+    request<{ imported: number; total: number; skipped: number; catalog: { factoryApps: number; kimi3Companions: number; totalTools: number }; inventory: import('./types').NotionInventory }>(
+      '/notion-tools/seed-catalog', { method: 'POST', body: JSON.stringify({ force }) }
+    ),
+  expandAllProposals: () =>
+    request<{ results: Array<{ folder: string; expandedSingles: number; expandedSuites: number }>; totalExpanded: number }>(
+      '/factory/expand-proposals', { method: 'POST' }
+    ),
   getTopProducts: (limit = 5) => request<import('./types').Product[]>(`/products/top?limit=${limit}`),
   addProduct: (data: { name: string; cost: number; sellPrice: number; category?: string }) =>
     request<import('./types').Product>('/products', { method: 'POST', body: JSON.stringify(data) }),

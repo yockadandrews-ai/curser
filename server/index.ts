@@ -16,7 +16,10 @@ import { runAutopilotCycle, getAutopilotStatus, startAutopilotScheduler, stopAut
 import {
   getNotionTools, getNotionTool, addNotionTool, updateNotionTool, deleteNotionTool,
   importNotionTools, getNotionInventorySummary, recordNotionToolSale, cleanupMixedSgosProducts,
+  seedNotionCatalog,
 } from './notionTools.js';
+import { expandAllOutputFolders } from './factory/expandProposals.js';
+import { NOTION_CATALOG_STATS } from './data/notionToolsCatalog.js';
 import {
   generateDailyRun, getFactoryRuns, getFactoryRun, FACTORY_THEMES, getThemeForDay, OUTPUT_ROOT,
   generateMultiThemeRun, generateThreeThemePackage, generateFiveThemePackage, getMultiThemeRuns, getMultiThemeRun,
@@ -81,6 +84,14 @@ app.post('/api/notion-tools/import', (req, res) => {
   if (!Array.isArray(names)) return res.status(400).json({ error: 'names array required' });
   const imported = importNotionTools(names);
   res.json({ imported: imported.length, tools: imported });
+});
+app.post('/api/notion-tools/seed-catalog', (req, res) => {
+  const force = !!req.body.force;
+  const result = seedNotionCatalog(force);
+  res.json({ ...result, catalog: NOTION_CATALOG_STATS, inventory: getNotionInventorySummary() });
+});
+app.get('/api/notion-tools/catalog-info', (_req, res) => {
+  res.json({ ...NOTION_CATALOG_STATS, inventory: getNotionInventorySummary() });
 });
 app.post('/api/notion-tools/:id/sell', (req, res) => {
   const tool = getNotionTool(req.params.id);
@@ -275,6 +286,10 @@ app.get('/api/factory/multi-runs/:id', (req, res) => {
   res.json(run);
 });
 app.get('/api/factory/output-root', (_req, res) => res.json({ path: OUTPUT_ROOT }));
+app.post('/api/factory/expand-proposals', (_req, res) => {
+  const results = expandAllOutputFolders();
+  res.json({ results, totalExpanded: results.reduce((s, r) => s + r.expandedSingles + r.expandedSuites, 0) });
+});
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');

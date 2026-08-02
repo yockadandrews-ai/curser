@@ -11,6 +11,18 @@ export default function NotionTools() {
   const [importText, setImportText] = useState('');
   const [newTool, setNewTool] = useState({ name: '', description: '', sellPrice: '', category: '' });
 
+  const [seeding, setSeeding] = useState(false);
+
+  const handleSeedCatalog = async () => {
+    setSeeding(true);
+    try {
+      await api.seedNotionCatalog(true);
+      await refresh();
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   const refresh = useCallback(async () => {
     try {
       setInventory(await api.getNotionInventory());
@@ -64,12 +76,13 @@ export default function NotionTools() {
       <div className="card border-blue-600/20">
         {inventory?.hasPriceList ? (
           <p className="text-sm text-gray-300">
-            ✅ <span className="text-blue-400 font-medium">{inventory.pricedTools}</span> tools have prices set ·{' '}
-            <span className="text-gray-500">{inventory.unpricedTools} still need pricing</span>
+            ✅ <span className="text-blue-400 font-medium">{inventory.pricedTools}</span> tools priced ·{' '}
+            <span className="text-gray-500">{inventory.unpricedTools} need pricing</span> ·{' '}
+            <span className="text-gray-500">{inventory.totalStock?.toLocaleString()} total stock</span>
           </p>
         ) : (
           <p className="text-sm text-gray-300">
-            📋 <span className="text-yellow-400 font-medium">No price list yet</span> — import your 30+ tools below, add prices when ready
+            📋 Click <strong className="text-blue-400">Import 33-Tool Catalog</strong> below — 25 factory apps + 8 Kimi3 platform tools with prices
           </p>
         )}
       </div>
@@ -81,12 +94,16 @@ export default function NotionTools() {
         <div className="card"><p className="text-gray-400 text-sm">Sold</p><p className="stat-value">{inventory?.totalSold ?? 0}</p></div>
       </div>
 
-      <div className="flex gap-2">
-        <button onClick={() => setShowAdd(true)} className="btn-primary flex items-center gap-2 text-sm">
+      <div className="flex gap-2 flex-wrap">
+        <button onClick={handleSeedCatalog} disabled={seeding} className="btn-primary flex items-center gap-2 text-sm">
+          {seeding ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+          Import 33-Tool Catalog
+        </button>
+        <button onClick={() => setShowAdd(true)} className="btn-secondary flex items-center gap-2 text-sm">
           <Plus size={16} /> Add Tool
         </button>
         <button onClick={() => setShowImport(true)} className="btn-secondary flex items-center gap-2 text-sm">
-          <Upload size={16} /> Bulk Import from Notion List
+          <Upload size={16} /> Paste Custom List
         </button>
       </div>
 

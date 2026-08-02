@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { buildNotionCatalog } from './data/notionToolsCatalog.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/autopilot.db');
@@ -105,6 +106,33 @@ export function importNotionTools(names: string[]): NotionTool[] {
     existing.add(trimmed.toLowerCase());
   }
   return imported;
+}
+
+export function seedNotionCatalog(force = false): { imported: number; total: number; skipped: number } {
+  if (force) {
+    db.prepare('DELETE FROM notion_tools').run();
+  }
+
+  const catalog = buildNotionCatalog();
+  const existing = new Set(getNotionTools().map(t => t.name.toLowerCase()));
+  let imported = 0;
+
+  for (const item of catalog) {
+    if (existing.has(item.name.toLowerCase())) continue;
+    addNotionTool({
+      id: crypto.randomUUID(),
+      name: item.name,
+      description: item.description,
+      category: item.category,
+      sellPrice: item.sellPrice,
+      cost: 0,
+      stock: item.stock,
+    });
+    existing.add(item.name.toLowerCase());
+    imported++;
+  }
+
+  return { imported, total: getNotionTools().length, skipped: catalog.length - imported };
 }
 
 export function getNotionInventorySummary() {
