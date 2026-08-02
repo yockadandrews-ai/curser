@@ -23,6 +23,8 @@ export interface Sale {
   revenue: number;
   profit: number;
   createdAt: string;
+  saleType?: 'product' | 'notion_tool';
+  itemName?: string;
 }
 
 export interface Expense {

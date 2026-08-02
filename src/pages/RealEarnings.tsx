@@ -191,10 +191,16 @@ export default function RealEarnings() {
               <p className="text-gray-500 text-sm text-center py-4">{t('earnings.noSales')}</p>
             ) : sales.slice(0, 10).map(s => {
               const product = products.find(p => p.id === s.productId);
+              const displayName = s.itemName || product?.name || t('common.unknown');
               return (
                 <div key={s.id} className="flex justify-between items-center py-2 border-b border-gray-800/50">
                   <div>
-                    <p className="text-sm text-white">{product?.name || t('common.unknown')}</p>
+                    <p className="text-sm text-white">
+                      {displayName}
+                      {s.saleType === 'notion_tool' && (
+                        <span className="ml-2 text-xs text-blue-400">Notion</span>
+                      )}
+                    </p>
                     <p className="text-xs text-gray-500">{new Date(s.createdAt).toLocaleDateString()} · {t('earnings.qty', { count: s.quantity })}</p>
                   </div>
                   <p className="text-money-400 font-semibold">+${s.profit.toFixed(2)}</p>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, Plus, Loader2, Upload, DollarSign, Package } from 'lucide-react';
+import { BookOpen, Plus, Loader2, Upload, DollarSign, Package, ShoppingCart } from 'lucide-react';
 import { api } from '../api';
 import type { NotionTool, NotionInventory } from '../types';
 
@@ -13,6 +13,8 @@ export default function NotionTools() {
   const [importText, setImportText] = useState('');
   const [newTool, setNewTool] = useState({ name: '', description: '', sellPrice: '', category: '' });
   const [seeding, setSeeding] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [sellingId, setSellingId] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -23,6 +25,28 @@ export default function NotionTools() {
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  const handleSyncPrices = async () => {
+    setSyncing(true);
+    try {
+      await api.syncNotionPrices();
+      await refresh();
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleSell = async (toolId: string) => {
+    setSellingId(toolId);
+    try {
+      await api.sellNotionTool(toolId, 1);
+      await refresh();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSellingId(null);
+    }
+  };
 
   const handleSeedCatalog = async () => {
     setSeeding(true);
@@ -97,6 +121,12 @@ export default function NotionTools() {
           {seeding ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
           {t('notionTools.importCatalog')}
         </button>
+        {(inventory?.unpricedTools ?? 0) > 0 && (
+          <button onClick={handleSyncPrices} disabled={syncing} className="btn-secondary flex items-center gap-2 text-sm border-yellow-600/30">
+            {syncing ? <Loader2 size={16} className="animate-spin" /> : <DollarSign size={16} className="text-yellow-400" />}
+            {t('notionTools.syncPrices')}
+          </button>
+        )}
         <button onClick={() => setShowAdd(true)} className="btn-secondary flex items-center gap-2 text-sm">
           <Plus size={16} /> {t('notionTools.addTool')}
         </button>
@@ -145,6 +175,7 @@ export default function NotionTools() {
                 <th className="text-right py-2">{t('notionTools.colPrice')}</th>
                 <th className="text-right py-2">{t('notionTools.colStock')}</th>
                 <th className="text-right py-2">{t('notionTools.colSold')}</th>
+                <th className="text-right py-2"></th>
               </tr>
             </thead>
             <tbody>
@@ -168,6 +199,18 @@ export default function NotionTools() {
                     <span className="flex items-center justify-end gap-1"><Package size={12} />{tool.stock ?? 0}</span>
                   </td>
                   <td className="py-3 text-right text-gray-300">{tool.unitsSold ?? 0}</td>
+                  <td className="py-3 text-right">
+                    {tool.sellPrice != null && (
+                      <button
+                        onClick={() => handleSell(tool.id)}
+                        disabled={sellingId === tool.id}
+                        className="btn-secondary text-xs py-1 px-2 flex items-center gap-1 ml-auto"
+                      >
+                        {sellingId === tool.id ? <Loader2 size={12} className="animate-spin" /> : <ShoppingCart size={12} />}
+                        {t('notionTools.recordSale')}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

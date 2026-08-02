@@ -1,10 +1,16 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { buildNotionCatalog } from './data/notionToolsCatalog.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/autopilot.db');
+const dbPath = process.env.DB_PATH || path.join(process.cwd(), 'data', 'autopilot.db');
+try {
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+} catch (e) {
+  console.warn('[notionTools] Could not create data directory:', (e as Error).message);
+}
 
 export interface NotionTool {
   id: string;
@@ -17,6 +23,16 @@ export interface NotionTool {
   unitsSold?: number;
   notionUrl?: string;
   createdAt: string;
+}
+
+export interface NotionToolSale {
+  id: string;
+  notionToolId: string;
+  quantity: number;
+  revenue: number;
+  profit: number;
+  createdAt: string;
+  toolName?: string;
 }
 
 const db = new Database(dbPath);
@@ -33,6 +49,16 @@ db.exec(`
     units_sold INTEGER DEFAULT 0,
     notion_url TEXT,
     created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS notion_tool_sales (
+    id TEXT PRIMARY KEY,
+    notion_tool_id TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    revenue REAL NOT NULL,
+    profit REAL NOT NULL,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY (notion_tool_id) REFERENCES notion_tools(id)
   );
 `);
 
@@ -108,7 +134,7 @@ export function importNotionTools(names: string[]): NotionTool[] {
   return imported;
 }
 
-export function seedNotionCatalog(force = false): { imported: number; total: number; skipped: number } {
+export function seedNotionCatalog(force = false): { imported: number; total: number; skipped: number; pricesSynced: number } {
   if (force) {
     db.prepare('DELETE FROM notion_tools').run();
   }
@@ -132,7 +158,79 @@ export function seedNotionCatalog(force = false): { imported: number; total: num
     imported++;
   }
 
-  return { imported, total: getNotionTools().length, skipped: catalog.length - imported };
+  const pricesSynced = syncCatalogPrices();
+
+  return { imported, total: getNotionTools().length, skipped: catalog.length - imported, pricesSynced };
+}
+
+/** Backfill missing prices from catalog (e.g. Bridge-Builder credits-only pricing) */
+export function syncCatalogPrices(): number {
+  const catalog = buildNotionCatalog();
+  const byName = new Map(catalog.map(c => [c.name.toLowerCase(), c]));
+  let updated = 0;
+  for (const tool of getNotionTools()) {
+    if (tool.sellPrice != null && tool.sellPrice > 0) continue;
+    const cat = byName.get(tool.name.toLowerCase());
+    if (cat?.sellPrice != null && cat.sellPrice > 0) {
+      updateNotionTool(tool.id, { sellPrice: cat.sellPrice });
+      updated++;
+    }
+  }
+  return updated;
+}
+
+function mapNotionToolSale(row: Record<string, unknown>): NotionToolSale {
+  return {
+    id: row.id as string,
+    notionToolId: row.notion_tool_id as string,
+    quantity: row.quantity as number,
+    revenue: row.revenue as number,
+    profit: row.profit as number,
+    createdAt: row.created_at as string,
+  };
+}
+
+export function getNotionToolSales(limit = 100): NotionToolSale[] {
+  return db.prepare(`
+    SELECT s.*, t.name as tool_name FROM notion_tool_sales s
+    LEFT JOIN notion_tools t ON t.id = s.notion_tool_id
+    ORDER BY s.created_at DESC LIMIT ?
+  `).all(limit).map(row => {
+    const r = row as Record<string, unknown>;
+    return { ...mapNotionToolSale(r), toolName: r.tool_name as string | undefined };
+  });
+}
+
+export function addNotionToolSaleRecord(
+  toolId: string,
+  quantity = 1,
+): { sale: NotionToolSale; tool: NotionTool } | null {
+  const tool = getNotionTool(toolId);
+  if (!tool || tool.sellPrice == null) return null;
+
+  const qty = Math.max(1, quantity);
+  const revenue = tool.sellPrice * qty;
+  const profit = ((tool.sellPrice ?? 0) - (tool.cost ?? 0)) * qty;
+  const createdAt = new Date().toISOString();
+  const sale: NotionToolSale = {
+    id: crypto.randomUUID(),
+    notionToolId: toolId,
+    quantity: qty,
+    revenue,
+    profit,
+    createdAt,
+    toolName: tool.name,
+  };
+
+  db.prepare(`
+    INSERT INTO notion_tool_sales (id, notion_tool_id, quantity, revenue, profit, created_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(sale.id, sale.notionToolId, sale.quantity, sale.revenue, sale.profit, sale.createdAt);
+
+  const updatedTool = recordNotionToolSale(toolId, qty);
+  if (!updatedTool) return null;
+
+  return { sale, tool: updatedTool };
 }
 
 export function getNotionInventorySummary() {

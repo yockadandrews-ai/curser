@@ -16,7 +16,7 @@ import { runAutopilotCycle, getAutopilotStatus, startAutopilotScheduler, stopAut
 import {
   getNotionTools, getNotionTool, addNotionTool, updateNotionTool, deleteNotionTool,
   importNotionTools, getNotionInventorySummary, recordNotionToolSale, cleanupMixedSgosProducts,
-  seedNotionCatalog,
+  seedNotionCatalog, syncCatalogPrices, addNotionToolSaleRecord, getNotionToolSales,
 } from './notionTools.js';
 import { expandAllOutputFolders } from './factory/expandProposals.js';
 import { NOTION_CATALOG_STATS } from './data/notionToolsCatalog.js';
@@ -38,6 +38,9 @@ const PORT = process.env.PORT || 3001;
 // Remove SGOS tools that were incorrectly mixed into affiliate products
 const removed = cleanupMixedSgosProducts(db);
 if (removed > 0) console.log(`[Cleanup] Removed ${removed} SGOS tools from affiliate products (now separate)`);
+
+const pricesSynced = syncCatalogPrices();
+if (pricesSynced > 0) console.log(`[Catalog] Synced ${pricesSynced} Notion tool prices`);
 
 app.use(cors());
 app.use(express.json());
@@ -158,19 +161,30 @@ app.post('/api/notion-tools/seed-catalog', (req, res) => {
   const result = seedNotionCatalog(force);
   res.json({ ...result, catalog: NOTION_CATALOG_STATS, inventory: getNotionInventorySummary() });
 });
+app.post('/api/notion-tools/sync-prices', (_req, res) => {
+  const pricesSynced = syncCatalogPrices();
+  res.json({ pricesSynced, inventory: getNotionInventorySummary() });
+});
+app.get('/api/notion-tools/sales', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 50;
+  res.json(getNotionToolSales(limit));
+});
 app.get('/api/notion-tools/catalog-info', (_req, res) => {
   res.json({ ...NOTION_CATALOG_STATS, inventory: getNotionInventorySummary() });
 });
 app.post('/api/notion-tools/:id/sell', (req, res) => {
   const tool = getNotionTool(req.params.id);
   if (!tool) return res.status(404).json({ error: 'Tool not found' });
-  if (tool.sellPrice == null) return res.status(400).json({ error: 'No price set for this tool yet' });
+  if (tool.sellPrice == null) {
+    return res.status(400).json({
+      error: 'No price set for this tool yet',
+      hint: 'Run POST /api/notion-tools/sync-prices or set a price in Notion Tools',
+    });
+  }
   const qty = Number(req.body.quantity) || 1;
-  const revenue = tool.sellPrice * qty;
-  const profit = ((tool.sellPrice ?? 0) - (tool.cost ?? 0)) * qty;
-  const sale = addSale({ id: uuidv4(), productId: req.params.id, quantity: qty, revenue, profit });
-  recordNotionToolSale(req.params.id, qty);
-  res.json(sale);
+  const result = addNotionToolSaleRecord(req.params.id, qty);
+  if (!result) return res.status(500).json({ error: 'Failed to record sale' });
+  res.json(result);
 });
 app.get('/api/products/top', (req, res) => {
   const limit = parseInt(req.query.limit as string) || 5;
@@ -215,8 +229,21 @@ app.delete('/api/products/:id', (req, res) => {
   res.json({ ok: true });
 });
 
-// Sales
-app.get('/api/sales', (_req, res) => res.json(getSales()));
+// Sales — affiliate products only (Notion tool sales use /api/notion-tools/:id/sell)
+app.get('/api/sales', (_req, res) => {
+  const productSales = getSales().map(s => ({ ...s, saleType: 'product' as const }));
+  const toolSales = getNotionToolSales(100).map(s => ({
+    id: s.id,
+    productId: s.notionToolId,
+    quantity: s.quantity,
+    revenue: s.revenue,
+    profit: s.profit,
+    createdAt: s.createdAt,
+    saleType: 'notion_tool' as const,
+    itemName: s.toolName,
+  }));
+  res.json([...productSales, ...toolSales].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+});
 app.post('/api/sales', (req, res) => {
   const { productId, quantity } = req.body;
   const product = getProduct(productId);

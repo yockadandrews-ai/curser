@@ -105,7 +105,10 @@
     "colStock": "Stock",
     "colSold": "Sold",
     "noPriceYet": "No price yet",
-    "perTool": "/tool"
+    "perTool": "/tool",
+    "recordSale": "Record Sale",
+    "syncPrices": "Fix Missing Prices",
+    "saleRecorded": "Sale recorded"
   },
   "earnings": {
     "title": "Real Earnings",

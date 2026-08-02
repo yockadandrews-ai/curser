@@ -1,9 +1,16 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { getNotionToolSales } from './notionTools.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/autopilot.db');
+const dbPath = process.env.DB_PATH || path.join(process.cwd(), 'data', 'autopilot.db');
+try {
+  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+} catch (e) {
+  console.warn('[db] Could not create data directory:', (e as Error).message);
+}
 
 export interface Product {
   id: string;
@@ -30,6 +37,8 @@ export interface Sale {
   revenue: number;
   profit: number;
   createdAt: string;
+  saleType?: 'product' | 'notion_tool';
+  itemName?: string;
 }
 
 export interface Expense {
@@ -302,18 +311,24 @@ export function logActivity(type: string, message: string): Activity {
 
 export function getStats() {
   const products = getProducts();
-  const sales = getSales();
+  const productSales = getSales();
+  const notionSales = getNotionToolSales(1000);
   const expenses = getExpenses();
   const content = getContent();
 
-  const totalRevenue = sales.reduce((s, x) => s + x.revenue, 0);
-  const totalProfit = sales.reduce((s, x) => s + x.profit, 0);
+  const allSales = [
+    ...productSales,
+    ...notionSales.map(s => ({ revenue: s.revenue, profit: s.profit, createdAt: s.createdAt })),
+  ];
+
+  const totalRevenue = allSales.reduce((s, x) => s + x.revenue, 0);
+  const totalProfit = allSales.reduce((s, x) => s + x.profit, 0);
   const totalExpenses = expenses.reduce((s, x) => s + x.amount, 0);
   const netProfit = totalProfit - totalExpenses;
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const monthlySales = sales.filter(s => s.createdAt >= monthStart);
+  const monthlySales = allSales.filter(s => s.createdAt >= monthStart);
   const monthlyProfit = monthlySales.reduce((s, x) => s + x.profit, 0);
 
   const postedCount = content.filter(c => c.status === 'posted').length;
@@ -325,7 +340,7 @@ export function getStats() {
     totalExpenses,
     netProfit,
     monthlyProfit,
-    totalSales: sales.length,
+    totalSales: allSales.length,
     productsTracked: products.length,
     contentGenerated: content.length,
     postsPublished: postedCount,
