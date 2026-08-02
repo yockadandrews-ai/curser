@@ -1,6 +1,8 @@
 import type { Plate } from '@prisma/client';
 import { prisma } from './prisma.js';
 import type { ClassifiedScenario } from './classifier.js';
+import type { SgosLocale } from './locales.js';
+import { buildLocalizedSmsTemplate } from './i18n.js';
 
 const DEFAULT_TEMPLATES: Record<string, string> = {
   'DRV-PICKUP': `[SGOS ALERT] TYPE: {{scenario}}
@@ -117,15 +119,20 @@ export async function buildFieldTagSms(
   plate: Plate,
   classified: ClassifiedScenario,
   timestamp?: Date,
+  locale: SgosLocale = 'en',
 ): Promise<string> {
   const ts = (timestamp ?? new Date()).toISOString().slice(11, 16);
   const scenario = classified.scenario;
+
+  const localizedTemplate = buildLocalizedSmsTemplate(locale, scenario);
 
   const dbTemplate = await prisma.smsTemplate.findFirst({
     where: { scenario, isActive: true },
   });
 
-  const template = dbTemplate?.template ?? DEFAULT_TEMPLATES[scenario] ?? DEFAULT_TEMPLATES.STANDARD;
+  const template = locale === 'en'
+    ? (dbTemplate?.template ?? DEFAULT_TEMPLATES[scenario] ?? DEFAULT_TEMPLATES.STANDARD)
+    : localizedTemplate;
 
   return applyTemplate(template, {
     scenario,

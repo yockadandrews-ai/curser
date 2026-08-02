@@ -1,0 +1,163 @@
+{
+  "common": {
+    "appName": "SGOS",
+    "subtitle": "Opérations terrain",
+    "loading": "Chargement…",
+    "error": "Une erreur s'est produite",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "saved": "Enregistré !",
+    "back": "Centre de commande",
+    "backCmd": "CMD",
+    "plate": "Plaque",
+    "scenario": "Scénario",
+    "location": "Emplacement",
+    "language": "Langue"
+  },
+  "nav": {
+    "cmd": "CMD",
+    "logs": "LOGS",
+    "settings": "RÉGL"
+  },
+  "commandCenter": {
+    "fieldTag": "FIELD TAG",
+    "fieldTagDesc": "Dicter la plaque → instructions SMS",
+    "batchLog": "BATCH LOG",
+    "batchLogDesc": "5–10 plaques → résumé décodé",
+    "dispatch": "DISPATCH",
+    "dispatchDesc": "HERMES · PORTAL · COURIER",
+    "ack": "ACK",
+    "ackDesc": "PKG-OK · DRV-IN · HOLD · ABORT",
+    "cmdTitle": "SGOS CMD",
+    "cmdDesc": "Marquage terrain rapide — appuyez pour commencer",
+    "voiceTipTitle": "Astuce contrôle vocal",
+    "voiceTipPath": "Réglages → Accessibilité → Contrôle vocal",
+    "voiceTipPhrase": "Phrase : \"{{phrase}}\" → lance Field Tag",
+    "voicePhrase": "Log plate",
+    "viewLogs": "Voir les journaux SMS",
+    "openSettings": "Réglages",
+    "languageLabel": "Langue"
+  },
+  "fieldTag": {
+    "title": "FIELD TAG",
+    "subtitle": "Saisissez ou dictez un code plaque",
+    "placeholder": "JG6613",
+    "submit": "Marquer et envoyer SMS",
+    "sending": "Envoi du SMS…",
+    "voiceAria": "Saisie vocale",
+    "voicePrompt": "Code plaque ?",
+    "voiceUnsupported": "La saisie vocale n'est pas prise en charge par ce navigateur",
+    "lookupFailed": "Recherche échouée",
+    "smsSent": "SMS envoyé",
+    "smsMock": "SMS en file d'attente (mode simulation)"
+  },
+  "batchLog": {
+    "title": "BATCH LOG",
+    "subtitle": "Saisissez 5–10 codes plaque",
+    "plateN": "Plaque {{n}}",
+    "addPlate": "Ajouter une plaque",
+    "submit": "Décoder et envoyer le résumé",
+    "processing": "Traitement…",
+    "failed": "Lot échoué",
+    "found": "{{found}} / {{total}} plaques trouvées"
+  },
+  "dispatch": {
+    "title": "DISPATCH",
+    "subtitle": "Notifier le canal conducteur",
+    "etaLabel": "ETA (minutes)",
+    "notesLabel": "Notes (facultatif)",
+    "notesPlaceholder": "Code portail, description véhicule…",
+    "notifying": "Notification du conducteur…",
+    "failed": "Dispatch échoué",
+    "hermes": "HERMES",
+    "hermesDesc": "Voie messagerie express",
+    "portal": "PORTAL",
+    "portalDesc": "Route de transfert hub",
+    "courier": "COURIER",
+    "courierDesc": "Conducteur terrain standard"
+  },
+  "ack": {
+    "title": "ACK",
+    "subtitle": "Boucler la boucle — l'équipe est notifiée",
+    "plateOptional": "Plaque (facultatif)",
+    "platePlaceholder": "Lier l'ACK à une plaque",
+    "failed": "ACK échoué",
+    "loopClosed": "Boucle fermée ✓",
+    "pkgOk": "PKG-OK",
+    "pkgOkDesc": "Colis livré",
+    "drvIn": "DRV-IN",
+    "drvInDesc": "Conducteur enregistré",
+    "hold": "HOLD",
+    "holdDesc": "En attente d'autorisation",
+    "abort": "ABORT",
+    "abortDesc": "Annuler l'opération"
+  },
+  "logs": {
+    "title": "Activité SMS",
+    "empty": "Aucun message pour l'instant. Marquez une plaque pour commencer.",
+    "delivered": "Livré",
+    "failed": "Échoué",
+    "sent": "Envoyé"
+  },
+  "settings": {
+    "title": "Réglages",
+    "postgresTitle": "Registre PostgreSQL",
+    "postgresOk": "{{count}} plaques actives · extensible à 1000+",
+    "postgresError": "Base de données non connectée — exécutez : docker compose up -d && npm run db:push && npm run db:seed",
+    "operatorPhone": "Téléphone opérateur (destination SMS)",
+    "phonePlaceholder": "+1-202-555-0147",
+    "savePhone": "Enregistrer le téléphone",
+    "importTitle": "Importer le registre maître",
+    "importDesc": "Déposez SGOS_Master_Plate_Registry_v2.json ou CSV (172+ plaques)",
+    "importBtn": "Choisir un fichier JSON ou CSV",
+    "importing": "Importation…",
+    "importResult": "Importé : {{created}} nouvelles, {{updated}} mises à jour ({{total}} actives au total)",
+    "importFailed": "Importation échouée",
+    "importCli": "CLI : npx tsx scripts/import-plates.ts ./registry.json",
+    "sendblue": "Sendblue",
+    "sendblueConnected": "Connecté",
+    "sendblueMock": "Mode simulation",
+    "sendblueHint": "Définissez SENDBLUE_API_KEY, SENDBLUE_API_SECRET et SENDBLUE_FROM_NUMBER pour les SMS en direct."
+  },
+  "errors": {
+    "plateRequired": "plaque requise",
+    "plateNotFound": "Plaque introuvable dans le registre",
+    "databaseUnavailable": "DATABASE_URL non configurée. Démarrez PostgreSQL : docker compose up -d",
+    "requestFailed": "Requête échouée"
+  },
+  "sms": {
+    "replyHint": "Répondre : PKG-OK | DRV-IN | HOLD | ABORT",
+    "labels": {
+      "alert": "[SGOS ALERT] TYPE:",
+      "plate": "PLATE:",
+      "tier": "TIER-",
+      "callsign": "CALLSIGN:",
+      "loc": "LOC:",
+      "contact": "CONTACT:",
+      "action": "ACTION:",
+      "decode": "DECODE:",
+      "zone": "ZONE:",
+      "time": "TIME:",
+      "utc": "UTC",
+      "freezeHold": "NE PAS CONTINUER. Alerter le commandement immédiatement.",
+      "holdWait": "Attendre l'autorisation avant de continuer."
+    },
+    "dispatch": {
+      "header": "[SGOS DISPATCH] CHANNEL:",
+      "eta": "Conducteur notifié. ETA : {{minutes}} min",
+      "notes": "NOTES:",
+      "standby": "En attente de confirmation DRV-IN."
+    },
+    "ack": {
+      "prefix": "[SGOS ACK]",
+      "pkgOk": "Livraison du colis confirmée. Boucle fermée.",
+      "drvIn": "Enregistrement conducteur noté. Ramassage en cours.",
+      "hold": "Statut HOLD défini. Équipe notifiée — en attente d'autorisation.",
+      "abort": "Opération annulée. Sécurité et dispatch alertés."
+    },
+    "batch": {
+      "header": "[SGOS BATCH] {{count}} plaques enregistrées",
+      "footer": "Détail complet envoyé par plaque. Répondez ACK une fois terminé."
+    }
+  }
+}

@@ -1,22 +1,26 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Truck, Loader2 } from 'lucide-react';
 import { sgosApi } from '../../sgosApi';
+import { useSgosLocale } from '../../i18n/useSgosLocale';
 import type { DispatchChannel } from '../../types/sgos';
 
-const channels: { id: DispatchChannel; label: string; desc: string }[] = [
-  { id: 'HERMES', label: 'HERMES', desc: 'Express courier lane' },
-  { id: 'PORTAL', label: 'PORTAL', desc: 'Hub transfer route' },
-  { id: 'COURIER', label: 'COURIER', desc: 'Standard field driver' },
-];
-
 export default function Dispatch() {
+  const { t } = useTranslation();
+  const { path } = useSgosLocale();
   const [channel, setChannel] = useState<DispatchChannel | null>(null);
   const [eta, setEta] = useState(15);
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [smsBody, setSmsBody] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const channels: { id: DispatchChannel; label: string; desc: string }[] = [
+    { id: 'HERMES', label: t('dispatch.hermes'), desc: t('dispatch.hermesDesc') },
+    { id: 'PORTAL', label: t('dispatch.portal'), desc: t('dispatch.portalDesc') },
+    { id: 'COURIER', label: t('dispatch.courier'), desc: t('dispatch.courierDesc') },
+  ];
 
   const submit = async (ch: DispatchChannel) => {
     setChannel(ch);
@@ -27,7 +31,7 @@ export default function Dispatch() {
       const res = await sgosApi.dispatch(ch, eta, notes || undefined);
       setSmsBody(res.sms.body);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Dispatch failed');
+      setError(e instanceof Error ? e.message : t('dispatch.failed'));
     } finally {
       setLoading(false);
     }
@@ -35,18 +39,18 @@ export default function Dispatch() {
 
   return (
     <div className="space-y-5">
-      <Link to="/sgos" className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm">
-        <ArrowLeft size={16} /> Command Center
+      <Link to={path('')} className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm">
+        <ArrowLeft size={16} /> {t('common.back')}
       </Link>
 
       <div className="rounded-2xl bg-gradient-to-br from-emerald-900 to-emerald-950 border border-emerald-700/50 p-5">
         <div className="flex items-center gap-2 mb-1">
           <Truck size={20} className="text-emerald-300" />
-          <h2 className="text-xl font-bold text-emerald-100">DISPATCH</h2>
+          <h2 className="text-xl font-bold text-emerald-100">{t('dispatch.title')}</h2>
         </div>
-        <p className="text-sm text-emerald-200/60 mb-4">Notify driver channel</p>
+        <p className="text-sm text-emerald-200/60 mb-4">{t('dispatch.subtitle')}</p>
 
-        <label className="block text-xs text-gray-400 mb-1">ETA (minutes)</label>
+        <label className="block text-xs text-gray-400 mb-1">{t('dispatch.etaLabel')}</label>
         <input
           type="number"
           min={1}
@@ -56,10 +60,10 @@ export default function Dispatch() {
           onChange={(e) => setEta(Number(e.target.value))}
         />
 
-        <label className="block text-xs text-gray-400 mb-1">Notes (optional)</label>
+        <label className="block text-xs text-gray-400 mb-1">{t('dispatch.notesLabel')}</label>
         <input
           className="sgos-input mb-4"
-          placeholder="Gate code, vehicle description…"
+          placeholder={t('dispatch.notesPlaceholder')}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
@@ -85,7 +89,7 @@ export default function Dispatch() {
 
         {loading && (
           <div className="flex items-center justify-center gap-2 mt-4 text-emerald-300">
-            <Loader2 size={18} className="animate-spin" /> Notifying driver…
+            <Loader2 size={18} className="animate-spin" /> {t('dispatch.notifying')}
           </div>
         )}
       </div>

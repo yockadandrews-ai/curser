@@ -46,6 +46,7 @@ model TagEvent {
   rawInput    String?
   locationLat Float?
   locationLng Float?
+  locale      String   @default("en")
   createdAt   DateTime @default(now())
 
   smsLogs SmsLog[]
@@ -101,6 +102,7 @@ model User {
   phone     String?  @unique
   role      String   @default("FIELD")
   email     String?  @unique
+  locale    String   @default("en")
   createdAt DateTime @default(now())
 }
 

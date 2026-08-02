@@ -1,0 +1,163 @@
+{
+  "common": {
+    "appName": "SGOS",
+    "subtitle": "Field Operations",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "save": "Save",
+    "saved": "Saved!",
+    "back": "Command Center",
+    "backCmd": "CMD",
+    "plate": "Plate",
+    "scenario": "Scenario",
+    "location": "Location",
+    "language": "Language"
+  },
+  "nav": {
+    "cmd": "CMD",
+    "logs": "LOGS",
+    "settings": "SET"
+  },
+  "commandCenter": {
+    "fieldTag": "FIELD TAG",
+    "fieldTagDesc": "Dictate plate → SMS instructions",
+    "batchLog": "BATCH LOG",
+    "batchLogDesc": "5–10 plates → summary decode",
+    "dispatch": "DISPATCH",
+    "dispatchDesc": "HERMES · PORTAL · COURIER",
+    "ack": "ACK",
+    "ackDesc": "PKG-OK · DRV-IN · HOLD · ABORT",
+    "cmdTitle": "SGOS CMD",
+    "cmdDesc": "Quick field tag — tap to start",
+    "voiceTipTitle": "Voice Control Tip",
+    "voiceTipPath": "Settings → Accessibility → Voice Control",
+    "voiceTipPhrase": "Phrase: \"{{phrase}}\" → runs Field Tag",
+    "voicePhrase": "Log plate",
+    "viewLogs": "View SMS Logs",
+    "openSettings": "Settings",
+    "languageLabel": "Language"
+  },
+  "fieldTag": {
+    "title": "FIELD TAG",
+    "subtitle": "Enter or dictate a plate code",
+    "placeholder": "JG6613",
+    "submit": "Tag & Send SMS",
+    "sending": "Sending SMS…",
+    "voiceAria": "Voice input",
+    "voicePrompt": "Plate code?",
+    "voiceUnsupported": "Voice input not supported in this browser",
+    "lookupFailed": "Lookup failed",
+    "smsSent": "SMS sent",
+    "smsMock": "SMS queued (mock mode)"
+  },
+  "batchLog": {
+    "title": "BATCH LOG",
+    "subtitle": "Enter 5–10 plate codes",
+    "plateN": "Plate {{n}}",
+    "addPlate": "Add plate",
+    "submit": "Decode & Send Summary",
+    "processing": "Processing…",
+    "failed": "Batch failed",
+    "found": "{{found}} / {{total}} plates found"
+  },
+  "dispatch": {
+    "title": "DISPATCH",
+    "subtitle": "Notify driver channel",
+    "etaLabel": "ETA (minutes)",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "Gate code, vehicle description…",
+    "notifying": "Notifying driver…",
+    "failed": "Dispatch failed",
+    "hermes": "HERMES",
+    "hermesDesc": "Express courier lane",
+    "portal": "PORTAL",
+    "portalDesc": "Hub transfer route",
+    "courier": "COURIER",
+    "courierDesc": "Standard field driver"
+  },
+  "ack": {
+    "title": "ACK",
+    "subtitle": "Close the loop — team gets notified",
+    "plateOptional": "Plate (optional)",
+    "platePlaceholder": "Link ACK to plate",
+    "failed": "ACK failed",
+    "loopClosed": "Loop closed ✓",
+    "pkgOk": "PKG-OK",
+    "pkgOkDesc": "Package delivered",
+    "drvIn": "DRV-IN",
+    "drvInDesc": "Driver checked in",
+    "hold": "HOLD",
+    "holdDesc": "Awaiting clearance",
+    "abort": "ABORT",
+    "abortDesc": "Cancel operation"
+  },
+  "logs": {
+    "title": "SMS Activity",
+    "empty": "No messages yet. Tag a plate to get started.",
+    "delivered": "Delivered",
+    "failed": "Failed",
+    "sent": "Sent"
+  },
+  "settings": {
+    "title": "Settings",
+    "postgresTitle": "PostgreSQL Registry",
+    "postgresOk": "{{count}} active plates · scalable to 1000+",
+    "postgresError": "Database not connected — run: docker compose up -d && npm run db:push && npm run db:seed",
+    "operatorPhone": "Operator Phone (SMS destination)",
+    "phonePlaceholder": "+1-202-555-0147",
+    "savePhone": "Save Phone",
+    "importTitle": "Import Master Registry",
+    "importDesc": "Drop SGOS_Master_Plate_Registry_v2.json or CSV (172+ plates)",
+    "importBtn": "Choose JSON or CSV File",
+    "importing": "Importing…",
+    "importResult": "Imported: {{created}} new, {{updated}} updated ({{total}} total active)",
+    "importFailed": "Import failed",
+    "importCli": "CLI: npx tsx scripts/import-plates.ts ./registry.json",
+    "sendblue": "Sendblue",
+    "sendblueConnected": "Connected",
+    "sendblueMock": "Mock mode",
+    "sendblueHint": "Set SENDBLUE_API_KEY, SENDBLUE_API_SECRET, and SENDBLUE_FROM_NUMBER for live SMS."
+  },
+  "errors": {
+    "plateRequired": "plate required",
+    "plateNotFound": "Plate not found in registry",
+    "databaseUnavailable": "DATABASE_URL not configured. Start PostgreSQL: docker compose up -d",
+    "requestFailed": "Request failed"
+  },
+  "sms": {
+    "replyHint": "Reply: PKG-OK | DRV-IN | HOLD | ABORT",
+    "labels": {
+      "alert": "[SGOS ALERT] TYPE:",
+      "plate": "PLATE:",
+      "tier": "TIER-",
+      "callsign": "CALLSIGN:",
+      "loc": "LOC:",
+      "contact": "CONTACT:",
+      "action": "ACTION:",
+      "decode": "DECODE:",
+      "zone": "ZONE:",
+      "time": "TIME:",
+      "utc": "UTC",
+      "freezeHold": "DO NOT PROCEED. Alert command immediately.",
+      "holdWait": "Await clearance before proceeding."
+    },
+    "dispatch": {
+      "header": "[SGOS DISPATCH] CHANNEL:",
+      "eta": "Driver notified. ETA: {{minutes}} min",
+      "notes": "NOTES:",
+      "standby": "Stand by for DRV-IN confirmation."
+    },
+    "ack": {
+      "prefix": "[SGOS ACK]",
+      "pkgOk": "Package delivery confirmed. Loop closed.",
+      "drvIn": "Driver check-in recorded. Pickup in progress.",
+      "hold": "Hold status set. Team notified — awaiting clearance.",
+      "abort": "Operation aborted. Security and dispatch alerted."
+    },
+    "batch": {
+      "header": "[SGOS BATCH] {{count}} plates logged",
+      "footer": "Full detail sent per plate. Reply ACK when complete."
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "common": {
+    "appName": "SGOS",
+    "subtitle": "العمليات الميدانية",
+    "loading": "جارٍ التحميل…",
+    "error": "حدث خطأ ما",
+    "retry": "إعادة المحاولة",
+    "save": "حفظ",
+    "saved": "تم الحفظ!",
+    "back": "مركز القيادة",
+    "backCmd": "CMD",
+    "plate": "اللوحة",
+    "scenario": "السيناريو",
+    "location": "الموقع",
+    "language": "اللغة"
+  },
+  "nav": {
+    "cmd": "CMD",
+    "logs": "LOGS",
+    "settings": "إعداد"
+  },
+  "commandCenter": {
+    "fieldTag": "FIELD TAG",
+    "fieldTagDesc": "إملاء اللوحة → تعليمات SMS",
+    "batchLog": "BATCH LOG",
+    "batchLogDesc": "5–10 لوحات → ملخص مفكوك",
+    "dispatch": "DISPATCH",
+    "dispatchDesc": "HERMES · PORTAL · COURIER",
+    "ack": "ACK",
+    "ackDesc": "PKG-OK · DRV-IN · HOLD · ABORT",
+    "cmdTitle": "SGOS CMD",
+    "cmdDesc": "وسم ميداني سريع — اضغط للبدء",
+    "voiceTipTitle": "نصيحة التحكم الصوتي",
+    "voiceTipPath": "الإعدادات → إمكانية الوصول → التحكم الصوتي",
+    "voiceTipPhrase": "العبارة: \"{{phrase}}\" → يشغّل Field Tag",
+    "voicePhrase": "Log plate",
+    "viewLogs": "عرض سجلات SMS",
+    "openSettings": "الإعدادات",
+    "languageLabel": "اللغة"
+  },
+  "fieldTag": {
+    "title": "FIELD TAG",
+    "subtitle": "أدخل أو أملِ رمز اللوحة",
+    "placeholder": "JG6613",
+    "submit": "وسم وإرسال SMS",
+    "sending": "جارٍ إرسال SMS…",
+    "voiceAria": "إدخال صوتي",
+    "voicePrompt": "رمز اللوحة؟",
+    "voiceUnsupported": "الإدخال الصوتي غير مدعوم في هذا المتصفح",
+    "lookupFailed": "فشل البحث",
+    "smsSent": "تم إرسال SMS",
+    "smsMock": "SMS في قائمة الانتظار (وضع المحاكاة)"
+  },
+  "batchLog": {
+    "title": "BATCH LOG",
+    "subtitle": "أدخل 5–10 رموز لوحات",
+    "plateN": "اللوحة {{n}}",
+    "addPlate": "إضافة لوحة",
+    "submit": "فك الترميز وإرسال الملخص",
+    "processing": "جارٍ المعالجة…",
+    "failed": "فشل الدفعة",
+    "found": "تم العثور على {{found}} / {{total}} لوحات"
+  },
+  "dispatch": {
+    "title": "DISPATCH",
+    "subtitle": "إبلاغ قناة السائق",
+    "etaLabel": "وقت الوصول المتوقع (دقائق)",
+    "notesLabel": "ملاحظات (اختياري)",
+    "notesPlaceholder": "رمز البوابة، وصف المركبة…",
+    "notifying": "جارٍ إبلاغ السائق…",
+    "failed": "فشل الإرسال",
+    "hermes": "HERMES",
+    "hermesDesc": "مسار البريد السريع",
+    "portal": "PORTAL",
+    "portalDesc": "مسار النقل عبر المحور",
+    "courier": "COURIER",
+    "courierDesc": "سائق ميداني قياسي"
+  },
+  "ack": {
+    "title": "ACK",
+    "subtitle": "إغلاق الحلقة — يتم إبلاغ الفريق",
+    "plateOptional": "اللوحة (اختياري)",
+    "platePlaceholder": "ربط ACK باللوحة",
+    "failed": "فشل ACK",
+    "loopClosed": "تم إغلاق الحلقة ✓",
+    "pkgOk": "PKG-OK",
+    "pkgOkDesc": "تم تسليم الطرد",
+    "drvIn": "DRV-IN",
+    "drvInDesc": "تم تسجيل حضور السائق",
+    "hold": "HOLD",
+    "holdDesc": "في انتظار الموافقة",
+    "abort": "ABORT",
+    "abortDesc": "إلغاء العملية"
+  },
+  "logs": {
+    "title": "نشاط SMS",
+    "empty": "لا توجد رسائل بعد. قم بوسم لوحة للبدء.",
+    "delivered": "تم التسليم",
+    "failed": "فشل",
+    "sent": "تم الإرسال"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "postgresTitle": "سجل PostgreSQL",
+    "postgresOk": "{{count}} لوحة نشطة · قابل للتوسع إلى 1000+",
+    "postgresError": "قاعدة البيانات غير متصلة — نفّذ: docker compose up -d && npm run db:push && npm run db:seed",
+    "operatorPhone": "هاتف المشغّل (وجهة SMS)",
+    "phonePlaceholder": "+1-202-555-0147",
+    "savePhone": "حفظ الهاتف",
+    "importTitle": "استيراد السجل الرئيسي",
+    "importDesc": "أسقط SGOS_Master_Plate_Registry_v2.json أو CSV (172+ لوحة)",
+    "importBtn": "اختر ملف JSON أو CSV",
+    "importing": "جارٍ الاستيراد…",
+    "importResult": "تم الاستيراد: {{created}} جديدة، {{updated}} محدّثة ({{total}} نشطة إجمالاً)",
+    "importFailed": "فشل الاستيراد",
+    "importCli": "CLI: npx tsx scripts/import-plates.ts ./registry.json",
+    "sendblue": "Sendblue",
+    "sendblueConnected": "متصل",
+    "sendblueMock": "وضع المحاكاة",
+    "sendblueHint": "عيّن SENDBLUE_API_KEY و SENDBLUE_API_SECRET و SENDBLUE_FROM_NUMBER لـ SMS المباشر."
+  },
+  "errors": {
+    "plateRequired": "اللوحة مطلوبة",
+    "plateNotFound": "اللوحة غير موجودة في السجل",
+    "databaseUnavailable": "DATABASE_URL غير مهيأ. شغّل PostgreSQL: docker compose up -d",
+    "requestFailed": "فشل الطلب"
+  },
+  "sms": {
+    "replyHint": "الرد: PKG-OK | DRV-IN | HOLD | ABORT",
+    "labels": {
+      "alert": "[SGOS ALERT] TYPE:",
+      "plate": "PLATE:",
+      "tier": "TIER-",
+      "callsign": "CALLSIGN:",
+      "loc": "LOC:",
+      "contact": "CONTACT:",
+      "action": "ACTION:",
+      "decode": "DECODE:",
+      "zone": "ZONE:",
+      "time": "TIME:",
+      "utc": "UTC",
+      "freezeHold": "لا تتابع. أبلغ القيادة فوراً.",
+      "holdWait": "انتظر الموافقة قبل المتابعة."
+    },
+    "dispatch": {
+      "header": "[SGOS DISPATCH] CHANNEL:",
+      "eta": "تم إبلاغ السائق. وقت الوصول: {{minutes}} د",
+      "notes": "NOTES:",
+      "standby": "في انتظار تأكيد DRV-IN."
+    },
+    "ack": {
+      "prefix": "[SGOS ACK]",
+      "pkgOk": "تم تأكيد تسليم الطرد. تم إغلاق الحلقة.",
+      "drvIn": "تم تسجيل حضور السائق. الاستلام جارٍ.",
+      "hold": "تم تعيين حالة HOLD. تم إبلاغ الفريق — في انتظار الموافقة.",
+      "abort": "تم إلغاء العملية. تم تنبيه الأمن والإرسال."
+    },
+    "batch": {
+      "header": "[SGOS BATCH] {{count}} لوحة مسجّلة",
+      "footer": "تم إرسال التفاصيل الكاملة لكل لوحة. رد بـ ACK عند الانتهاء."
+    }
+  }
+}

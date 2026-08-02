@@ -5,14 +5,7 @@ import RealEarnings from './pages/RealEarnings';
 import ViralCashGenerator from './pages/ViralCashGenerator';
 import NotionTools from './pages/NotionTools';
 import DailyFactory from './pages/DailyFactory';
-import SGOSLayout from './pages/sgos/SGOSLayout';
-import CommandCenter from './pages/sgos/CommandCenter';
-import FieldTag from './pages/sgos/FieldTag';
-import BatchLog from './pages/sgos/BatchLog';
-import Dispatch from './pages/sgos/Dispatch';
-import Ack from './pages/sgos/Ack';
-import ActivityLog from './pages/sgos/ActivityLog';
-import SgosSettingsPage from './pages/sgos/SgosSettings';
+import SgosRoutes from './SgosRoutes';
 
 function NavItem({ to, icon: Icon, label }: { to: string; icon: typeof Zap; label: string }) {
   return (
@@ -79,19 +72,7 @@ export default function App() {
   const isSgos = location.pathname.startsWith('/sgos');
 
   if (isSgos) {
-    return (
-      <Routes>
-        <Route path="/sgos" element={<SGOSLayout />}>
-          <Route index element={<CommandCenter />} />
-          <Route path="field-tag" element={<FieldTag />} />
-          <Route path="batch-log" element={<BatchLog />} />
-          <Route path="dispatch" element={<Dispatch />} />
-          <Route path="ack" element={<Ack />} />
-          <Route path="logs" element={<ActivityLog />} />
-          <Route path="settings" element={<SgosSettingsPage />} />
-        </Route>
-      </Routes>
-    );
+    return <SgosRoutes />;
   }
 
   return <AutopilotShell />;

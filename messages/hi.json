@@ -1,0 +1,163 @@
+{
+  "common": {
+    "appName": "SGOS",
+    "subtitle": "फ़ील्ड संचालन",
+    "loading": "लोड हो रहा है…",
+    "error": "कुछ गलत हो गया",
+    "retry": "पुनः प्रयास करें",
+    "save": "सहेजें",
+    "saved": "सहेजा गया!",
+    "back": "कमांड सेंटर",
+    "backCmd": "CMD",
+    "plate": "प्लेट",
+    "scenario": "परिदृश्य",
+    "location": "स्थान",
+    "language": "भाषा"
+  },
+  "nav": {
+    "cmd": "CMD",
+    "logs": "LOGS",
+    "settings": "सेट"
+  },
+  "commandCenter": {
+    "fieldTag": "FIELD TAG",
+    "fieldTagDesc": "प्लेट बोलें → SMS निर्देश",
+    "batchLog": "BATCH LOG",
+    "batchLogDesc": "5–10 प्लेट → सारांश डिकोड",
+    "dispatch": "DISPATCH",
+    "dispatchDesc": "HERMES · PORTAL · COURIER",
+    "ack": "ACK",
+    "ackDesc": "PKG-OK · DRV-IN · HOLD · ABORT",
+    "cmdTitle": "SGOS CMD",
+    "cmdDesc": "त्वरित फ़ील्ड टैग — शुरू करने के लिए टैप करें",
+    "voiceTipTitle": "वॉइस कंट्रोल टिप",
+    "voiceTipPath": "सेटिंग्स → एक्सेसिबिलिटी → वॉइस कंट्रोल",
+    "voiceTipPhrase": "वाक्यांश: \"{{phrase}}\" → Field Tag चलाता है",
+    "voicePhrase": "Log plate",
+    "viewLogs": "SMS लॉग देखें",
+    "openSettings": "सेटिंग्स",
+    "languageLabel": "भाषा"
+  },
+  "fieldTag": {
+    "title": "FIELD TAG",
+    "subtitle": "प्लेट कोड दर्ज करें या बोलें",
+    "placeholder": "JG6613",
+    "submit": "टैग करें और SMS भेजें",
+    "sending": "SMS भेजा जा रहा है…",
+    "voiceAria": "वॉइस इनपुट",
+    "voicePrompt": "प्लेट कोड?",
+    "voiceUnsupported": "इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है",
+    "lookupFailed": "खोज विफल",
+    "smsSent": "SMS भेजा गया",
+    "smsMock": "SMS कतार में (मॉक मोड)"
+  },
+  "batchLog": {
+    "title": "BATCH LOG",
+    "subtitle": "5–10 प्लेट कोड दर्ज करें",
+    "plateN": "प्लेट {{n}}",
+    "addPlate": "प्लेट जोड़ें",
+    "submit": "डिकोड करें और सारांश भेजें",
+    "processing": "प्रसंस्करण…",
+    "failed": "बैच विफल",
+    "found": "{{found}} / {{total}} प्लेट मिलीं"
+  },
+  "dispatch": {
+    "title": "DISPATCH",
+    "subtitle": "ड्राइवर चैनल को सूचित करें",
+    "etaLabel": "ETA (मिनट)",
+    "notesLabel": "नोट्स (वैकल्पिक)",
+    "notesPlaceholder": "गेट कोड, वाहन विवरण…",
+    "notifying": "ड्राइवर को सूचित किया जा रहा है…",
+    "failed": "डिस्पैच विफल",
+    "hermes": "HERMES",
+    "hermesDesc": "एक्सप्रेस कूरियर लेन",
+    "portal": "PORTAL",
+    "portalDesc": "हब ट्रांसफर रूट",
+    "courier": "COURIER",
+    "courierDesc": "मानक फ़ील्ड ड्राइवर"
+  },
+  "ack": {
+    "title": "ACK",
+    "subtitle": "लूप बंद करें — टीम को सूचित किया जाता है",
+    "plateOptional": "प्लेट (वैकल्पिक)",
+    "platePlaceholder": "ACK को प्लेट से लिंक करें",
+    "failed": "ACK विफल",
+    "loopClosed": "लूप बंद ✓",
+    "pkgOk": "PKG-OK",
+    "pkgOkDesc": "पैकेज वितरित",
+    "drvIn": "DRV-IN",
+    "drvInDesc": "ड्राइवर चेक-इन किया",
+    "hold": "HOLD",
+    "holdDesc": "मंजूरी की प्रतीक्षा",
+    "abort": "ABORT",
+    "abortDesc": "ऑपरेशन रद्द करें"
+  },
+  "logs": {
+    "title": "SMS गतिविधि",
+    "empty": "अभी तक कोई संदेश नहीं। शुरू करने के लिए प्लेट टैग करें।",
+    "delivered": "वितरित",
+    "failed": "विफल",
+    "sent": "भेजा गया"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "postgresTitle": "PostgreSQL रजिस्ट्री",
+    "postgresOk": "{{count}} सक्रिय प्लेट · 1000+ तक स्केलेबल",
+    "postgresError": "डेटाबेस कनेक्ट नहीं — चलाएँ: docker compose up -d && npm run db:push && npm run db:seed",
+    "operatorPhone": "ऑपरेटर फ़ोन (SMS गंतव्य)",
+    "phonePlaceholder": "+1-202-555-0147",
+    "savePhone": "फ़ोन सहेजें",
+    "importTitle": "मास्टर रजिस्ट्री आयात करें",
+    "importDesc": "SGOS_Master_Plate_Registry_v2.json या CSV छोड़ें (172+ प्लेट)",
+    "importBtn": "JSON या CSV फ़ाइल चुनें",
+    "importing": "आयात हो रहा है…",
+    "importResult": "आयात: {{created}} नई, {{updated}} अपडेट (कुल {{total}} सक्रिय)",
+    "importFailed": "आयात विफल",
+    "importCli": "CLI: npx tsx scripts/import-plates.ts ./registry.json",
+    "sendblue": "Sendblue",
+    "sendblueConnected": "कनेक्टेड",
+    "sendblueMock": "मॉक मोड",
+    "sendblueHint": "लाइव SMS के लिए SENDBLUE_API_KEY, SENDBLUE_API_SECRET और SENDBLUE_FROM_NUMBER सेट करें।"
+  },
+  "errors": {
+    "plateRequired": "प्लेट आवश्यक",
+    "plateNotFound": "रजिस्ट्री में प्लेट नहीं मिली",
+    "databaseUnavailable": "DATABASE_URL कॉन्फ़िगर नहीं। PostgreSQL शुरू करें: docker compose up -d",
+    "requestFailed": "अनुरोध विफल"
+  },
+  "sms": {
+    "replyHint": "उत्तर: PKG-OK | DRV-IN | HOLD | ABORT",
+    "labels": {
+      "alert": "[SGOS ALERT] TYPE:",
+      "plate": "PLATE:",
+      "tier": "TIER-",
+      "callsign": "CALLSIGN:",
+      "loc": "LOC:",
+      "contact": "CONTACT:",
+      "action": "ACTION:",
+      "decode": "DECODE:",
+      "zone": "ZONE:",
+      "time": "TIME:",
+      "utc": "UTC",
+      "freezeHold": "आगे न बढ़ें। तुरंत कमांड को सूचित करें।",
+      "holdWait": "आगे बढ़ने से पहले मंजूरी की प्रतीक्षा करें।"
+    },
+    "dispatch": {
+      "header": "[SGOS DISPATCH] CHANNEL:",
+      "eta": "ड्राइवर को सूचित किया। ETA: {{minutes}} मिनट",
+      "notes": "NOTES:",
+      "standby": "DRV-IN पुष्टि की प्रतीक्षा।"
+    },
+    "ack": {
+      "prefix": "[SGOS ACK]",
+      "pkgOk": "पैकेज वितरण की पुष्टि। लूप बंद।",
+      "drvIn": "ड्राइवर चेक-इन दर्ज। पिकअप प्रगति पर।",
+      "hold": "HOLD स्थिति सेट। टीम को सूचित — मंजूरी की प्रतीक्षा।",
+      "abort": "ऑपरेशन रद्द। सुरक्षा और डिस्पैच को सूचित।"
+    },
+    "batch": {
+      "header": "[SGOS BATCH] {{count}} प्लेट लॉग की गईं",
+      "footer": "प्रत्येक प्लेट का पूरा विवरण भेजा गया। पूर्ण होने पर ACK दें।"
+    }
+  }
+}

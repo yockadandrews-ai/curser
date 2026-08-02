@@ -12,6 +12,12 @@ import {
 } from './classifier.js';
 import { buildFieldTagSms } from './templates.js';
 import { sendSms, getSendblueConfig } from './sendblue.js';
+import type { SgosLocale } from './locales.js';
+import {
+  buildLocalizedDispatchSms,
+  buildLocalizedAckSms,
+  buildLocalizedBatchSummary,
+} from './i18n.js';
 
 export async function getOperatorPhone(): Promise<string> {
   const row = await prisma.appSetting.findUnique({ where: { key: 'operator_phone' } });
@@ -65,16 +71,18 @@ interface FieldTagOptions {
   taggedBy?: string;
   source?: string;
   rawInput?: string;
+  locale?: SgosLocale;
 }
 
 export async function processFieldTag(opts: FieldTagOptions) {
+  const locale = opts.locale ?? 'en';
   const record = await findPlateByCode(opts.plate);
   if (!record) {
     return { error: 'not_found' as const, normalized: normalizePlateCode(opts.plate) };
   }
 
   const classified = classifyPlate(record);
-  const body = await buildFieldTagSms(record, classified);
+  const body = await buildFieldTagSms(record, classified, undefined, locale);
   const phone = opts.phone ?? (await getOperatorPhone());
 
   const tagEvent = await prisma.tagEvent.create({
@@ -84,6 +92,7 @@ export async function processFieldTag(opts: FieldTagOptions) {
       source: opts.source ?? 'FIELD_TAG',
       scenario: classified.scenario,
       rawInput: opts.rawInput ?? opts.plate,
+      locale,
     },
   });
 
@@ -103,7 +112,7 @@ export async function processFieldTag(opts: FieldTagOptions) {
   return { record, classified, tagEvent, sms: result, smsLog };
 }
 
-export async function processBatchLog(plates: string[], phone?: string) {
+export async function processBatchLog(plates: string[], phone?: string, locale: SgosLocale = 'en') {
   const results: Array<{ plate: string; found: boolean; scenario?: string; sms?: string }> = [];
   const decoded: Array<{ plate: Plate; scenario: string }> = [];
   const operatorPhone = phone ?? (await getOperatorPhone());
@@ -116,7 +125,7 @@ export async function processBatchLog(plates: string[], phone?: string) {
     }
 
     const classified = classifyPlate(record);
-    const body = await buildFieldTagSms(record, classified);
+    const body = await buildFieldTagSms(record, classified, undefined, locale);
 
     const tagEvent = await prisma.tagEvent.create({
       data: {
@@ -124,6 +133,7 @@ export async function processBatchLog(plates: string[], phone?: string) {
         source: 'BATCH',
         scenario: classified.scenario,
         rawInput: raw,
+        locale,
       },
     });
 
@@ -145,9 +155,14 @@ export async function processBatchLog(plates: string[], phone?: string) {
 
   let summarySms: string | undefined;
   if (decoded.length > 0) {
-    summarySms = buildBatchSummarySms(
-      decoded.map((d) => ({ plate: d.plate.plate, scenario: d.scenario, location: d.plate.location })),
-    );
+    const items = decoded.map((d) => ({
+      plate: d.plate.plate,
+      scenario: d.scenario,
+      location: d.plate.location,
+    }));
+    summarySms = locale === 'en'
+      ? buildBatchSummarySms(items)
+      : buildLocalizedBatchSummary(locale, items);
     const summaryResult = await sendSms(operatorPhone, summarySms);
     await prisma.smsLog.create({
       data: {
@@ -162,8 +177,16 @@ export async function processBatchLog(plates: string[], phone?: string) {
   return { total: plates.length, found: decoded.length, results, summarySms };
 }
 
-export async function processDispatch(channel: DispatchChannel, etaMinutes: number, notes?: string, phone?: string) {
-  const body = buildDispatchSms(channel, etaMinutes, notes);
+export async function processDispatch(
+  channel: DispatchChannel,
+  etaMinutes: number,
+  notes?: string,
+  phone?: string,
+  locale: SgosLocale = 'en',
+) {
+  const body = locale === 'en'
+    ? buildDispatchSms(channel, etaMinutes, notes)
+    : buildLocalizedDispatchSms(locale, channel, etaMinutes, notes);
   const operatorPhone = phone ?? (await getOperatorPhone());
   const result = await sendSms(operatorPhone, body);
 
@@ -179,7 +202,13 @@ export async function processDispatch(channel: DispatchChannel, etaMinutes: numb
   return { channel, etaMinutes, sms: result, smsLog };
 }
 
-export async function processAck(code: AckCode, plateRaw?: string, phone?: string, receivedFrom?: string) {
+export async function processAck(
+  code: AckCode,
+  plateRaw?: string,
+  phone?: string,
+  receivedFrom?: string,
+  locale: SgosLocale = 'en',
+) {
   const operatorPhone = phone ?? (await getOperatorPhone());
   let tagEvent: TagEvent | null = null;
 
@@ -198,7 +227,9 @@ export async function processAck(code: AckCode, plateRaw?: string, phone?: strin
     }
   }
 
-  const body = buildAckConfirmationSms(code, plateRaw ? normalizePlateCode(plateRaw) : undefined);
+  const body = locale === 'en'
+    ? buildAckConfirmationSms(code, plateRaw ? normalizePlateCode(plateRaw) : undefined)
+    : buildLocalizedAckSms(locale, code, plateRaw ? normalizePlateCode(plateRaw) : undefined);
   const result = await sendSms(operatorPhone, body);
 
   const smsLog = await prisma.smsLog.create({
@@ -237,11 +268,11 @@ export async function getRecentLogs(limit = 50) {
   });
 }
 
-export async function processInboundSms(content: string, from?: string) {
+export async function processInboundSms(content: string, from?: string, locale: SgosLocale = 'en') {
   const ack = parseAckFromText(content);
   if (!ack) return { parsed: null as AckCode | null };
 
-  const result = await processAck(ack, undefined, undefined, from);
+  const result = await processAck(ack, undefined, undefined, from, locale);
   return { parsed: ack, ...result };
 }
 

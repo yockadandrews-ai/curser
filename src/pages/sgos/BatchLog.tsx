@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Plus, Trash2, Loader2, Layers } from 'lucide-react';
 import { sgosApi } from '../../sgosApi';
+import { useSgosLocale } from '../../i18n/useSgosLocale';
 import type { BatchLogResult } from '../../types/sgos';
 
 export default function BatchLog() {
+  const { t } = useTranslation();
+  const { path } = useSgosLocale();
   const [plates, setPlates] = useState<string[]>(['', '']);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<BatchLogResult | null>(null);
@@ -29,7 +33,7 @@ export default function BatchLog() {
       const res = await sgosApi.batchLog(codes);
       setResult(res);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Batch failed');
+      setError(e instanceof Error ? e.message : t('batchLog.failed'));
     } finally {
       setLoading(false);
     }
@@ -37,23 +41,23 @@ export default function BatchLog() {
 
   return (
     <div className="space-y-5">
-      <Link to="/sgos" className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm">
-        <ArrowLeft size={16} /> Command Center
+      <Link to={path('')} className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm">
+        <ArrowLeft size={16} /> {t('common.back')}
       </Link>
 
       <div className="rounded-2xl bg-gradient-to-br from-blue-900 to-blue-950 border border-blue-700/50 p-5">
         <div className="flex items-center gap-2 mb-1">
           <Layers size={20} className="text-blue-300" />
-          <h2 className="text-xl font-bold text-blue-100">BATCH LOG</h2>
+          <h2 className="text-xl font-bold text-blue-100">{t('batchLog.title')}</h2>
         </div>
-        <p className="text-sm text-blue-200/60 mb-4">Enter 5–10 plate codes</p>
+        <p className="text-sm text-blue-200/60 mb-4">{t('batchLog.subtitle')}</p>
 
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {plates.map((p, i) => (
             <div key={i} className="flex gap-2">
               <input
                 className="sgos-input flex-1 uppercase font-mono"
-                placeholder={`Plate ${i + 1}`}
+                placeholder={t('batchLog.plateN', { n: i + 1 })}
                 value={p}
                 onChange={(e) => update(i, e.target.value)}
               />
@@ -67,7 +71,7 @@ export default function BatchLog() {
         </div>
 
         <button type="button" onClick={addRow} className="mt-2 text-sm text-blue-300 flex items-center gap-1 hover:text-blue-100">
-          <Plus size={16} /> Add plate
+          <Plus size={16} /> {t('batchLog.addPlate')}
         </button>
 
         <button
@@ -77,7 +81,7 @@ export default function BatchLog() {
           className="sgos-btn-primary w-full mt-4 bg-blue-600 hover:bg-blue-500 flex items-center justify-center gap-2"
         >
           {loading ? <Loader2 size={18} className="animate-spin" /> : null}
-          {loading ? 'Processing…' : 'Decode & Send Summary'}
+          {loading ? t('batchLog.processing') : t('batchLog.submit')}
         </button>
       </div>
 
@@ -85,9 +89,8 @@ export default function BatchLog() {
 
       {result && (
         <div className="rounded-xl bg-sgos-900 border border-sgos-800 p-4 space-y-3">
-          <p className="text-sm">
-            <span className="text-emerald-400 font-semibold">{result.found}</span>
-            <span className="text-gray-400"> / {result.total} plates found</span>
+          <p className="text-sm text-gray-300">
+            {t('batchLog.found', { found: result.found, total: result.total })}
           </p>
           <ul className="space-y-2">
             {result.results.map((r) => (
@@ -96,7 +99,7 @@ export default function BatchLog() {
                 {r.found ? (
                   <span className="text-sgos-accent">{r.scenario}</span>
                 ) : (
-                  <span className="text-red-400">Not found</span>
+                  <span className="text-red-400">{t('errors.plateNotFound')}</span>
                 )}
               </li>
             ))}

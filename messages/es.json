@@ -1,0 +1,163 @@
+{
+  "common": {
+    "appName": "SGOS",
+    "subtitle": "Operaciones de campo",
+    "loading": "Cargando…",
+    "error": "Algo salió mal",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "saved": "¡Guardado!",
+    "back": "Centro de mando",
+    "backCmd": "CMD",
+    "plate": "Matrícula",
+    "scenario": "Escenario",
+    "location": "Ubicación",
+    "language": "Idioma"
+  },
+  "nav": {
+    "cmd": "CMD",
+    "logs": "LOGS",
+    "settings": "AJUST"
+  },
+  "commandCenter": {
+    "fieldTag": "FIELD TAG",
+    "fieldTagDesc": "Dictar matrícula → instrucciones SMS",
+    "batchLog": "BATCH LOG",
+    "batchLogDesc": "5–10 matrículas → resumen decodificado",
+    "dispatch": "DISPATCH",
+    "dispatchDesc": "HERMES · PORTAL · COURIER",
+    "ack": "ACK",
+    "ackDesc": "PKG-OK · DRV-IN · HOLD · ABORT",
+    "cmdTitle": "SGOS CMD",
+    "cmdDesc": "Etiquetado rápido en campo — toque para empezar",
+    "voiceTipTitle": "Consejo de control por voz",
+    "voiceTipPath": "Ajustes → Accesibilidad → Control por voz",
+    "voiceTipPhrase": "Frase: \"{{phrase}}\" → ejecuta Field Tag",
+    "voicePhrase": "Log plate",
+    "viewLogs": "Ver registros SMS",
+    "openSettings": "Ajustes",
+    "languageLabel": "Idioma"
+  },
+  "fieldTag": {
+    "title": "FIELD TAG",
+    "subtitle": "Introduzca o dicte un código de matrícula",
+    "placeholder": "JG6613",
+    "submit": "Etiquetar y enviar SMS",
+    "sending": "Enviando SMS…",
+    "voiceAria": "Entrada de voz",
+    "voicePrompt": "¿Código de matrícula?",
+    "voiceUnsupported": "La entrada de voz no es compatible con este navegador",
+    "lookupFailed": "Búsqueda fallida",
+    "smsSent": "SMS enviado",
+    "smsMock": "SMS en cola (modo simulación)"
+  },
+  "batchLog": {
+    "title": "BATCH LOG",
+    "subtitle": "Introduzca 5–10 códigos de matrícula",
+    "plateN": "Matrícula {{n}}",
+    "addPlate": "Añadir matrícula",
+    "submit": "Decodificar y enviar resumen",
+    "processing": "Procesando…",
+    "failed": "Lote fallido",
+    "found": "{{found}} / {{total}} matrículas encontradas"
+  },
+  "dispatch": {
+    "title": "DISPATCH",
+    "subtitle": "Notificar canal del conductor",
+    "etaLabel": "ETA (minutos)",
+    "notesLabel": "Notas (opcional)",
+    "notesPlaceholder": "Código de puerta, descripción del vehículo…",
+    "notifying": "Notificando al conductor…",
+    "failed": "Despacho fallido",
+    "hermes": "HERMES",
+    "hermesDesc": "Canal de mensajería express",
+    "portal": "PORTAL",
+    "portalDesc": "Ruta de transferencia en hub",
+    "courier": "COURIER",
+    "courierDesc": "Conductor estándar de campo"
+  },
+  "ack": {
+    "title": "ACK",
+    "subtitle": "Cerrar el ciclo — el equipo recibe notificación",
+    "plateOptional": "Matrícula (opcional)",
+    "platePlaceholder": "Vincular ACK a matrícula",
+    "failed": "ACK fallido",
+    "loopClosed": "Ciclo cerrado ✓",
+    "pkgOk": "PKG-OK",
+    "pkgOkDesc": "Paquete entregado",
+    "drvIn": "DRV-IN",
+    "drvInDesc": "Conductor registrado",
+    "hold": "HOLD",
+    "holdDesc": "Esperando autorización",
+    "abort": "ABORT",
+    "abortDesc": "Cancelar operación"
+  },
+  "logs": {
+    "title": "Actividad SMS",
+    "empty": "Aún no hay mensajes. Etiquete una matrícula para empezar.",
+    "delivered": "Entregado",
+    "failed": "Fallido",
+    "sent": "Enviado"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "postgresTitle": "Registro PostgreSQL",
+    "postgresOk": "{{count}} matrículas activas · escalable a 1000+",
+    "postgresError": "Base de datos no conectada — ejecute: docker compose up -d && npm run db:push && npm run db:seed",
+    "operatorPhone": "Teléfono del operador (destino SMS)",
+    "phonePlaceholder": "+1-202-555-0147",
+    "savePhone": "Guardar teléfono",
+    "importTitle": "Importar registro maestro",
+    "importDesc": "Suelte SGOS_Master_Plate_Registry_v2.json o CSV (172+ matrículas)",
+    "importBtn": "Elegir archivo JSON o CSV",
+    "importing": "Importando…",
+    "importResult": "Importado: {{created}} nuevas, {{updated}} actualizadas ({{total}} activas en total)",
+    "importFailed": "Importación fallida",
+    "importCli": "CLI: npx tsx scripts/import-plates.ts ./registry.json",
+    "sendblue": "Sendblue",
+    "sendblueConnected": "Conectado",
+    "sendblueMock": "Modo simulación",
+    "sendblueHint": "Configure SENDBLUE_API_KEY, SENDBLUE_API_SECRET y SENDBLUE_FROM_NUMBER para SMS en vivo."
+  },
+  "errors": {
+    "plateRequired": "matrícula requerida",
+    "plateNotFound": "Matrícula no encontrada en el registro",
+    "databaseUnavailable": "DATABASE_URL no configurada. Inicie PostgreSQL: docker compose up -d",
+    "requestFailed": "Solicitud fallida"
+  },
+  "sms": {
+    "replyHint": "Responder: PKG-OK | DRV-IN | HOLD | ABORT",
+    "labels": {
+      "alert": "[SGOS ALERT] TYPE:",
+      "plate": "PLATE:",
+      "tier": "TIER-",
+      "callsign": "CALLSIGN:",
+      "loc": "LOC:",
+      "contact": "CONTACT:",
+      "action": "ACTION:",
+      "decode": "DECODE:",
+      "zone": "ZONE:",
+      "time": "TIME:",
+      "utc": "UTC",
+      "freezeHold": "NO CONTINUAR. Alertar al mando de inmediato.",
+      "holdWait": "Espere autorización antes de continuar."
+    },
+    "dispatch": {
+      "header": "[SGOS DISPATCH] CHANNEL:",
+      "eta": "Conductor notificado. ETA: {{minutes}} min",
+      "notes": "NOTES:",
+      "standby": "En espera de confirmación DRV-IN."
+    },
+    "ack": {
+      "prefix": "[SGOS ACK]",
+      "pkgOk": "Entrega de paquete confirmada. Ciclo cerrado.",
+      "drvIn": "Registro de conductor anotado. Recogida en curso.",
+      "hold": "Estado HOLD establecido. Equipo notificado — esperando autorización.",
+      "abort": "Operación abortada. Seguridad y despacho alertados."
+    },
+    "batch": {
+      "header": "[SGOS BATCH] {{count}} matrículas registradas",
+      "footer": "Detalle completo enviado por matrícula. Responda ACK al completar."
+    }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "common": {
+    "appName": "SGOS",
+    "subtitle": "Полевые операции",
+    "loading": "Загрузка…",
+    "error": "Что-то пошло не так",
+    "retry": "Повторить",
+    "save": "Сохранить",
+    "saved": "Сохранено!",
+    "back": "Командный центр",
+    "backCmd": "CMD",
+    "plate": "Номер",
+    "scenario": "Сценарий",
+    "location": "Местоположение",
+    "language": "Язык"
+  },
+  "nav": {
+    "cmd": "CMD",
+    "logs": "LOGS",
+    "settings": "НАСТ"
+  },
+  "commandCenter": {
+    "fieldTag": "FIELD TAG",
+    "fieldTagDesc": "Диктовать номер → SMS-инструкции",
+    "batchLog": "BATCH LOG",
+    "batchLogDesc": "5–10 номеров → сводная расшифровка",
+    "dispatch": "DISPATCH",
+    "dispatchDesc": "HERMES · PORTAL · COURIER",
+    "ack": "ACK",
+    "ackDesc": "PKG-OK · DRV-IN · HOLD · ABORT",
+    "cmdTitle": "SGOS CMD",
+    "cmdDesc": "Быстрая полевая метка — нажмите для начала",
+    "voiceTipTitle": "Подсказка по голосовому управлению",
+    "voiceTipPath": "Настройки → Универсальный доступ → Голосовое управление",
+    "voiceTipPhrase": "Фраза: \"{{phrase}}\" → запускает Field Tag",
+    "voicePhrase": "Log plate",
+    "viewLogs": "Просмотр SMS-логов",
+    "openSettings": "Настройки",
+    "languageLabel": "Язык"
+  },
+  "fieldTag": {
+    "title": "FIELD TAG",
+    "subtitle": "Введите или продиктуйте код номера",
+    "placeholder": "JG6613",
+    "submit": "Отметить и отправить SMS",
+    "sending": "Отправка SMS…",
+    "voiceAria": "Голосовой ввод",
+    "voicePrompt": "Код номера?",
+    "voiceUnsupported": "Голосовой ввод не поддерживается в этом браузере",
+    "lookupFailed": "Поиск не удался",
+    "smsSent": "SMS отправлено",
+    "smsMock": "SMS в очереди (режим имитации)"
+  },
+  "batchLog": {
+    "title": "BATCH LOG",
+    "subtitle": "Введите 5–10 кодов номеров",
+    "plateN": "Номер {{n}}",
+    "addPlate": "Добавить номер",
+    "submit": "Расшифровать и отправить сводку",
+    "processing": "Обработка…",
+    "failed": "Пакетная обработка не удалась",
+    "found": "Найдено {{found}} / {{total}} номеров"
+  },
+  "dispatch": {
+    "title": "DISPATCH",
+    "subtitle": "Уведомить канал водителя",
+    "etaLabel": "ETA (минуты)",
+    "notesLabel": "Заметки (необязательно)",
+    "notesPlaceholder": "Код ворот, описание транспорта…",
+    "notifying": "Уведомление водителя…",
+    "failed": "Диспетчеризация не удалась",
+    "hermes": "HERMES",
+    "hermesDesc": "Экспресс-курьерский канал",
+    "portal": "PORTAL",
+    "portalDesc": "Маршрут трансфера через хаб",
+    "courier": "COURIER",
+    "courierDesc": "Стандартный полевой водитель"
+  },
+  "ack": {
+    "title": "ACK",
+    "subtitle": "Закрыть цикл — команда получит уведомление",
+    "plateOptional": "Номер (необязательно)",
+    "platePlaceholder": "Привязать ACK к номеру",
+    "failed": "ACK не удался",
+    "loopClosed": "Цикл закрыт ✓",
+    "pkgOk": "PKG-OK",
+    "pkgOkDesc": "Посылка доставлена",
+    "drvIn": "DRV-IN",
+    "drvInDesc": "Водитель зарегистрирован",
+    "hold": "HOLD",
+    "holdDesc": "Ожидание разрешения",
+    "abort": "ABORT",
+    "abortDesc": "Отменить операцию"
+  },
+  "logs": {
+    "title": "SMS-активность",
+    "empty": "Сообщений пока нет. Отметьте номер, чтобы начать.",
+    "delivered": "Доставлено",
+    "failed": "Не удалось",
+    "sent": "Отправлено"
+  },
+  "settings": {
+    "title": "Настройки",
+    "postgresTitle": "Реестр PostgreSQL",
+    "postgresOk": "{{count}} активных номеров · масштабируется до 1000+",
+    "postgresError": "База данных не подключена — выполните: docker compose up -d && npm run db:push && npm run db:seed",
+    "operatorPhone": "Телефон оператора (адрес SMS)",
+    "phonePlaceholder": "+1-202-555-0147",
+    "savePhone": "Сохранить телефон",
+    "importTitle": "Импорт мастер-реестра",
+    "importDesc": "Перетащите SGOS_Master_Plate_Registry_v2.json или CSV (172+ номеров)",
+    "importBtn": "Выбрать JSON или CSV файл",
+    "importing": "Импорт…",
+    "importResult": "Импортировано: {{created}} новых, {{updated}} обновлено (всего {{total}} активных)",
+    "importFailed": "Импорт не удался",
+    "importCli": "CLI: npx tsx scripts/import-plates.ts ./registry.json",
+    "sendblue": "Sendblue",
+    "sendblueConnected": "Подключено",
+    "sendblueMock": "Режим имитации",
+    "sendblueHint": "Установите SENDBLUE_API_KEY, SENDBLUE_API_SECRET и SENDBLUE_FROM_NUMBER для живых SMS."
+  },
+  "errors": {
+    "plateRequired": "требуется номер",
+    "plateNotFound": "Номер не найден в реестре",
+    "databaseUnavailable": "DATABASE_URL не настроен. Запустите PostgreSQL: docker compose up -d",
+    "requestFailed": "Запрос не удался"
+  },
+  "sms": {
+    "replyHint": "Ответ: PKG-OK | DRV-IN | HOLD | ABORT",
+    "labels": {
+      "alert": "[SGOS ALERT] TYPE:",
+      "plate": "PLATE:",
+      "tier": "TIER-",
+      "callsign": "CALLSIGN:",
+      "loc": "LOC:",
+      "contact": "CONTACT:",
+      "action": "ACTION:",
+      "decode": "DECODE:",
+      "zone": "ZONE:",
+      "time": "TIME:",
+      "utc": "UTC",
+      "freezeHold": "НЕ ПРОДОЛЖАТЬ. Немедленно оповестить командование.",
+      "holdWait": "Дождитесь разрешения перед продолжением."
+    },
+    "dispatch": {
+      "header": "[SGOS DISPATCH] CHANNEL:",
+      "eta": "Водитель уведомлён. ETA: {{minutes}} мин",
+      "notes": "NOTES:",
+      "standby": "Ожидание подтверждения DRV-IN."
+    },
+    "ack": {
+      "prefix": "[SGOS ACK]",
+      "pkgOk": "Доставка посылки подтверждена. Цикл закрыт.",
+      "drvIn": "Регистрация водителя записана. Забор в процессе.",
+      "hold": "Статус HOLD установлен. Команда уведомлена — ожидание разрешения.",
+      "abort": "Операция прервана. Безопасность и диспетчеризация оповещены."
+    },
+    "batch": {
+      "header": "[SGOS BATCH] {{count}} номеров зарегистрировано",
+      "footer": "Полные данные отправлены по каждому номеру. Ответьте ACK по завершении."
+    }
+  }
+}

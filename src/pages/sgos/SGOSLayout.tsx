@@ -1,15 +1,20 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Radio, History, Settings } from 'lucide-react';
-
-const navItems = [
-  { to: '/sgos', label: 'CMD', end: true },
-  { to: '/sgos/logs', label: 'LOGS', end: false },
-  { to: '/sgos/settings', label: 'SET', end: false },
-];
+import { useSgosLocale } from '../../i18n/useSgosLocale';
 
 export default function SGOSLayout() {
+  const { t } = useTranslation();
+  const { path, locale } = useSgosLocale();
   const location = useLocation();
-  const isHome = location.pathname === '/sgos';
+  const homePath = path('');
+  const isHome = location.pathname === homePath || location.pathname === `/sgos/${locale}`;
+
+  const navItems = [
+    { to: path(''), label: t('nav.cmd'), end: true, icon: 'cmd' as const },
+    { to: path('logs'), label: t('nav.logs'), end: false, icon: 'logs' as const },
+    { to: path('settings'), label: t('nav.settings'), end: false, icon: 'settings' as const },
+  ];
 
   return (
     <div className="min-h-screen bg-sgos-950 text-gray-100 flex flex-col max-w-lg mx-auto">
@@ -19,8 +24,8 @@ export default function SGOSLayout() {
             <Radio size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg tracking-wide text-white">SGOS</h1>
-            <p className="text-[11px] text-sgos-accent/80 uppercase tracking-widest">Field Operations</p>
+            <h1 className="font-bold text-lg tracking-wide text-white">{t('common.appName')}</h1>
+            <p className="text-[11px] text-sgos-accent/80 uppercase tracking-widest">{t('common.subtitle')}</p>
           </div>
         </div>
       </header>
@@ -31,7 +36,7 @@ export default function SGOSLayout() {
 
       {!isHome && (
         <nav className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto bg-sgos-900/95 backdrop-blur border-t border-sgos-800 px-6 py-3 pb-safe flex justify-around">
-          {navItems.map(({ to, label, end }) => (
+          {navItems.map(({ to, label, end, icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -42,7 +47,13 @@ export default function SGOSLayout() {
                 }`
               }
             >
-              {label === 'LOGS' ? <History size={18} className="mx-auto mb-0.5" /> : label === 'SET' ? <Settings size={18} className="mx-auto mb-0.5" /> : <Radio size={18} className="mx-auto mb-0.5" />}
+              {icon === 'logs' ? (
+                <History size={18} className="mx-auto mb-0.5" />
+              ) : icon === 'settings' ? (
+                <Settings size={18} className="mx-auto mb-0.5" />
+              ) : (
+                <Radio size={18} className="mx-auto mb-0.5" />
+              )}
               <span className="block text-center">{label}</span>
             </NavLink>
           ))}

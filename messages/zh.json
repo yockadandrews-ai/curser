@@ -1,0 +1,163 @@
+{
+  "common": {
+    "appName": "SGOS",
+    "subtitle": "现场作业",
+    "loading": "加载中…",
+    "error": "出了点问题",
+    "retry": "重试",
+    "save": "保存",
+    "saved": "已保存！",
+    "back": "指挥中心",
+    "backCmd": "CMD",
+    "plate": "车牌",
+    "scenario": "场景",
+    "location": "位置",
+    "language": "语言"
+  },
+  "nav": {
+    "cmd": "CMD",
+    "logs": "LOGS",
+    "settings": "设置"
+  },
+  "commandCenter": {
+    "fieldTag": "FIELD TAG",
+    "fieldTagDesc": "口述车牌 → 短信指令",
+    "batchLog": "BATCH LOG",
+    "batchLogDesc": "5–10 个车牌 → 汇总解码",
+    "dispatch": "DISPATCH",
+    "dispatchDesc": "HERMES · PORTAL · COURIER",
+    "ack": "ACK",
+    "ackDesc": "PKG-OK · DRV-IN · HOLD · ABORT",
+    "cmdTitle": "SGOS CMD",
+    "cmdDesc": "快速现场标记 — 点击开始",
+    "voiceTipTitle": "语音控制提示",
+    "voiceTipPath": "设置 → 辅助功能 → 语音控制",
+    "voiceTipPhrase": "短语：\"{{phrase}}\" → 运行 Field Tag",
+    "voicePhrase": "Log plate",
+    "viewLogs": "查看短信日志",
+    "openSettings": "设置",
+    "languageLabel": "语言"
+  },
+  "fieldTag": {
+    "title": "FIELD TAG",
+    "subtitle": "输入或口述车牌代码",
+    "placeholder": "JG6613",
+    "submit": "标记并发送短信",
+    "sending": "正在发送短信…",
+    "voiceAria": "语音输入",
+    "voicePrompt": "车牌代码？",
+    "voiceUnsupported": "此浏览器不支持语音输入",
+    "lookupFailed": "查询失败",
+    "smsSent": "短信已发送",
+    "smsMock": "短信已排队（模拟模式）"
+  },
+  "batchLog": {
+    "title": "BATCH LOG",
+    "subtitle": "输入 5–10 个车牌代码",
+    "plateN": "车牌 {{n}}",
+    "addPlate": "添加车牌",
+    "submit": "解码并发送汇总",
+    "processing": "处理中…",
+    "failed": "批量处理失败",
+    "found": "找到 {{found}} / {{total}} 个车牌"
+  },
+  "dispatch": {
+    "title": "DISPATCH",
+    "subtitle": "通知司机通道",
+    "etaLabel": "预计到达（分钟）",
+    "notesLabel": "备注（可选）",
+    "notesPlaceholder": "门禁码、车辆描述…",
+    "notifying": "正在通知司机…",
+    "failed": "调度失败",
+    "hermes": "HERMES",
+    "hermesDesc": "快递专线",
+    "portal": "PORTAL",
+    "portalDesc": "枢纽转运路线",
+    "courier": "COURIER",
+    "courierDesc": "标准现场司机"
+  },
+  "ack": {
+    "title": "ACK",
+    "subtitle": "闭环确认 — 团队将收到通知",
+    "plateOptional": "车牌（可选）",
+    "platePlaceholder": "将 ACK 关联到车牌",
+    "failed": "ACK 失败",
+    "loopClosed": "闭环完成 ✓",
+    "pkgOk": "PKG-OK",
+    "pkgOkDesc": "包裹已送达",
+    "drvIn": "DRV-IN",
+    "drvInDesc": "司机已签到",
+    "hold": "HOLD",
+    "holdDesc": "等待放行",
+    "abort": "ABORT",
+    "abortDesc": "取消操作"
+  },
+  "logs": {
+    "title": "短信活动",
+    "empty": "暂无消息。标记一个车牌以开始。",
+    "delivered": "已送达",
+    "failed": "失败",
+    "sent": "已发送"
+  },
+  "settings": {
+    "title": "设置",
+    "postgresTitle": "PostgreSQL 注册表",
+    "postgresOk": "{{count}} 个活跃车牌 · 可扩展至 1000+",
+    "postgresError": "数据库未连接 — 请运行：docker compose up -d && npm run db:push && npm run db:seed",
+    "operatorPhone": "操作员电话（短信接收号码）",
+    "phonePlaceholder": "+1-202-555-0147",
+    "savePhone": "保存电话",
+    "importTitle": "导入主注册表",
+    "importDesc": "拖放 SGOS_Master_Plate_Registry_v2.json 或 CSV（172+ 车牌）",
+    "importBtn": "选择 JSON 或 CSV 文件",
+    "importing": "导入中…",
+    "importResult": "已导入：{{created}} 条新增，{{updated}} 条更新（共 {{total}} 条活跃）",
+    "importFailed": "导入失败",
+    "importCli": "CLI：npx tsx scripts/import-plates.ts ./registry.json",
+    "sendblue": "Sendblue",
+    "sendblueConnected": "已连接",
+    "sendblueMock": "模拟模式",
+    "sendblueHint": "设置 SENDBLUE_API_KEY、SENDBLUE_API_SECRET 和 SENDBLUE_FROM_NUMBER 以启用实时短信。"
+  },
+  "errors": {
+    "plateRequired": "需要车牌",
+    "plateNotFound": "注册表中未找到该车牌",
+    "databaseUnavailable": "未配置 DATABASE_URL。请启动 PostgreSQL：docker compose up -d",
+    "requestFailed": "请求失败"
+  },
+  "sms": {
+    "replyHint": "回复：PKG-OK | DRV-IN | HOLD | ABORT",
+    "labels": {
+      "alert": "[SGOS ALERT] TYPE:",
+      "plate": "PLATE:",
+      "tier": "TIER-",
+      "callsign": "CALLSIGN:",
+      "loc": "LOC:",
+      "contact": "CONTACT:",
+      "action": "ACTION:",
+      "decode": "DECODE:",
+      "zone": "ZONE:",
+      "time": "TIME:",
+      "utc": "UTC",
+      "freezeHold": "请勿继续。立即向指挥部报警。",
+      "holdWait": "继续前等待放行。"
+    },
+    "dispatch": {
+      "header": "[SGOS DISPATCH] CHANNEL:",
+      "eta": "已通知司机。预计到达：{{minutes}} 分钟",
+      "notes": "NOTES:",
+      "standby": "等待 DRV-IN 确认。"
+    },
+    "ack": {
+      "prefix": "[SGOS ACK]",
+      "pkgOk": "包裹送达已确认。闭环完成。",
+      "drvIn": "司机签到已记录。取件进行中。",
+      "hold": "已设置 HOLD 状态。团队已通知 — 等待放行。",
+      "abort": "操作已中止。安全和调度已报警。"
+    },
+    "batch": {
+      "header": "[SGOS BATCH] 已记录 {{count}} 个车牌",
+      "footer": "每个车牌的完整详情已发送。完成后请回复 ACK。"
+    }
+  }
+}

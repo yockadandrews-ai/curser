@@ -23,7 +23,16 @@ import { importPlates, parseCsvPlates, type ImportPlateRow } from './importPlate
 import { getSendblueConfig } from './sendblue.js';
 import { seedDefaultTemplates } from './templates.js';
 
+import { resolveLocale } from './i18n.js';
+
 const router = Router();
+
+function requestLocale(req: Request): import('./locales.js').SgosLocale {
+  return resolveLocale(
+    (req.body?.locale as string) ?? (req.query?.locale as string),
+    req.headers['accept-language'],
+  );
+}
 
 function requireDb(_req: Request, res: Response, next: () => void) {
   if (!isDatabaseConfigured()) {
@@ -50,6 +59,7 @@ router.post('/field-tag', async (req: Request, res: Response) => {
     taggedBy: req.body?.taggedBy as string | undefined,
     source: 'FIELD_TAG',
     rawInput: rawPlate,
+    locale: requestLocale(req),
   });
 
   if ('error' in result) {
@@ -72,7 +82,7 @@ router.post('/batch-log', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'plates array required' });
   }
 
-  const result = await processBatchLog(rawPlates, resolvePhone(req));
+  const result = await processBatchLog(rawPlates, resolvePhone(req), requestLocale(req));
   res.json({ ok: true, ...result });
 });
 
@@ -86,7 +96,7 @@ router.post('/dispatch', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'channel must be HERMES, PORTAL, or COURIER' });
   }
 
-  const result = await processDispatch(channel, etaMinutes, notes, resolvePhone(req));
+  const result = await processDispatch(channel, etaMinutes, notes, resolvePhone(req), requestLocale(req));
   res.json({ ok: result.sms.status !== 'failed', ...result });
 });
 
@@ -99,7 +109,7 @@ router.post('/ack', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'code must be PKG-OK, DRV-IN, HOLD, or ABORT' });
   }
 
-  const result = await processAck(code, plateCode, resolvePhone(req), req.body?.receivedFrom as string | undefined);
+  const result = await processAck(code, plateCode, resolvePhone(req), req.body?.receivedFrom as string | undefined, requestLocale(req));
   res.json({ ok: result.sms.status !== 'failed', ...result });
 });
 
@@ -113,7 +123,8 @@ router.get('/plates/:code', async (req: Request, res: Response) => {
   const record = await findPlateByCode(String(req.params.code));
   if (!record) return res.status(404).json({ error: 'Not found' });
   const classified = classifyPlate(record);
-  const previewSms = await buildFieldTagSms(record, classified);
+  const locale = requestLocale(req);
+  const previewSms = await buildFieldTagSms(record, classified, undefined, locale);
   res.json({ plate: record, classified, previewSms });
 });
 
@@ -173,7 +184,7 @@ router.post('/webhook/delivery', async (req: Request, res: Response) => {
 router.post('/webhook/inbound', async (req: Request, res: Response) => {
   const content = (req.body?.content ?? req.body?.message ?? '') as string;
   const from = (req.body?.from_number ?? req.body?.from) as string | undefined;
-  const result = await processInboundSms(content, from);
+  const result = await processInboundSms(content, from, requestLocale(req));
   res.json({ ok: true, ...result });
 });
 
