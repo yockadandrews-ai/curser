@@ -3,6 +3,7 @@ dist/
 data/*.db
 data/import_chunk_*.sql
 !data/SGOS_Master_Plate_Registry_v2.json
+!data/SGOS_Master_Plate_Registry_v2.csv
 !data/.gitkeep
 output/
 !output/**/
