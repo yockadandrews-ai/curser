@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "Real Automation",
+    "engineRunning": "Engine Running",
+    "engineNote": "Autopilot handles affiliate products. Notion tools are tracked separately."
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "Daily Factory",
+    "notionTools": "Notion Tools",
+    "earnings": "Real Earnings",
+    "viral": "Viral Cash Generator"
+  },
+  "language": {
+    "label": "Language",
+    "switchTo": "Switch language",
+    "phase1": "Phase 1 languages",
+    "phase2": "Phase 2 languages"
+  },
+  "common": {
+    "loading": "Loading…",
+    "passed": "Passed",
+    "review": "Review",
+    "apps": "Apps",
+    "proposals": "Proposals",
+    "themes": "Themes",
+    "suite": "Suite"
+  },
+  "factory": {
+    "title": "Daily Factory",
+    "subtitle": "5 apps + 5 proposals every day — ready for Cursor / sales / outreach",
+    "step1": "Cluster Selection",
+    "step2": "App Definitions",
+    "step3": "5 Proposals",
+    "step4": "Packaging",
+    "step1Desc": "Pick theme, refine 5 apps",
+    "step2Desc": "Full template per app",
+    "step3Desc": "Singles + suite proposal",
+    "step4Desc": "Folder for Cursor handoff",
+    "todayTheme": "Today's Theme",
+    "suggestedToday": "(suggested today)",
+    "runThree": "Run 3 Themes (15 Apps)",
+    "singleTheme": "Single Theme",
+    "runFive": "Run 5 Themes (25 Apps)",
+    "generateMultilingual": "Generate Multilingual Package",
+    "multilingualNote": "Includes EN + ES + PT-BR suite proposals and i18n Cursor handoff",
+    "i18nGate": "Language & Accessibility quality gate enabled",
+    "outputFolder": "Output Folder Structure",
+    "writtenTo": "Written to",
+    "sendToCursor": "send to Cursor to scaffold",
+    "pastRuns": "Past Runs",
+    "appDefinitions": "5 App Definitions",
+    "qualityChecks": "Quality checks",
+    "multiPackage": "Multi-theme package",
+    "clickRunThree": "Click Run 3 Themes for the full 15-app package"
+  }
+}

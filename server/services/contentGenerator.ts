@@ -1,6 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import type { Product } from '../db.js';
 import { addContent, logActivity } from '../db.js';
+import type { SupportedLocale } from '../i18n/languages.js';
+import { DEFAULT_LOCALE } from '../i18n/languages.js';
+import { aiLanguageInstruction } from '../i18n/multilingual.js';
 
 const HOOKS = [
   'POV: You just found the product that changed everything',
@@ -94,9 +97,14 @@ export interface GeneratedPost {
   caption: string;
   hashtags: string;
   viralScore: number;
+  locale: SupportedLocale;
 }
 
-export function generateContentForProduct(product: Product, platforms: string[]): GeneratedPost[] {
+export function generateContentForProduct(
+  product: Product,
+  platforms: string[],
+  locale: SupportedLocale = DEFAULT_LOCALE,
+): GeneratedPost[] {
   const profit = product.sellPrice - product.cost;
   const posts: GeneratedPost[] = [];
 
@@ -116,26 +124,35 @@ export function generateContentForProduct(product: Product, platforms: string[])
       caption,
       hashtags: tags,
       viralScore,
+      locale,
     });
   }
 
   return posts;
 }
 
-export function generateAndSaveContent(product: Product, platforms: string[]) {
-  const posts = generateContentForProduct(product, platforms);
+export function generateAndSaveContent(
+  product: Product,
+  platforms: string[],
+  locale: SupportedLocale = DEFAULT_LOCALE,
+) {
+  const posts = generateContentForProduct(product, platforms, locale);
   const saved = posts.map(p => {
     const content = addContent({
       ...p,
       status: 'queued',
     });
-    logActivity('content', `📝 Generated ${p.platform} post for "${product.name}" (score: ${p.viralScore})`);
+    logActivity('content', `📝 Generated ${p.platform} post for "${product.name}" (${p.locale}, score: ${p.viralScore})`);
     return content;
   });
   return saved;
 }
 
-export async function generateWithAI(product: Product, platform: string): Promise<GeneratedPost | null> {
+export async function generateWithAI(
+  product: Product,
+  platform: string,
+  locale: SupportedLocale = DEFAULT_LOCALE,
+): Promise<GeneratedPost | null> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
 
@@ -150,6 +167,9 @@ export async function generateWithAI(product: Product, platform: string): Promis
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [{
+          role: 'system',
+          content: aiLanguageInstruction(locale),
+        }, {
           role: 'user',
           content: `Create viral ${platform} content for this product:
 Product: ${product.name}
@@ -179,6 +199,7 @@ Return JSON: {"hook":"...","caption":"...","hashtags":"..."}`,
       caption: parsed.caption,
       hashtags: parsed.hashtags,
       viralScore: calculateContentViralScore(product, platform) + 5,
+      locale,
     };
   } catch {
     return null;

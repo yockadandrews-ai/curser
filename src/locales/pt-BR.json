@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "Automação real",
+    "engineRunning": "Motor em execução",
+    "engineNote": "Autopilot gerencia produtos de afiliados. Ferramentas Notion são rastreadas separadamente."
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "Fábrica diária",
+    "notionTools": "Ferramentas Notion",
+    "earnings": "Ganhos reais",
+    "viral": "Gerador viral"
+  },
+  "language": {
+    "label": "Idioma",
+    "switchTo": "Trocar idioma",
+    "phase1": "Idiomas Fase 1",
+    "phase2": "Idiomas Fase 2"
+  },
+  "common": {
+    "loading": "Carregando…",
+    "passed": "Aprovado",
+    "review": "Revisar",
+    "apps": "Apps",
+    "proposals": "Propostas",
+    "themes": "Temas",
+    "suite": "Suite"
+  },
+  "factory": {
+    "title": "Fábrica diária",
+    "subtitle": "5 apps + 5 propostas por dia — prontas para Cursor / vendas / outreach",
+    "step1": "Seleção de cluster",
+    "step2": "Definições de apps",
+    "step3": "5 propostas",
+    "step4": "Empacotamento",
+    "step1Desc": "Escolha tema, refine 5 apps",
+    "step2Desc": "Template completo por app",
+    "step3Desc": "Individuais + proposta suite",
+    "step4Desc": "Pasta para handoff Cursor",
+    "todayTheme": "Tema de hoje",
+    "suggestedToday": "(sugerido hoje)",
+    "runThree": "Executar 3 temas (15 apps)",
+    "singleTheme": "Tema único",
+    "runFive": "Executar 5 temas (25 apps)",
+    "generateMultilingual": "Gerar pacote multilíngue",
+    "multilingualNote": "Inclui propostas suite EN + ES + PT-BR e handoff i18n para Cursor",
+    "i18nGate": "Controle de qualidade Idioma e Acessibilidade ativado",
+    "outputFolder": "Estrutura da pasta de saída",
+    "writtenTo": "Escrito em",
+    "sendToCursor": "enviar ao Cursor para scaffolding",
+    "pastRuns": "Execuções anteriores",
+    "appDefinitions": "5 definições de apps",
+    "qualityChecks": "Controles de qualidade",
+    "multiPackage": "Pacote multi-tema",
+    "clickRunThree": "Clique em Executar 3 temas para o pacote completo de 15 apps"
+  }
+}

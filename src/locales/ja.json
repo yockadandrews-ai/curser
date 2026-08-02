@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "本物の自動化",
+    "engineRunning": "エンジン稼働中",
+    "engineNote": "Autopilotはアフィリエイト商品を処理。Notionツールは別途管理。"
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "デイリーファクトリー",
+    "notionTools": "Notionツール",
+    "earnings": "実際の収益",
+    "viral": "バイラル生成"
+  },
+  "language": {
+    "label": "言語",
+    "switchTo": "言語を切り替え",
+    "phase1": "フェーズ1言語",
+    "phase2": "フェーズ2言語"
+  },
+  "common": {
+    "loading": "読み込み中…",
+    "passed": "合格",
+    "review": "要確認",
+    "apps": "アプリ",
+    "proposals": "提案",
+    "themes": "テーマ",
+    "suite": "スイート"
+  },
+  "factory": {
+    "title": "デイリーファクトリー",
+    "subtitle": "毎日5アプリ + 5提案 — Cursor / 営業 / アウトリーチ用",
+    "step1": "クラスター選択",
+    "step2": "アプリ定義",
+    "step3": "5提案",
+    "step4": "パッケージング",
+    "step1Desc": "テーマ選択、5アプリを精緻化",
+    "step2Desc": "アプリごとの完全テンプレート",
+    "step3Desc": "個別 + スイート提案",
+    "step4Desc": "Cursor引き渡しフォルダ",
+    "todayTheme": "今日のテーマ",
+    "suggestedToday": "（本日の推奨）",
+    "runThree": "3テーマ実行（15アプリ）",
+    "singleTheme": "単一テーマ",
+    "runFive": "5テーマ実行（25アプリ）",
+    "generateMultilingual": "多言語パッケージ生成",
+    "multilingualNote": "EN + ES + PT-BRスイート提案とi18n Cursor引き渡しを含む",
+    "i18nGate": "言語・アクセシビリティ品質ゲート有効",
+    "outputFolder": "出力フォルダ構造",
+    "writtenTo": "出力先",
+    "sendToCursor": "Cursorでスキャフォールド",
+    "pastRuns": "過去の実行",
+    "appDefinitions": "5アプリ定義",
+    "qualityChecks": "品質チェック",
+    "multiPackage": "マルチテーマパッケージ",
+    "clickRunThree": "15アプリ完全パッケージは3テーマ実行をクリック"
+  }
+}

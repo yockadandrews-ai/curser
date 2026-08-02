@@ -96,4 +96,10 @@ export const api = {
   runFactoryThree: () =>
     request<import('./types/factory').MultiThemeRun>('/factory/run-three', { method: 'POST' }),
   getMultiThemeRuns: () => request<import('./types/factory').MultiThemeRun[]>('/factory/multi-runs'),
+
+  getI18nCatalog: () => request<{ defaultLocale: string; phase1: string[]; phase2: string[]; languages: unknown[]; preference: string }>('/i18n/languages'),
+  getLocale: () => request<{ locale: string }>('/i18n/locale'),
+  setLocale: (locale: string) => request<{ locale: string }>('/i18n/locale', { method: 'PUT', body: JSON.stringify({ locale }) }),
+  generateMultilingualPackage: () =>
+    request<{ ok: boolean; outputRoot: string; paths: string[]; folder: string }>('/factory/multilingual-package', { method: 'POST' }),
 };

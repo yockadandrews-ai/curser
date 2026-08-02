@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "वास्तविक ऑटomation",
+    "engineRunning": "इंजन चालू",
+    "engineNote": "Autopilot सहबद्ध उत्पादों को संभालता है। Notion टूल अलग से ट्रैक होते हैं।"
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "दैनिक फैक्ट्री",
+    "notionTools": "Notion टूल",
+    "earnings": "वास्तविक कमाई",
+    "viral": "वायरल जनरेटर"
+  },
+  "language": {
+    "label": "भाषा",
+    "switchTo": "भाषा बदलें",
+    "phase1": "चरण 1 भाषाएँ",
+    "phase2": "चरण 2 भाषाएँ"
+  },
+  "common": {
+    "loading": "लोड हो रहा है…",
+    "passed": "पास",
+    "review": "समीक्षा",
+    "apps": "ऐप्स",
+    "proposals": "प्रस्ताव",
+    "themes": "थीम",
+    "suite": "सूट"
+  },
+  "factory": {
+    "title": "दैनिक फैक्ट्री",
+    "subtitle": "हर दिन 5 ऐप + 5 प्रस्ताव — Cursor / बिक्री / आउटरीच के लिए तैयार",
+    "step1": "क्लस्टर चयन",
+    "step2": "ऐप परिभाषाएँ",
+    "step3": "5 प्रस्ताव",
+    "step4": "पैकेजिंग",
+    "step1Desc": "थीम चुनें, 5 ऐप परिष्कृत करें",
+    "step2Desc": "प्रति ऐप पूर्ण टेम्पलेट",
+    "step3Desc": "व्यक्तिगत + सूट प्रस्ताव",
+    "step4Desc": "Cursor हैंडऑफ़ फ़ोल्डर",
+    "todayTheme": "आज की थीम",
+    "suggestedToday": "(आज सुझाई गई)",
+    "runThree": "3 थीम चलाएँ (15 ऐप)",
+    "singleTheme": "एकल थीम",
+    "runFive": "5 थीम चलाएँ (25 ऐप)",
+    "generateMultilingual": "बहुभाषी पैकेज बनाएँ",
+    "multilingualNote": "EN + ES + PT-BR सूट प्रस्ताव और i18n Cursor हैंडऑफ़ शामिल",
+    "i18nGate": "भाषा और पहुँच गुणवत्ता गेट सक्रिय",
+    "outputFolder": "आउटपुट फ़ोल्डर संरचना",
+    "writtenTo": "लिखा गया",
+    "sendToCursor": "Cursor में स्कैफ़ोल्डिंग के लिए भेजें",
+    "pastRuns": "पिछले रन",
+    "appDefinitions": "5 ऐप परिभाषाएँ",
+    "qualityChecks": "गुणवत्ता जाँच",
+    "multiPackage": "मल्टी-थीम पैकेज",
+    "clickRunThree": "15 ऐप का पूरा पैकेज — 3 थीम चलाएँ पर क्लिक करें"
+  }
+}

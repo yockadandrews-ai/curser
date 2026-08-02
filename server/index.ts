@@ -20,10 +20,11 @@ import {
 } from './notionTools.js';
 import { expandAllOutputFolders } from './factory/expandProposals.js';
 import { NOTION_CATALOG_STATS } from './data/notionToolsCatalog.js';
-import {
-  generateDailyRun, getFactoryRuns, getFactoryRun, FACTORY_THEMES, getThemeForDay, OUTPUT_ROOT,
+import { generateDailyRun, getFactoryRuns, getFactoryRun, FACTORY_THEMES, getThemeForDay, OUTPUT_ROOT,
   generateMultiThemeRun, generateThreeThemePackage, generateFiveThemePackage, getMultiThemeRuns, getMultiThemeRun,
 } from './factory/generator.js';
+import { getI18nCatalog, resolveRequestLocale, setLocalePreference } from './i18n/index.js';
+import { writeMultilingualPackage } from './i18n/multilingualProposals.js';
 import { db } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,6 +37,19 @@ if (removed > 0) console.log(`[Cleanup] Removed ${removed} SGOS tools from affil
 
 app.use(cors());
 app.use(express.json());
+
+// i18n — language catalog and user preference
+app.get('/api/i18n/languages', (_req, res) => res.json(getI18nCatalog()));
+app.get('/api/i18n/locale', (req, res) => {
+  const locale = resolveRequestLocale(req.headers['accept-language'] as string | undefined);
+  res.json({ locale, catalog: getI18nCatalog() });
+});
+app.put('/api/i18n/locale', (req, res) => {
+  const { locale } = req.body;
+  if (!locale) return res.status(400).json({ error: 'locale required' });
+  const saved = setLocalePreference(locale);
+  res.json({ locale: saved });
+});
 
 // Stats & dashboard
 app.get('/api/stats', (_req, res) => res.json(getStats()));
@@ -172,27 +186,30 @@ app.post('/api/expenses', (req, res) => {
 // Content generation
 app.get('/api/content', (_req, res) => res.json(getContent()));
 app.post('/api/content/generate', async (req, res) => {
-  const { productId, platforms } = req.body;
+  const { productId, platforms, locale } = req.body;
   const product = getProduct(productId);
   if (!product) return res.status(404).json({ error: 'Product not found' });
   const plats = platforms || ['tiktok', 'instagram', 'twitter'];
-  const saved = generateAndSaveContent(product, plats);
+  const resolvedLocale = resolveRequestLocale(req.headers['accept-language'] as string | undefined, locale);
+  const saved = generateAndSaveContent(product, plats, resolvedLocale);
   res.json(saved);
 });
 app.post('/api/content/preview', (req, res) => {
-  const { productId, platforms } = req.body;
+  const { productId, platforms, locale } = req.body;
   const product = getProduct(productId);
   if (!product) return res.status(404).json({ error: 'Product not found' });
   const plats = platforms || ['tiktok', 'instagram', 'twitter'];
-  res.json(generateContentForProduct(product, plats));
+  const resolvedLocale = resolveRequestLocale(req.headers['accept-language'] as string | undefined, locale);
+  res.json(generateContentForProduct(product, plats, resolvedLocale));
 });
 app.post('/api/content/generate-ai', async (req, res) => {
-  const { productId, platform } = req.body;
+  const { productId, platform, locale } = req.body;
   const product = getProduct(productId);
   if (!product) return res.status(404).json({ error: 'Product not found' });
-  const aiPost = await generateWithAI(product, platform || 'tiktok');
+  const resolvedLocale = resolveRequestLocale(req.headers['accept-language'] as string | undefined, locale);
+  const aiPost = await generateWithAI(product, platform || 'tiktok', resolvedLocale);
   if (!aiPost) {
-    const fallback = generateContentForProduct(product, [platform || 'tiktok']);
+    const fallback = generateContentForProduct(product, [platform || 'tiktok'], resolvedLocale);
     return res.json(fallback[0]);
   }
   const saved = addContent({ ...aiPost, status: 'draft' });
@@ -289,6 +306,10 @@ app.get('/api/factory/output-root', (_req, res) => res.json({ path: OUTPUT_ROOT 
 app.post('/api/factory/expand-proposals', (_req, res) => {
   const results = expandAllOutputFolders();
   res.json({ results, totalExpanded: results.reduce((s, r) => s + r.expandedSingles + r.expandedSuites, 0) });
+});
+app.post('/api/factory/multilingual-package', (_req, res) => {
+  const result = writeMultilingualPackage();
+  res.json({ ok: true, outputRoot: OUTPUT_ROOT, ...result });
 });
 
 // Serve frontend in production

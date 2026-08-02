@@ -37,3 +37,16 @@
     @apply badge bg-yellow-900/50 text-yellow-400 border border-yellow-700;
   }
 }
+
+/* RTL layout — Arabic and future RTL locales */
+html[dir='rtl'] aside {
+  right: 0;
+  left: auto;
+  border-right: none;
+  border-left: 1px solid rgb(31 41 55);
+}
+
+html[dir='rtl'] main {
+  margin-left: 0;
+  margin-right: 16rem;
+}

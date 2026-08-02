@@ -48,6 +48,7 @@ export interface GeneratedContent {
   hashtags: string;
   viralScore: number;
   status: 'draft' | 'queued' | 'posted' | 'failed';
+  locale?: string;
   createdAt: string;
   postedAt?: string;
 }
@@ -144,6 +145,10 @@ if (!colNames.has('brand')) db.exec("ALTER TABLE products ADD COLUMN brand TEXT 
 if (!colNames.has('stock')) db.exec("ALTER TABLE products ADD COLUMN stock INTEGER DEFAULT 0");
 if (!colNames.has('units_sold')) db.exec("ALTER TABLE products ADD COLUMN units_sold INTEGER DEFAULT 0");
 if (!colNames.has('description')) db.exec("ALTER TABLE products ADD COLUMN description TEXT DEFAULT ''");
+
+const contentCols = db.prepare("PRAGMA table_info(content)").all() as { name: string }[];
+const contentColNames = new Set(contentCols.map(c => c.name));
+if (!contentColNames.has('locale')) db.exec("ALTER TABLE content ADD COLUMN locale TEXT DEFAULT 'en'");
 
 function getSetting<T>(key: string, defaultValue: T): T {
   const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as { value: string } | undefined;
@@ -265,13 +270,14 @@ export function getContent(): GeneratedContent[] {
 export function addContent(content: Omit<GeneratedContent, 'createdAt'> & { createdAt?: string }): GeneratedContent {
   const createdAt = content.createdAt || new Date().toISOString();
   db.prepare(`
-    INSERT INTO content (id, product_id, platform, hook, caption, hashtags, viral_score, status, created_at, posted_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO content (id, product_id, platform, hook, caption, hashtags, viral_score, status, created_at, posted_at, locale)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     content.id, content.productId, content.platform, content.hook, content.caption,
-    content.hashtags, content.viralScore, content.status, createdAt, content.postedAt || null
+    content.hashtags, content.viralScore, content.status, createdAt, content.postedAt || null,
+    content.locale || 'en',
   );
-  return { ...content, createdAt } as GeneratedContent;
+  return { ...content, locale: content.locale || 'en', createdAt } as GeneratedContent;
 }
 
 export function updateContentStatus(id: string, status: GeneratedContent['status'], postedAt?: string): void {
@@ -378,6 +384,7 @@ function mapContent(row: Record<string, unknown>): GeneratedContent {
     hashtags: row.hashtags as string,
     viralScore: row.viral_score as number,
     status: row.status as GeneratedContent['status'],
+    locale: (row.locale as string) || 'en',
     createdAt: row.created_at as string,
     postedAt: row.posted_at as string | undefined,
   };

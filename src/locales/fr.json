@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "Automatisation réelle",
+    "engineRunning": "Moteur actif",
+    "engineNote": "Autopilot gère les produits affiliés. Les outils Notion sont suivis séparément."
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "Usine quotidienne",
+    "notionTools": "Outils Notion",
+    "earnings": "Revenus réels",
+    "viral": "Générateur viral"
+  },
+  "language": {
+    "label": "Langue",
+    "switchTo": "Changer de langue",
+    "phase1": "Langues Phase 1",
+    "phase2": "Langues Phase 2"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "passed": "Validé",
+    "review": "À revoir",
+    "apps": "Apps",
+    "proposals": "Propositions",
+    "themes": "Thèmes",
+    "suite": "Suite"
+  },
+  "factory": {
+    "title": "Usine quotidienne",
+    "subtitle": "5 apps + 5 propositions par jour — prêtes pour Cursor / ventes / outreach",
+    "step1": "Sélection du cluster",
+    "step2": "Définitions d'apps",
+    "step3": "5 propositions",
+    "step4": "Empaquetage",
+    "step1Desc": "Choisir le thème, affiner 5 apps",
+    "step2Desc": "Modèle complet par app",
+    "step3Desc": "Individuelles + proposition suite",
+    "step4Desc": "Dossier pour handoff Cursor",
+    "todayTheme": "Thème du jour",
+    "suggestedToday": "(suggéré aujourd'hui)",
+    "runThree": "Lancer 3 thèmes (15 apps)",
+    "singleTheme": "Thème unique",
+    "runFive": "Lancer 5 thèmes (25 apps)",
+    "generateMultilingual": "Générer le pack multilingue",
+    "multilingualNote": "Inclut propositions suite EN + ES + PT-BR et handoff i18n Cursor",
+    "i18nGate": "Contrôle qualité Langue et Accessibilité activé",
+    "outputFolder": "Structure du dossier de sortie",
+    "writtenTo": "Écrit dans",
+    "sendToCursor": "envoyer à Cursor pour scaffolding",
+    "pastRuns": "Exécutions passées",
+    "appDefinitions": "5 définitions d'apps",
+    "qualityChecks": "Contrôles qualité",
+    "multiPackage": "Pack multi-thèmes",
+    "clickRunThree": "Cliquez Lancer 3 thèmes pour le pack complet de 15 apps"
+  }
+}

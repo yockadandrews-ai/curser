@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "Echte Automatisierung",
+    "engineRunning": "Engine läuft",
+    "engineNote": "Autopilot verwaltet Affiliate-Produkte. Notion-Tools werden separat erfasst."
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "Tägliche Fabrik",
+    "notionTools": "Notion-Tools",
+    "earnings": "Echte Einnahmen",
+    "viral": "Viral-Generator"
+  },
+  "language": {
+    "label": "Sprache",
+    "switchTo": "Sprache wechseln",
+    "phase1": "Phase-1-Sprachen",
+    "phase2": "Phase-2-Sprachen"
+  },
+  "common": {
+    "loading": "Laden…",
+    "passed": "Bestanden",
+    "review": "Prüfen",
+    "apps": "Apps",
+    "proposals": "Angebote",
+    "themes": "Themen",
+    "suite": "Suite"
+  },
+  "factory": {
+    "title": "Tägliche Fabrik",
+    "subtitle": "5 Apps + 5 Angebote täglich — bereit für Cursor / Vertrieb / Outreach",
+    "step1": "Cluster-Auswahl",
+    "step2": "App-Definitionen",
+    "step3": "5 Angebote",
+    "step4": "Paketierung",
+    "step1Desc": "Thema wählen, 5 Apps verfeinern",
+    "step2Desc": "Vollständige Vorlage pro App",
+    "step3Desc": "Einzelangebote + Suite-Angebot",
+    "step4Desc": "Ordner für Cursor-Handoff",
+    "todayTheme": "Heutiges Thema",
+    "suggestedToday": "(heute vorgeschlagen)",
+    "runThree": "3 Themen starten (15 Apps)",
+    "singleTheme": "Einzelnes Thema",
+    "runFive": "5 Themen starten (25 Apps)",
+    "generateMultilingual": "Mehrsprachiges Paket generieren",
+    "multilingualNote": "Enthält EN + ES + PT-BR Suite-Angebote und i18n Cursor-Handoff",
+    "i18nGate": "Sprach- & Barrierefreiheits-Qualitätsgate aktiviert",
+    "outputFolder": "Ausgabeordner-Struktur",
+    "writtenTo": "Geschrieben nach",
+    "sendToCursor": "an Cursor zum Scaffolding senden",
+    "pastRuns": "Frühere Läufe",
+    "appDefinitions": "5 App-Definitionen",
+    "qualityChecks": "Qualitätsprüfungen",
+    "multiPackage": "Multi-Themen-Paket",
+    "clickRunThree": "Klicken Sie 3 Themen starten für das vollständige 15-App-Paket"
+  }
+}

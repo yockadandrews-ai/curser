@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "أتمتة حقيقية",
+    "engineRunning": "المحرك يعمل",
+    "engineNote": "Autopilot يدير منتجات الشركاء. أدوات Notion تُتتبع بشكل منفصل."
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "المصنع اليومي",
+    "notionTools": "أدوات Notion",
+    "earnings": "الأرباح الحقيقية",
+    "viral": "مولّد المحتوى الفيروسي"
+  },
+  "language": {
+    "label": "اللغة",
+    "switchTo": "تغيير اللغة",
+    "phase1": "لغات المرحلة 1",
+    "phase2": "لغات المرحلة 2"
+  },
+  "common": {
+    "loading": "جاري التحميل…",
+    "passed": "ناجح",
+    "review": "مراجعة",
+    "apps": "التطبيقات",
+    "proposals": "العروض",
+    "themes": "المواضيع",
+    "suite": "الحزمة"
+  },
+  "factory": {
+    "title": "المصنع اليومي",
+    "subtitle": "5 تطبيقات + 5 عروض يومياً — جاهزة لـ Cursor / المبيعات / التواصل",
+    "step1": "اختيار المجموعة",
+    "step2": "تعريفات التطبيقات",
+    "step3": "5 عروض",
+    "step4": "التعبئة",
+    "step1Desc": "اختر الموضوع، حسّن 5 تطبيقات",
+    "step2Desc": "قالب كامل لكل تطبيق",
+    "step3Desc": "فردية + عرض الحزمة",
+    "step4Desc": "مجلد تسليم Cursor",
+    "todayTheme": "موضوع اليوم",
+    "suggestedToday": "(مقترح اليوم)",
+    "runThree": "تشغيل 3 مواضيع (15 تطبيق)",
+    "singleTheme": "موضوع واحد",
+    "runFive": "تشغيل 5 مواضيع (25 تطبيق)",
+    "generateMultilingual": "إنشاء حزمة متعددة اللغات",
+    "multilingualNote": "يتضمن عروض EN + ES + PT-BR وحزمة i18n لـ Cursor",
+    "i18nGate": "بوابة جودة اللغة وإمكانية الوصول مفعّلة",
+    "outputFolder": "هيكل مجلد الإخراج",
+    "writtenTo": "مكتوب في",
+    "sendToCursor": "أرسل إلى Cursor للبناء",
+    "pastRuns": "التشغيلات السابقة",
+    "appDefinitions": "5 تعريفات تطبيق",
+    "qualityChecks": "فحوصات الجودة",
+    "multiPackage": "حزمة متعددة المواضيع",
+    "clickRunThree": "انقر تشغيل 3 مواضيع للحزمة الكاملة من 15 تطبيق"
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory } from 'lucide-react';
 import AutoPilot from './pages/AutoPilot';
@@ -5,6 +6,7 @@ import RealEarnings from './pages/RealEarnings';
 import ViralCashGenerator from './pages/ViralCashGenerator';
 import NotionTools from './pages/NotionTools';
 import DailyFactory from './pages/DailyFactory';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 function NavItem({ to, icon: Icon, label }: { to: string; icon: typeof Zap; label: string }) {
   return (
@@ -25,6 +27,8 @@ function NavItem({ to, icon: Icon, label }: { to: string; icon: typeof Zap; labe
 }
 
 export default function App() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen flex">
       <aside className="w-64 bg-dark-900 border-r border-gray-800 p-4 flex flex-col gap-2 fixed h-full">
@@ -33,22 +37,24 @@ export default function App() {
             <Rocket size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-white text-sm">Money Autopilot</h1>
-            <p className="text-xs text-money-400">Real Automation</p>
+            <h1 className="font-bold text-white text-sm">{t('app.title')}</h1>
+            <p className="text-xs text-money-400">{t('app.subtitle')}</p>
           </div>
         </div>
 
         <nav className="flex flex-col gap-1">
-          <NavItem to="/" icon={Zap} label="Money Autopilot" />
-          <NavItem to="/factory" icon={Factory} label="Daily Factory" />
-          <NavItem to="/notion-tools" icon={BookOpen} label="Notion Tools" />
-          <NavItem to="/earnings" icon={DollarSign} label="Real Earnings" />
-          <NavItem to="/viral" icon={Sparkles} label="Viral Cash Generator" />
+          <NavItem to="/" icon={Zap} label={t('nav.autopilot')} />
+          <NavItem to="/factory" icon={Factory} label={t('nav.factory')} />
+          <NavItem to="/notion-tools" icon={BookOpen} label={t('nav.notionTools')} />
+          <NavItem to="/earnings" icon={DollarSign} label={t('nav.earnings')} />
+          <NavItem to="/viral" icon={Sparkles} label={t('nav.viral')} />
         </nav>
 
+        <LanguageSwitcher />
+
         <div className="mt-auto card text-xs text-gray-500">
-          <p className="text-money-400 font-semibold mb-1">🟢 Engine Running</p>
-          <p>Autopilot handles affiliate products. Notion tools are tracked separately.</p>
+          <p className="text-money-400 font-semibold mb-1">🟢 {t('app.engineRunning')}</p>
+          <p>{t('app.engineNote')}</p>
         </div>
       </aside>
 

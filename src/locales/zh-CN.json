@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "真实自动化",
+    "engineRunning": "引擎运行中",
+    "engineNote": "Autopilot 处理联盟产品。Notion 工具单独跟踪。"
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "每日工厂",
+    "notionTools": "Notion 工具",
+    "earnings": "真实收益",
+    "viral": "病毒式生成器"
+  },
+  "language": {
+    "label": "语言",
+    "switchTo": "切换语言",
+    "phase1": "第一阶段语言",
+    "phase2": "第二阶段语言"
+  },
+  "common": {
+    "loading": "加载中…",
+    "passed": "通过",
+    "review": "待审",
+    "apps": "应用",
+    "proposals": "提案",
+    "themes": "主题",
+    "suite": "套件"
+  },
+  "factory": {
+    "title": "每日工厂",
+    "subtitle": "每天 5 个应用 + 5 份提案 — 可用于 Cursor / 销售 / 外联",
+    "step1": "集群选择",
+    "step2": "应用定义",
+    "step3": "5 份提案",
+    "step4": "打包",
+    "step1Desc": "选择主题，完善 5 个应用",
+    "step2Desc": "每个应用完整模板",
+    "step3Desc": "单应用 + 套件提案",
+    "step4Desc": "Cursor 交接文件夹",
+    "todayTheme": "今日主题",
+    "suggestedToday": "（今日推荐）",
+    "runThree": "运行 3 主题（15 应用）",
+    "singleTheme": "单一主题",
+    "runFive": "运行 5 主题（25 应用）",
+    "generateMultilingual": "生成多语言包",
+    "multilingualNote": "包含 EN + ES + PT-BR 套件提案和 i18n Cursor 交接",
+    "i18nGate": "语言与无障碍质量门已启用",
+    "outputFolder": "输出文件夹结构",
+    "writtenTo": "写入位置",
+    "sendToCursor": "发送至 Cursor 进行脚手架搭建",
+    "pastRuns": "历史运行",
+    "appDefinitions": "5 个应用定义",
+    "qualityChecks": "质量检查",
+    "multiPackage": "多主题包",
+    "clickRunThree": "点击运行 3 主题获取完整 15 应用包"
+  }
+}

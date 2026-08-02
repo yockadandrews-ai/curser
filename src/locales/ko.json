@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "실제 자동화",
+    "engineRunning": "엔진 실행 중",
+    "engineNote": "Autopilot은 제휴 상품을 처리합니다. Notion 도구는 별도로 추적됩니다."
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "데일리 팩토리",
+    "notionTools": "Notion 도구",
+    "earnings": "실제 수익",
+    "viral": "바이럴 생성기"
+  },
+  "language": {
+    "label": "언어",
+    "switchTo": "언어 변경",
+    "phase1": "1단계 언어",
+    "phase2": "2단계 언어"
+  },
+  "common": {
+    "loading": "로딩 중…",
+    "passed": "통과",
+    "review": "검토",
+    "apps": "앱",
+    "proposals": "제안서",
+    "themes": "테마",
+    "suite": "스위트"
+  },
+  "factory": {
+    "title": "데일리 팩토리",
+    "subtitle": "매일 5앱 + 5제안서 — Cursor / 영업 / 아웃리치 준비",
+    "step1": "클러스터 선택",
+    "step2": "앱 정의",
+    "step3": "5제안서",
+    "step4": "패키징",
+    "step1Desc": "테마 선택, 5앱 정제",
+    "step2Desc": "앱별 전체 템플릿",
+    "step3Desc": "개별 + 스위트 제안서",
+    "step4Desc": "Cursor 인수인계 폴더",
+    "todayTheme": "오늘의 테마",
+    "suggestedToday": "(오늘 추천)",
+    "runThree": "3테마 실행 (15앱)",
+    "singleTheme": "단일 테마",
+    "runFive": "5테마 실행 (25앱)",
+    "generateMultilingual": "다국어 패키지 생성",
+    "multilingualNote": "EN + ES + PT-BR 스위트 제안서 및 i18n Cursor 인수인계 포함",
+    "i18nGate": "언어 및 접근성 품질 게이트 활성화",
+    "outputFolder": "출력 폴더 구조",
+    "writtenTo": "저장 위치",
+    "sendToCursor": "Cursor로 스캐폴딩",
+    "pastRuns": "이전 실행",
+    "appDefinitions": "5앱 정의",
+    "qualityChecks": "품질 검사",
+    "multiPackage": "멀티테마 패키지",
+    "clickRunThree": "15앱 전체 패키지는 3테마 실행 클릭"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "app": {
+    "title": "Money Autopilot",
+    "subtitle": "Automatización real",
+    "engineRunning": "Motor en marcha",
+    "engineNote": "Autopilot gestiona productos de afiliados. Las herramientas Notion se rastrean por separado."
+  },
+  "nav": {
+    "autopilot": "Money Autopilot",
+    "factory": "Fábrica diaria",
+    "notionTools": "Herramientas Notion",
+    "earnings": "Ganancias reales",
+    "viral": "Generador viral"
+  },
+  "language": {
+    "label": "Idioma",
+    "switchTo": "Cambiar idioma",
+    "phase1": "Idiomas Fase 1",
+    "phase2": "Idiomas Fase 2"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "passed": "Aprobado",
+    "review": "Revisar",
+    "apps": "Apps",
+    "proposals": "Propuestas",
+    "themes": "Temas",
+    "suite": "Suite"
+  },
+  "factory": {
+    "title": "Fábrica diaria",
+    "subtitle": "5 apps + 5 propuestas cada día — listas para Cursor / ventas / outreach",
+    "step1": "Selección de cluster",
+    "step2": "Definiciones de apps",
+    "step3": "5 propuestas",
+    "step4": "Empaquetado",
+    "step1Desc": "Elige tema, refina 5 apps",
+    "step2Desc": "Plantilla completa por app",
+    "step3Desc": "Individuales + propuesta suite",
+    "step4Desc": "Carpeta para handoff Cursor",
+    "todayTheme": "Tema de hoy",
+    "suggestedToday": "(sugerido hoy)",
+    "runThree": "Ejecutar 3 temas (15 apps)",
+    "singleTheme": "Tema único",
+    "runFive": "Ejecutar 5 temas (25 apps)",
+    "generateMultilingual": "Generar paquete multilingüe",
+    "multilingualNote": "Incluye propuestas suite EN + ES + PT-BR y handoff i18n para Cursor",
+    "i18nGate": "Control de calidad Idioma y Accesibilidad activado",
+    "outputFolder": "Estructura de carpeta de salida",
+    "writtenTo": "Escrito en",
+    "sendToCursor": "enviar a Cursor para scaffolding",
+    "pastRuns": "Ejecuciones anteriores",
+    "appDefinitions": "5 definiciones de apps",
+    "qualityChecks": "Controles de calidad",
+    "multiPackage": "Paquete multi-tema",
+    "clickRunThree": "Haz clic en Ejecutar 3 temas para el paquete completo de 15 apps"
+  }
+}
