@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sgos
+      POSTGRES_PASSWORD: sgos_dev_password
+      POSTGRES_DB: sgos
+    ports:
+      - "5432:5432"
+    volumes:
+      - sgos_pg_data:/var/lib/postgresql/data
+
+volumes:
+  sgos_pg_data:

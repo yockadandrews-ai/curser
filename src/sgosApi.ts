@@ -7,6 +7,7 @@ import type {
   SmsLog,
   SgosSettings,
   PlateLookupResult,
+  ImportResult,
 } from './types/sgos';
 
 const BASE = '/api/sgos';
@@ -62,4 +63,18 @@ export const sgosApi = {
       method: 'PUT',
       body: JSON.stringify({ operatorPhone }),
     }),
+
+  importPlates: (plates: unknown[], mode: 'upsert' | 'replace' = 'upsert') =>
+    request<ImportResult>('/import', {
+      method: 'POST',
+      body: JSON.stringify({ plates, mode }),
+    }),
+
+  importCsv: (csv: string, mode: 'upsert' | 'replace' = 'upsert') =>
+    request<ImportResult>('/import', {
+      method: 'POST',
+      body: JSON.stringify({ csv, mode }),
+    }),
+
+  health: () => request<{ ok: boolean; plates: number }>('/health'),
 };

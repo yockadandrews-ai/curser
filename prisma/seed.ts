@@ -1,19 +1,10 @@
-export type PlateTier = 1 | 2 | 3 | 4 | 5;
+import { PrismaClient } from '@prisma/client';
+import { seedDefaultTemplates } from '../server/sgos/templates.js';
+import { importPlates, type ImportPlateRow } from '../server/sgos/importPlates.js';
 
-export interface PlateRecord {
-  plateCode: string;
-  tier: PlateTier;
-  callSign?: string;
-  theme?: string;
-  location: string;
-  contact?: string;
-  instructions: string;
-  zone?: string;
-  notes?: string;
-}
+const prisma = new PrismaClient();
 
-/** Representative plate registry — import CSV via API to replace/extend */
-export const PLATE_REGISTRY: PlateRecord[] = [
+const SEED_PLATES: ImportPlateRow[] = [
   { plateCode: 'JG6613', tier: 1, callSign: 'HERMES-7', theme: 'driver pickup', location: 'Gate B — Loading Dock 3', contact: 'Mike T.', instructions: 'DRV-PICKUP: Meet driver at Gate B. Verify seal #4482 before release.', zone: 'North' },
   { plateCode: 'AB4421', tier: 1, callSign: 'PORTAL-2', theme: 'package delivery', location: 'Suite 412 — Front Desk', contact: 'Sarah K.', instructions: 'PKG-DROP: Leave with front desk. Photo required. Recipient: J. Walsh.', zone: 'Central' },
   { plateCode: 'XK9901', tier: 1, callSign: 'COURIER-9', theme: 'driver pickup', location: 'Parking Level P2 — Spot 14', contact: 'Dev R.', instructions: 'DRV-PICKUP: White van, plate FLK-882. Handoff cold chain box only.', zone: 'East' },
@@ -36,23 +27,27 @@ export const PLATE_REGISTRY: PlateRecord[] = [
   { plateCode: 'HJ9900', tier: 1, callSign: 'PORTAL-5', theme: 'package delivery', location: 'Tech Campus — Building 9', contact: 'Elena P.', instructions: 'PKG-DROP: Fragile — elevator to floor 3 only.', zone: 'East' },
 ];
 
-export function normalizePlateCode(raw: string): string {
-  return raw.replace(/[\s\-]/g, '').toUpperCase();
+async function main() {
+  console.log('Seeding SMS templates…');
+  const templateCount = await seedDefaultTemplates();
+  console.log(`  ${templateCount} templates ready`);
+
+  console.log('Seeding sample plates…');
+  const result = await importPlates(SEED_PLATES, 'upsert');
+  console.log(`  created=${result.created} updated=${result.updated} skipped=${result.skipped}`);
+
+  await prisma.appSetting.upsert({
+    where: { key: 'operator_phone' },
+    create: { key: 'operator_phone', value: process.env.SGOS_OPERATOR_PHONE ?? '+12025550147' },
+    update: {},
+  });
+
+  console.log('Seed complete.');
 }
 
-export function findPlate(raw: string): PlateRecord | undefined {
-  const code = normalizePlateCode(raw);
-  return PLATE_REGISTRY.find((p) => normalizePlateCode(p.plateCode) === code);
-}
-
-export function searchPlates(query?: string): PlateRecord[] {
-  if (!query?.trim()) return PLATE_REGISTRY;
-  const q = query.trim().toUpperCase();
-  return PLATE_REGISTRY.filter(
-    (p) =>
-      p.plateCode.includes(q) ||
-      p.location.toUpperCase().includes(q) ||
-      p.callSign?.toUpperCase().includes(q) ||
-      p.zone?.toUpperCase().includes(q),
-  );
-}
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());

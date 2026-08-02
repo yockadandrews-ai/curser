@@ -121,7 +121,7 @@ export default function FieldTag() {
             </span>
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div><span className="text-gray-500">Plate</span><p className="font-mono font-bold">{result.plate.plateCode}</p></div>
+            <div><span className="text-gray-500">Plate</span><p className="font-mono font-bold">{result.plate.plate}</p></div>
             <div><span className="text-gray-500">Scenario</span><p className="text-sgos-accent font-semibold">{result.classified.scenario}</p></div>
             <div className="col-span-2"><span className="text-gray-500">Location</span><p>{result.plate.location}</p></div>
           </div>

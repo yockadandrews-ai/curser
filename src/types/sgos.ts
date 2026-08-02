@@ -1,20 +1,29 @@
 export type PlateTier = 1 | 2 | 3 | 4 | 5;
 
 export interface PlateRecord {
-  plateCode: string;
+  id: string;
+  plate: string;
+  normalized: string;
+  callSign?: string | null;
   tier: PlateTier;
-  callSign?: string;
-  theme?: string;
-  location: string;
-  contact?: string;
-  instructions: string;
-  zone?: string;
-  notes?: string;
+  scenario?: string | null;
+  packageTheme: boolean;
+  location?: string | null;
+  contact?: string | null;
+  instructions?: string | null;
+  zone?: string | null;
+  ownerName?: string | null;
+  vehicleMake?: string | null;
+  vehicleModel?: string | null;
+  vehicleColor?: string | null;
+  notes?: string | null;
+  isActive: boolean;
 }
 
 export type ScenarioType =
   | 'DRV-PICKUP'
   | 'PKG-DROP'
+  | 'PKG-DELIVERY'
   | 'PKG-INTAKE'
   | 'HOLD'
   | 'FREEZE'
@@ -34,15 +43,13 @@ export interface ClassifiedScenario {
 export interface SmsLog {
   id: string;
   messageId: string | null;
-  plateCode: string | null;
-  scenario: string | null;
-  body: string;
   toNumber: string;
+  body: string;
   status: string;
-  delivered: boolean;
-  ackCode: string | null;
-  source: string;
+  deliveredAt: string | null;
   createdAt: string;
+  plate?: { plate: string; tier: number } | null;
+  tagEvent?: { source: string; scenario: string | null } | null;
 }
 
 export interface FieldTagResult {
@@ -68,6 +75,16 @@ export interface SgosSettings {
   operatorPhone: string;
   mockSms: boolean;
   sendblueConfigured: boolean;
+  plateCount: number;
+  database: string;
+}
+
+export interface ImportResult {
+  ok: boolean;
+  created: number;
+  updated: number;
+  skipped: number;
+  total: number;
   plateCount: number;
 }
 

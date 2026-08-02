@@ -1,131 +1,81 @@
 import { Router, type Request, type Response } from 'express';
-import { findPlate, searchPlates, normalizePlateCode, PLATE_REGISTRY } from './plateRegistry.js';
+import { isDatabaseConfigured, prisma } from './prisma.js';
+import { normalizePlateCode } from './normalize.js';
 import {
-  classifyPlate,
-  buildFieldTagSms,
-  buildBatchSummarySms,
-  buildDispatchSms,
-  buildAckConfirmationSms,
-  parseAckFromText,
-  type DispatchChannel,
-  type AckCode,
-} from './smsTemplates.js';
-import { sendSms, getSendblueConfig } from './sendblue.js';
-import {
-  logSms,
+  processFieldTag,
+  processBatchLog,
+  processDispatch,
+  processAck,
+  markSmsDelivered,
+  processInboundSms,
   getRecentLogs,
-  markDelivered,
-  updateAck,
   getOperatorPhone,
-  setSetting,
-  getSetting,
-} from './sgosDb.js';
+  setOperatorPhone,
+  searchPlates,
+  findPlateByCode,
+  getPlateCount,
+  type AckCode,
+  type DispatchChannel,
+} from './service.js';
+import { classifyPlate } from './classifier.js';
+import { buildFieldTagSms } from './templates.js';
+import { importPlates, parseCsvPlates, type ImportPlateRow } from './importPlates.js';
+import { getSendblueConfig } from './sendblue.js';
+import { seedDefaultTemplates } from './templates.js';
 
 const router = Router();
 
-function resolvePhone(req: Request): string {
-  return (req.body?.phone as string) || getOperatorPhone();
-}
-
-/** Field Tag — single plate lookup + SMS */
-router.post('/field-tag', async (req: Request, res: Response) => {
-  const rawPlate = req.body?.plate as string;
-  if (!rawPlate?.trim()) {
-    return res.status(400).json({ error: 'plate required' });
-  }
-
-  const plate = findPlate(rawPlate);
-  if (!plate) {
-    return res.status(404).json({
-      error: 'Plate not found in registry',
-      plate: normalizePlateCode(rawPlate),
+function requireDb(_req: Request, res: Response, next: () => void) {
+  if (!isDatabaseConfigured()) {
+    return res.status(503).json({
+      error: 'DATABASE_URL not configured. Start PostgreSQL: docker compose up -d',
     });
   }
+  next();
+}
 
-  const classified = classifyPlate(plate);
-  const body = buildFieldTagSms({ plate, classified });
-  const phone = resolvePhone(req);
-  const result = await sendSms(phone, body);
+router.use(requireDb);
 
-  const log = logSms({
-    messageId: result.messageId || undefined,
-    plateCode: plate.plateCode,
-    scenario: classified.scenario,
-    body,
-    toNumber: phone,
-    status: result.status,
-    source: 'field-tag',
+function resolvePhone(req: Request): string | undefined {
+  return (req.body?.phone as string) || undefined;
+}
+
+router.post('/field-tag', async (req: Request, res: Response) => {
+  const rawPlate = req.body?.plate as string;
+  if (!rawPlate?.trim()) return res.status(400).json({ error: 'plate required' });
+
+  const result = await processFieldTag({
+    plate: rawPlate,
+    phone: resolvePhone(req),
+    taggedBy: req.body?.taggedBy as string | undefined,
+    source: 'FIELD_TAG',
+    rawInput: rawPlate,
   });
 
+  if ('error' in result) {
+    return res.status(404).json({ error: 'Plate not found in registry', plate: result.normalized });
+  }
+
   res.json({
-    ok: result.status !== 'failed',
-    plate,
-    classified,
-    sms: result,
-    log,
+    ok: result.sms.status !== 'failed',
+    plate: result.record,
+    classified: result.classified,
+    sms: result.sms,
+    tagEvent: result.tagEvent,
+    log: result.smsLog,
   });
 });
 
-/** Batch Log — multiple plates */
 router.post('/batch-log', async (req: Request, res: Response) => {
   const rawPlates = req.body?.plates as string[];
   if (!Array.isArray(rawPlates) || rawPlates.length === 0) {
     return res.status(400).json({ error: 'plates array required' });
   }
 
-  const results: Array<{ plate: string; found: boolean; scenario?: string; sms?: string }> = [];
-  const decoded: Array<{ plate: ReturnType<typeof findPlate>; classified: ReturnType<typeof classifyPlate> }> = [];
-
-  for (const raw of rawPlates) {
-    const plate = findPlate(raw);
-    if (!plate) {
-      results.push({ plate: normalizePlateCode(raw), found: false });
-      continue;
-    }
-    const classified = classifyPlate(plate);
-    decoded.push({ plate, classified });
-    const sms = buildFieldTagSms({ plate, classified });
-    results.push({ plate: plate.plateCode, found: true, scenario: classified.scenario, sms });
-
-    const phone = resolvePhone(req);
-    const sendResult = await sendSms(phone, sms);
-    logSms({
-      messageId: sendResult.messageId || undefined,
-      plateCode: plate.plateCode,
-      scenario: classified.scenario,
-      body: sms,
-      toNumber: phone,
-      status: sendResult.status,
-      source: 'batch-log',
-    });
-  }
-
-  const phone = resolvePhone(req);
-  let summarySms: string | undefined;
-  if (decoded.length > 0) {
-    const valid = decoded.filter((d): d is { plate: NonNullable<typeof d.plate>; classified: typeof d.classified } => !!d.plate);
-    summarySms = buildBatchSummarySms(valid);
-    const summaryResult = await sendSms(phone, summarySms);
-    logSms({
-      messageId: summaryResult.messageId || undefined,
-      body: summarySms,
-      toNumber: phone,
-      status: summaryResult.status,
-      source: 'batch-summary',
-      scenario: 'BATCH',
-    });
-  }
-
-  res.json({
-    ok: true,
-    total: rawPlates.length,
-    found: decoded.length,
-    results,
-    summarySms,
-  });
+  const result = await processBatchLog(rawPlates, resolvePhone(req));
+  res.json({ ok: true, ...result });
 });
 
-/** Dispatch — HERMES / PORTAL / COURIER */
 router.post('/dispatch', async (req: Request, res: Response) => {
   const channel = req.body?.channel as DispatchChannel;
   const etaMinutes = Number(req.body?.etaMinutes) || 15;
@@ -136,23 +86,10 @@ router.post('/dispatch', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'channel must be HERMES, PORTAL, or COURIER' });
   }
 
-  const body = buildDispatchSms(channel, etaMinutes, notes);
-  const phone = resolvePhone(req);
-  const result = await sendSms(phone, body);
-
-  const log = logSms({
-    messageId: result.messageId || undefined,
-    body,
-    toNumber: phone,
-    status: result.status,
-    source: 'dispatch',
-    scenario: 'DISPATCH',
-  });
-
-  res.json({ ok: result.status !== 'failed', channel, etaMinutes, sms: result, log });
+  const result = await processDispatch(channel, etaMinutes, notes, resolvePhone(req));
+  res.json({ ok: result.sms.status !== 'failed', ...result });
 });
 
-/** ACK — PKG-OK, DRV-IN, HOLD, ABORT */
 router.post('/ack', async (req: Request, res: Response) => {
   const code = req.body?.code as AckCode;
   const plateCode = req.body?.plate as string | undefined;
@@ -162,84 +99,92 @@ router.post('/ack', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'code must be PKG-OK, DRV-IN, HOLD, or ABORT' });
   }
 
-  if (plateCode) {
-    updateAck(normalizePlateCode(plateCode), code);
-  }
-
-  const body = buildAckConfirmationSms(code, plateCode ? normalizePlateCode(plateCode) : undefined);
-  const phone = resolvePhone(req);
-  const result = await sendSms(phone, body);
-
-  const log = logSms({
-    messageId: result.messageId || undefined,
-    plateCode: plateCode ? normalizePlateCode(plateCode) : undefined,
-    body,
-    toNumber: phone,
-    status: result.status,
-    source: 'ack',
-    scenario: 'ACK',
-  });
-
-  res.json({ ok: result.status !== 'failed', code, sms: result, log });
+  const result = await processAck(code, plateCode, resolvePhone(req), req.body?.receivedFrom as string | undefined);
+  res.json({ ok: result.sms.status !== 'failed', ...result });
 });
 
-/** Plate lookup */
-router.get('/plates', (req: Request, res: Response) => {
+router.get('/plates', async (req: Request, res: Response) => {
   const q = req.query.q as string | undefined;
-  res.json(searchPlates(q));
+  const limit = parseInt(req.query.limit as string) || 100;
+  res.json(await searchPlates(q, limit));
 });
 
-router.get('/plates/:code', (req: Request, res: Response) => {
-  const code = String(req.params.code);
-  const plate = findPlate(code);
-  if (!plate) return res.status(404).json({ error: 'Not found' });
-  const classified = classifyPlate(plate);
-  res.json({ plate, classified, previewSms: buildFieldTagSms({ plate, classified }) });
+router.get('/plates/:code', async (req: Request, res: Response) => {
+  const record = await findPlateByCode(String(req.params.code));
+  if (!record) return res.status(404).json({ error: 'Not found' });
+  const classified = classifyPlate(record);
+  const previewSms = await buildFieldTagSms(record, classified);
+  res.json({ plate: record, classified, previewSms });
 });
 
-/** SMS logs */
-router.get('/logs', (req: Request, res: Response) => {
+router.get('/logs', async (req: Request, res: Response) => {
   const limit = parseInt(req.query.limit as string) || 50;
-  res.json(getRecentLogs(limit));
+  res.json(await getRecentLogs(limit));
 });
 
-/** Settings */
-router.get('/settings', (_req: Request, res: Response) => {
+router.get('/settings', async (_req: Request, res: Response) => {
   const sendblue = getSendblueConfig();
   res.json({
-    operatorPhone: getOperatorPhone(),
+    operatorPhone: await getOperatorPhone(),
     mockSms: sendblue.mockMode,
     sendblueConfigured: !sendblue.mockMode,
-    plateCount: PLATE_REGISTRY.length,
+    plateCount: await getPlateCount(),
+    database: 'postgresql',
   });
 });
 
-router.put('/settings', (req: Request, res: Response) => {
+router.put('/settings', async (req: Request, res: Response) => {
   const { operatorPhone } = req.body;
-  if (operatorPhone) setSetting('operator_phone', operatorPhone);
+  if (operatorPhone) await setOperatorPhone(operatorPhone);
   res.json({
-    operatorPhone: getOperatorPhone(),
+    operatorPhone: await getOperatorPhone(),
     mockSms: getSendblueConfig().mockMode,
   });
 });
 
-/** Webhooks — delivery confirmation & incoming ACK SMS */
-router.post('/webhook/delivery', (req: Request, res: Response) => {
+/** Import JSON array or CSV string — load 172+ plate master registry */
+router.post('/import', async (req: Request, res: Response) => {
+  const mode = (req.body?.mode as 'upsert' | 'replace') ?? 'upsert';
+
+  let rows: ImportPlateRow[] = [];
+  if (req.body?.plates && Array.isArray(req.body.plates)) {
+    rows = req.body.plates as ImportPlateRow[];
+  } else if (req.body?.csv && typeof req.body.csv === 'string') {
+    rows = parseCsvPlates(req.body.csv);
+  } else {
+    return res.status(400).json({ error: 'Provide plates array or csv string' });
+  }
+
+  const result = await importPlates(rows, mode);
+  res.json({ ok: true, ...result, plateCount: await getPlateCount() });
+});
+
+router.post('/seed', async (_req: Request, res: Response) => {
+  const templates = await seedDefaultTemplates();
+  res.json({ ok: true, templatesSeeded: templates });
+});
+
+router.post('/webhook/delivery', async (req: Request, res: Response) => {
   const messageId = req.body?.message_handle ?? req.body?.message_id;
-  if (messageId) markDelivered(String(messageId));
+  if (messageId) await markSmsDelivered(String(messageId));
   res.json({ ok: true });
 });
 
 router.post('/webhook/inbound', async (req: Request, res: Response) => {
   const content = (req.body?.content ?? req.body?.message ?? '') as string;
-  const ack = parseAckFromText(content);
-  if (ack) {
-    const phone = resolvePhone(req);
-    const body = buildAckConfirmationSms(ack);
-    await sendSms(phone, body);
-    logSms({ body, toNumber: phone, status: 'sent', source: 'inbound-ack', scenario: 'ACK' });
+  const from = (req.body?.from_number ?? req.body?.from) as string | undefined;
+  const result = await processInboundSms(content, from);
+  res.json({ ok: true, ...result });
+});
+
+/** Health check for SGOS database */
+router.get('/health', async (_req: Request, res: Response) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ ok: true, plates: await getPlateCount() });
+  } catch (e) {
+    res.status(503).json({ ok: false, error: String(e) });
   }
-  res.json({ ok: true, parsed: ack });
 });
 
 export default router;

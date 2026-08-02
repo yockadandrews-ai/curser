@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Plate {
+  id           String   @id @default(cuid())
+  plate        String   @unique
+  normalized   String   @unique
+  callSign     String?
+  tier         Int      @default(3)
+  scenario     String?
+  packageTheme Boolean  @default(false)
+  location     String?
+  contact      String?
+  instructions String?
+  zone         String?
+  ownerName    String?
+  vehicleMake  String?
+  vehicleModel String?
+  vehicleColor String?
+  notes        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  events  TagEvent[]
+  smsLogs SmsLog[]
+
+  @@index([normalized])
+  @@index([tier])
+  @@index([isActive])
+}
+
+model TagEvent {
+  id          String   @id @default(cuid())
+  plateId     String
+  plate       Plate    @relation(fields: [plateId], references: [id], onDelete: Cascade)
+  taggedBy    String?
+  source      String   @default("FIELD_TAG")
+  scenario    String?
+  rawInput    String?
+  locationLat Float?
+  locationLng Float?
+  createdAt   DateTime @default(now())
+
+  smsLogs SmsLog[]
+  acks    Ack[]
+
+  @@index([plateId])
+  @@index([createdAt])
+}
+
+model SmsLog {
+  id          String    @id @default(cuid())
+  tagEventId  String?
+  tagEvent    TagEvent? @relation(fields: [tagEventId], references: [id], onDelete: SetNull)
+  plateId     String?
+  plate       Plate?    @relation(fields: [plateId], references: [id], onDelete: SetNull)
+  messageId   String?   @unique
+  toNumber    String
+  body        String
+  status      String    @default("pending")
+  deliveredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([plateId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Ack {
+  id           String   @id @default(cuid())
+  tagEventId   String
+  tagEvent     TagEvent @relation(fields: [tagEventId], references: [id], onDelete: Cascade)
+  code         String
+  note         String?
+  receivedFrom String?
+  createdAt    DateTime @default(now())
+
+  @@index([tagEventId])
+}
+
+model SmsTemplate {
+  id          String   @id @default(cuid())
+  scenario    String   @unique
+  template    String
+  description String?
+  isActive    Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String?  @unique
+  role      String   @default("FIELD")
+  email     String?  @unique
+  createdAt DateTime @default(now())
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

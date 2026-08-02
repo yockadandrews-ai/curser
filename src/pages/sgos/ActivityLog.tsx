@@ -5,11 +5,9 @@ import { sgosApi } from '../../sgosApi';
 import type { SmsLog } from '../../types/sgos';
 
 function statusBadge(log: SmsLog) {
-  if (log.ackCode) return { label: log.ackCode, cls: 'text-emerald-400 bg-emerald-900/30' };
-  if (log.delivered) return { label: 'Delivered', cls: 'text-blue-400 bg-blue-900/30' };
-  if (log.status === 'mock') return { label: 'Mock', cls: 'text-yellow-400 bg-yellow-900/30' };
+  if (log.status === 'delivered') return { label: 'Delivered', cls: 'text-blue-400 bg-blue-900/30' };
   if (log.status === 'failed') return { label: 'Failed', cls: 'text-red-400 bg-red-900/30' };
-  return { label: 'Sent', cls: 'text-gray-400 bg-gray-800' };
+  return { label: 'Sent', cls: 'text-emerald-400 bg-emerald-900/30' };
 }
 
 export default function ActivityLog() {
@@ -47,13 +45,16 @@ export default function ActivityLog() {
       <ul className="space-y-2">
         {logs.map((log) => {
           const badge = statusBadge(log);
+          const plateCode = log.plate?.plate;
+          const scenario = log.tagEvent?.scenario;
+          const source = log.tagEvent?.source ?? 'direct';
           return (
             <li key={log.id} className="rounded-xl bg-sgos-900 border border-sgos-800 p-3">
               <div className="flex justify-between items-start gap-2 mb-1">
                 <div>
-                  {log.plateCode && <span className="font-mono font-bold text-white">{log.plateCode}</span>}
-                  {log.scenario && <span className="text-xs text-sgos-accent ml-2">{log.scenario}</span>}
-                  <p className="text-[10px] text-gray-500 mt-0.5">{log.source} · {new Date(log.createdAt).toLocaleString()}</p>
+                  {plateCode && <span className="font-mono font-bold text-white">{plateCode}</span>}
+                  {scenario && <span className="text-xs text-sgos-accent ml-2">{scenario}</span>}
+                  <p className="text-[10px] text-gray-500 mt-0.5">{source} · {new Date(log.createdAt).toLocaleString()}</p>
                 </div>
                 <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${badge.cls}`}>{badge.label}</span>
               </div>

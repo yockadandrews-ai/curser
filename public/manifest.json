@@ -1,0 +1,17 @@
+{
+  "name": "SGOS Field Operations",
+  "short_name": "SGOS",
+  "description": "Field tag, batch log, dispatch, and ACK for plate registry operations",
+  "start_url": "/sgos",
+  "display": "standalone",
+  "background_color": "#0a0806",
+  "theme_color": "#0a0806",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
