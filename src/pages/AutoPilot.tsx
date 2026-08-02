@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Play, Pause, RefreshCw, TrendingUp, Package, FileText, Send,
   Zap, Clock, Target, AlertCircle, CheckCircle2, Loader2,
@@ -42,6 +43,7 @@ function ActivityItem({ activity }: { activity: Activity }) {
 }
 
 export default function AutoPilot() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<Stats | null>(null);
   const [activity, setActivity] = useState<Activity[]>([]);
   const [status, setStatus] = useState<AutopilotStatus | null>(null);
@@ -87,11 +89,8 @@ export default function AutoPilot() {
   };
 
   const handleToggle = async () => {
-    if (status?.enabled) {
-      await api.stopAutopilot();
-    } else {
-      await api.startAutopilot();
-    }
+    if (status?.enabled) await api.stopAutopilot();
+    else await api.startAutopilot();
     await refresh();
   };
 
@@ -118,75 +117,71 @@ export default function AutoPilot() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
             <Zap className="text-money-400" />
-            Money Autopilot
+            {t('autopilot.title')}
           </h1>
-          <p className="text-gray-400 mt-1">Real automation — discovers, generates, and posts automatically</p>
+          <p className="text-gray-400 mt-1">{t('autopilot.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <button onClick={handleToggle} className={isEnabled ? 'btn-secondary flex items-center gap-2' : 'btn-primary flex items-center gap-2'}>
-            {isEnabled ? <><Pause size={16} /> Pause</> : <><Play size={16} /> Start Autopilot</>}
+            {isEnabled ? <><Pause size={16} /> {t('autopilot.pause')}</> : <><Play size={16} /> {t('autopilot.start')}</>}
           </button>
           <button onClick={handleRunNow} disabled={running || isCycleRunning} className="btn-primary flex items-center gap-2 disabled:opacity-50">
             {running || isCycleRunning ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
-            Run Now
+            {t('autopilot.runNow')}
           </button>
         </div>
       </div>
 
-      {/* Status bar */}
       <div className={`card flex items-center gap-4 ${isEnabled ? 'border-money-600/30' : 'border-gray-700'}`}>
         <div className={`w-3 h-3 rounded-full ${isEnabled ? 'bg-money-400 animate-pulse' : 'bg-gray-600'}`} />
         <div className="flex-1">
           <p className="font-semibold text-white">
-            {isEnabled ? (isCycleRunning ? 'Running cycle...' : 'Autopilot Active') : 'Autopilot Paused'}
+            {isEnabled ? (isCycleRunning ? t('autopilot.runningCycle') : t('autopilot.active')) : t('autopilot.paused')}
           </p>
           <p className="text-sm text-gray-400">
             {status?.lastRunAt
-              ? `Last run: ${new Date(status.lastRunAt).toLocaleString()}`
-              : 'Waiting for first run...'}
-            {' · '}Every {status?.intervalMinutes ?? 5} min
+              ? `${t('autopilot.lastRun')}: ${new Date(status.lastRunAt).toLocaleString()}`
+              : t('autopilot.waitingFirstRun')}
+            {' · '}{t('autopilot.everyMin', { count: status?.intervalMinutes ?? 5 })}
           </p>
         </div>
         {status?.lastRunResult && (
           <div className="flex gap-4 text-sm">
-            <span className="text-gray-400">Last cycle:</span>
-            <span className="text-money-400">+{status.lastRunResult.discovered} products</span>
-            <span className="text-blue-400">+{status.lastRunResult.contentGenerated} content</span>
-            <span className="text-purple-400">+{status.lastRunResult.postsPublished} posts</span>
+            <span className="text-gray-400">{t('autopilot.lastCycle')}:</span>
+            <span className="text-money-400">{t('autopilot.productsDiscovered', { count: status.lastRunResult.discovered })}</span>
+            <span className="text-blue-400">{t('autopilot.contentGenerated', { count: status.lastRunResult.contentGenerated })}</span>
+            <span className="text-purple-400">{t('autopilot.postsPublished', { count: status.lastRunResult.postsPublished })}</span>
           </div>
         )}
       </div>
 
-      {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Monthly Profit" value={`$${(stats?.monthlyProfit ?? 0).toFixed(2)}`} icon={TrendingUp} sub="This month" />
-        <StatCard label="Net Profit" value={`$${(stats?.netProfit ?? 0).toFixed(2)}`} icon={DollarSign} sub="All time" />
-        <StatCard label="Products Tracked" value={String(stats?.productsTracked ?? 0)} icon={Package} sub="Affiliate only" />
-        <StatCard label="Posts Published" value={String(stats?.postsPublished ?? 0)} icon={Send} sub={`${stats?.postsQueued ?? 0} queued`} />
+        <StatCard label={t('autopilot.monthlyProfit')} value={`$${(stats?.monthlyProfit ?? 0).toFixed(2)}`} icon={TrendingUp} sub={t('common.thisMonth')} />
+        <StatCard label={t('autopilot.netProfit')} value={`$${(stats?.netProfit ?? 0).toFixed(2)}`} icon={DollarSign} sub={t('common.allTime')} />
+        <StatCard label={t('autopilot.productsTracked')} value={String(stats?.productsTracked ?? 0)} icon={Package} sub={t('autopilot.affiliateOnly')} />
+        <StatCard label={t('autopilot.postsPublishedLabel')} value={String(stats?.postsPublished ?? 0)} icon={Send} sub={t('autopilot.queued', { count: stats?.postsQueued ?? 0 })} />
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Top 5 Winning Products */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-white flex items-center gap-2">
               <Target size={18} className="text-money-400" />
-              Top 5 Winning Products
+              {t('autopilot.topProducts')}
             </h2>
             <button onClick={handleDiscover} disabled={running} className="text-xs btn-secondary py-1 px-2">
-              Auto-Discover
+              {t('autopilot.autoDiscover')}
             </button>
           </div>
           {topProducts.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Package size={32} className="mx-auto mb-2 opacity-50" />
-              <p>No products yet</p>
-              <p className="text-sm mt-1">Add products in Real Earnings or click Auto-Discover</p>
+              <p>{t('autopilot.noProducts')}</p>
+              <p className="text-sm mt-1">{t('autopilot.noProductsHint')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -198,14 +193,12 @@ export default function AutoPilot() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-white truncate">{p.name}</p>
                       <p className="text-xs text-gray-500">
-                        ${p.cost.toFixed(2)} → ${p.sellPrice.toFixed(2)} · ${profit.toFixed(2)} profit
+                        {t('autopilot.profitLine', { cost: p.cost.toFixed(2), sell: p.sellPrice.toFixed(2), profit: profit.toFixed(2) })}
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="badge-green">{p.viralScore} viral</span>
-                      {p.source === 'discovered' && (
-                        <p className="text-xs text-blue-400 mt-1">auto-found</p>
-                      )}
+                      <span className="badge-green">{t('autopilot.viral', { score: p.viralScore })}</span>
+                      {p.source === 'discovered' && <p className="text-xs text-blue-400 mt-1">{t('autopilot.autoFound')}</p>}
                     </div>
                   </div>
                 );
@@ -214,16 +207,15 @@ export default function AutoPilot() {
           )}
         </div>
 
-        {/* Live Activity Feed */}
         <div className="card">
           <h2 className="font-semibold text-white flex items-center gap-2 mb-4">
             <Clock size={18} className="text-money-400" />
-            Live Activity Feed
-            <span className="ml-auto text-xs text-gray-500">updates every 10s</span>
+            {t('autopilot.activityFeed')}
+            <span className="ml-auto text-xs text-gray-500">{t('autopilot.updatesEvery')}</span>
           </h2>
           <div className="max-h-80 overflow-y-auto">
             {activity.length === 0 ? (
-              <p className="text-gray-500 text-sm text-center py-8">No activity yet — start the autopilot!</p>
+              <p className="text-gray-500 text-sm text-center py-8">{t('autopilot.noActivity')}</p>
             ) : (
               activity.map(a => <ActivityItem key={a.id} activity={a} />)
             )}
@@ -231,24 +223,21 @@ export default function AutoPilot() {
         </div>
       </div>
 
-      {/* Automation pipeline */}
       <div className="card">
         <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
           <FileText size={18} className="text-money-400" />
-          Automation Pipeline
+          {t('autopilot.pipeline')}
         </h2>
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: 'Auto-Discover Products', enabled: status?.settings.autoDiscover, icon: '🔍', desc: 'Finds top 5 winning products in your niche' },
-            { label: 'Auto-Generate Content', enabled: status?.settings.autoGenerate, icon: '📝', desc: 'Creates viral posts for your best products' },
-            { label: 'Auto-Post to Social', enabled: status?.settings.autoPost, icon: '📱', desc: 'Posts to TikTok, Instagram, Twitter' },
+            { label: t('autopilot.discoverTitle'), enabled: status?.settings.autoDiscover, icon: '🔍', desc: t('autopilot.discoverDesc') },
+            { label: t('autopilot.generateTitle'), enabled: status?.settings.autoGenerate, icon: '📝', desc: t('autopilot.generateDesc') },
+            { label: t('autopilot.postTitle'), enabled: status?.settings.autoPost, icon: '📱', desc: t('autopilot.postDesc') },
           ].map(step => (
             <div key={step.label} className={`p-4 rounded-lg border ${step.enabled ? 'border-money-600/30 bg-money-600/5' : 'border-gray-700 bg-dark-800/30'}`}>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">{step.icon}</span>
-                {step.enabled
-                  ? <CheckCircle2 size={16} className="text-money-400" />
-                  : <AlertCircle size={16} className="text-gray-600" />}
+                {step.enabled ? <CheckCircle2 size={16} className="text-money-400" /> : <AlertCircle size={16} className="text-gray-600" />}
               </div>
               <p className="font-medium text-white text-sm">{step.label}</p>
               <p className="text-xs text-gray-500 mt-1">{step.desc}</p>

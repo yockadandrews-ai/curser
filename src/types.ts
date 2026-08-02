@@ -41,8 +41,23 @@ export interface GeneratedContent {
   hashtags: string;
   viralScore: number;
   status: 'draft' | 'queued' | 'posted' | 'failed';
+  locale?: string;
   createdAt: string;
   postedAt?: string;
+}
+
+export interface Lead {
+  id: string;
+  name: string;
+  email?: string;
+  company?: string;
+  preferredLocale: string | null;
+  sourceApp: 'bridge-builder' | 'echo-scale';
+  acceptLanguage?: string;
+  resolvedLocale?: string;
+  localeSource?: 'lead' | 'browser' | 'account' | 'default';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Activity {

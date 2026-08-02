@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
 import { isRtlLocale } from '../i18n';
-import { CLIENT_LANGUAGES } from '../i18n/languages';
+import { CLIENT_LANGUAGES, CLIENT_LANGUAGES_PHASE2 } from '../i18n/languages';
 import { api } from '../api';
 
 interface LanguageSwitcherProps {
@@ -20,22 +20,27 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
     api.setLocale(code).catch(() => undefined);
   };
 
-  if (compact) {
-    return (
-      <select
-        aria-label={t('language.switchTo')}
-        value={current}
-        onChange={e => handleChange(e.target.value)}
-        className="input text-xs py-1.5 px-2 min-w-0"
-      >
+  const select = (
+    <select
+      aria-label={t('language.switchTo')}
+      value={current}
+      onChange={e => handleChange(e.target.value)}
+      className={compact ? 'input text-xs py-1.5 px-2 min-w-0' : 'input w-full text-sm'}
+    >
+      <optgroup label={t('language.phase1')}>
         {CLIENT_LANGUAGES.map(lang => (
-          <option key={lang.code} value={lang.code}>
-            {lang.nativeName}
-          </option>
+          <option key={lang.code} value={lang.code}>{lang.nativeName}</option>
         ))}
-      </select>
-    );
-  }
+      </optgroup>
+      <optgroup label={t('language.phase2')}>
+        {CLIENT_LANGUAGES_PHASE2.map(lang => (
+          <option key={lang.code} value={lang.code}>{lang.nativeName}</option>
+        ))}
+      </optgroup>
+    </select>
+  );
+
+  if (compact) return select;
 
   return (
     <div className="card text-xs">
@@ -43,18 +48,7 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
         <Globe size={14} className="text-money-400" />
         <span className="font-medium">{t('language.label')}</span>
       </div>
-      <select
-        aria-label={t('language.switchTo')}
-        value={current}
-        onChange={e => handleChange(e.target.value)}
-        className="input w-full text-sm"
-      >
-        {CLIENT_LANGUAGES.map(lang => (
-          <option key={lang.code} value={lang.code}>
-            {lang.nativeName} ({lang.name})
-          </option>
-        ))}
-      </select>
+      {select}
       <p className="text-gray-600 mt-2">{t('factory.i18nGate')}</p>
     </div>
   );

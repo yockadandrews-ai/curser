@@ -152,6 +152,7 @@ ${PHASE_1_LOCALES.map(c => `- \`${c}\` — ${LANGUAGES.find(l => l.code === c)?.
 ## UI: react-i18next + JSON locale files in src/locales/
 ## AI: aiLanguageInstruction(locale) on every generative call
 ## Storage: content.locale column + per-lead override
+## Leads: leads table + resolveLeadLocale() for Bridge-Builder & Echo-Scale
 ## RTL: dir="rtl" for Arabic
 
 ## Conversion Apps

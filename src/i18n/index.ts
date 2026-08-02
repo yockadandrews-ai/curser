@@ -12,25 +12,37 @@ import ko from '../locales/ko.json';
 import zhCN from '../locales/zh-CN.json';
 import ar from '../locales/ar.json';
 import hi from '../locales/hi.json';
+import it from '../locales/it.json';
+import nl from '../locales/nl.json';
+import tr from '../locales/tr.json';
+import id from '../locales/id.json';
+import vi from '../locales/vi.json';
+import pl from '../locales/pl.json';
+import ru from '../locales/ru.json';
+import th from '../locales/th.json';
+import zhTW from '../locales/zh-TW.json';
+
+import { ALL_CLIENT_LANGUAGES, isRtlLocale } from './languages';
 
 export const PHASE_1_LOCALES = [
   'en', 'es', 'pt-BR', 'fr', 'de', 'ja', 'ko', 'zh-CN', 'ar', 'hi',
 ] as const;
 
-export type AppLocale = typeof PHASE_1_LOCALES[number];
+export const PHASE_2_LOCALES = [
+  'it', 'nl', 'tr', 'id', 'vi', 'pl', 'ru', 'th', 'zh-TW',
+] as const;
 
-export const RTL_LOCALES = new Set<AppLocale>(['ar']);
+export const ALL_LOCALES = [...PHASE_1_LOCALES, ...PHASE_2_LOCALES] as const;
+
+export type AppLocale = typeof ALL_LOCALES[number];
+
+export { isRtlLocale } from './languages';
 
 const LOCALE_STORAGE_KEY = 'conversion-os-locale';
 
-export function isRtlLocale(locale: string): boolean {
-  return RTL_LOCALES.has(locale as AppLocale);
-}
-
 export function applyDocumentDirection(locale: string): void {
-  const rtl = isRtlLocale(locale);
   document.documentElement.lang = locale;
-  document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+  document.documentElement.dir = isRtlLocale(locale) ? 'rtl' : 'ltr';
 }
 
 i18n
@@ -48,9 +60,18 @@ i18n
       'zh-CN': { translation: zhCN },
       ar: { translation: ar },
       hi: { translation: hi },
+      it: { translation: it },
+      nl: { translation: nl },
+      tr: { translation: tr },
+      id: { translation: id },
+      vi: { translation: vi },
+      pl: { translation: pl },
+      ru: { translation: ru },
+      th: { translation: th },
+      'zh-TW': { translation: zhTW },
     },
     fallbackLng: 'en',
-    supportedLngs: [...PHASE_1_LOCALES],
+    supportedLngs: ALL_CLIENT_LANGUAGES.map(l => l.code),
     nonExplicitSupportedLngs: true,
     interpolation: { escapeValue: false },
     detection: {

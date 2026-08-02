@@ -53,15 +53,15 @@ export const api = {
     request<import('./types').Expense>('/expenses', { method: 'POST', body: JSON.stringify(data) }),
 
   getContent: () => request<import('./types').GeneratedContent[]>('/content'),
-  generateContent: (productId: string, platforms?: string[]) =>
+  generateContent: (productId: string, platforms?: string[], locale?: string) =>
     request<import('./types').GeneratedContent[]>('/content/generate', {
       method: 'POST',
-      body: JSON.stringify({ productId, platforms }),
+      body: JSON.stringify({ productId, platforms, locale }),
     }),
-  previewContent: (productId: string, platforms?: string[]) =>
+  previewContent: (productId: string, platforms?: string[], locale?: string) =>
     request<import('./types').GeneratedContent[]>('/content/preview', {
       method: 'POST',
-      body: JSON.stringify({ productId, platforms }),
+      body: JSON.stringify({ productId, platforms, locale }),
     }),
 
   discoverProducts: (niche?: string, limit = 5) =>
@@ -102,4 +102,17 @@ export const api = {
   setLocale: (locale: string) => request<{ locale: string }>('/i18n/locale', { method: 'PUT', body: JSON.stringify({ locale }) }),
   generateMultilingualPackage: () =>
     request<{ ok: boolean; outputRoot: string; paths: string[]; folder: string }>('/factory/multilingual-package', { method: 'POST' }),
+
+  getLeads: (sourceApp?: string) =>
+    request<import('./types').Lead[]>(`/leads${sourceApp ? `?sourceApp=${encodeURIComponent(sourceApp)}` : ''}`),
+  addLead: (data: {
+    name: string;
+    email?: string;
+    company?: string;
+    preferredLocale?: string | null;
+    sourceApp: 'bridge-builder' | 'echo-scale';
+    acceptLanguage?: string;
+  }) => request<import('./types').Lead>('/leads', { method: 'POST', body: JSON.stringify(data) }),
+  setLeadLocale: (id: string, locale: string | null) =>
+    request<import('./types').Lead>(`/leads/${id}/locale`, { method: 'PUT', body: JSON.stringify({ locale }) }),
 };

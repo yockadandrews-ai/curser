@@ -4,7 +4,7 @@ import {
   Factory, Play, CheckCircle2, XCircle, Loader2, FolderOpen,
   FileText, ChevronDown, ChevronUp, Calendar, Globe,
 } from 'lucide-react';
-import { api } from '../api';
+import LeadLocalePanel from '../components/LeadLocalePanel';
 import type { DailyRun, MultiThemeRun } from '../types/factory';
 
 const THEMES = [
@@ -175,6 +175,8 @@ export default function DailyFactory() {
           {t('factory.generateMultilingual')}
         </button>
       </div>
+
+      <LeadLocalePanel />
 
       {multilingualResult && (
         <div className="card border-money-600/30 text-sm">

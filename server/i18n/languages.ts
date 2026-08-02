@@ -111,5 +111,6 @@ export const FACTORY_I18N_QUALITY_GATE = [
   'Proposals generated in primary + optional parallel language versions',
   'Master Notes for Cursor include i18n scaffolding requirements',
   'Generated content stored with language tag for consistent lead treatment',
+  'Per-lead language override for Bridge-Builder AI and Echo-Scale AI (leads table + resolveLeadLocale)',
   'Fallback to English with user-visible note for unsupported edge cases',
 ];

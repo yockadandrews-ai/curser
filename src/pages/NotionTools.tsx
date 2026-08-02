@@ -1,27 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BookOpen, Plus, Loader2, Upload, DollarSign, Package } from 'lucide-react';
 import { api } from '../api';
 import type { NotionTool, NotionInventory } from '../types';
 
 export default function NotionTools() {
+  const { t } = useTranslation();
   const [inventory, setInventory] = useState<NotionInventory | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [importText, setImportText] = useState('');
   const [newTool, setNewTool] = useState({ name: '', description: '', sellPrice: '', category: '' });
-
   const [seeding, setSeeding] = useState(false);
-
-  const handleSeedCatalog = async () => {
-    setSeeding(true);
-    try {
-      await api.seedNotionCatalog(true);
-      await refresh();
-    } finally {
-      setSeeding(false);
-    }
-  };
 
   const refresh = useCallback(async () => {
     try {
@@ -32,6 +23,16 @@ export default function NotionTools() {
   }, []);
 
   useEffect(() => { refresh(); }, [refresh]);
+
+  const handleSeedCatalog = async () => {
+    setSeeding(true);
+    try {
+      await api.seedNotionCatalog(true);
+      await refresh();
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,73 +66,65 @@ export default function NotionTools() {
       <div>
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
           <BookOpen className="text-blue-400" />
-          Notion Tools Inventory
+          {t('notionTools.title')}
         </h1>
-        <p className="text-gray-400 mt-1">
-          Your Kimi3 / Notion tools — separate from Money Autopilot affiliate products
-        </p>
+        <p className="text-gray-400 mt-1">{t('notionTools.subtitle')}</p>
       </div>
 
-      {/* Status banner */}
       <div className="card border-blue-600/20">
         {inventory?.hasPriceList ? (
           <p className="text-sm text-gray-300">
-            ✅ <span className="text-blue-400 font-medium">{inventory.pricedTools}</span> tools priced ·{' '}
-            <span className="text-gray-500">{inventory.unpricedTools} need pricing</span> ·{' '}
-            <span className="text-gray-500">{inventory.totalStock?.toLocaleString()} total stock</span>
+            ✅ {t('notionTools.pricedBanner', {
+              priced: inventory.pricedTools,
+              unpriced: inventory.unpricedTools,
+              stock: inventory.totalStock?.toLocaleString() ?? 0,
+            })}
           </p>
         ) : (
-          <p className="text-sm text-gray-300">
-            📋 Click <strong className="text-blue-400">Import 33-Tool Catalog</strong> below — 25 factory apps + 8 Kimi3 platform tools with prices
-          </p>
+          <p className="text-sm text-gray-300">{t('notionTools.importBanner')}</p>
         )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="card"><p className="text-gray-400 text-sm">Total Tools</p><p className="stat-value">{inventory?.totalTools ?? 0}</p></div>
-        <div className="card"><p className="text-gray-400 text-sm">With Price</p><p className="stat-value">{inventory?.pricedTools ?? 0}</p></div>
-        <div className="card"><p className="text-gray-400 text-sm">Need Price</p><p className="stat-value text-yellow-400">{inventory?.unpricedTools ?? 0}</p></div>
-        <div className="card"><p className="text-gray-400 text-sm">Sold</p><p className="stat-value">{inventory?.totalSold ?? 0}</p></div>
+        <div className="card"><p className="text-gray-400 text-sm">{t('notionTools.totalTools')}</p><p className="stat-value">{inventory?.totalTools ?? 0}</p></div>
+        <div className="card"><p className="text-gray-400 text-sm">{t('notionTools.withPrice')}</p><p className="stat-value">{inventory?.pricedTools ?? 0}</p></div>
+        <div className="card"><p className="text-gray-400 text-sm">{t('notionTools.needPrice')}</p><p className="stat-value text-yellow-400">{inventory?.unpricedTools ?? 0}</p></div>
+        <div className="card"><p className="text-gray-400 text-sm">{t('notionTools.sold')}</p><p className="stat-value">{inventory?.totalSold ?? 0}</p></div>
       </div>
 
       <div className="flex gap-2 flex-wrap">
         <button onClick={handleSeedCatalog} disabled={seeding} className="btn-primary flex items-center gap-2 text-sm">
           {seeding ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-          Import 33-Tool Catalog
+          {t('notionTools.importCatalog')}
         </button>
         <button onClick={() => setShowAdd(true)} className="btn-secondary flex items-center gap-2 text-sm">
-          <Plus size={16} /> Add Tool
+          <Plus size={16} /> {t('notionTools.addTool')}
         </button>
         <button onClick={() => setShowImport(true)} className="btn-secondary flex items-center gap-2 text-sm">
-          <Upload size={16} /> Paste Custom List
+          <Upload size={16} /> {t('notionTools.pasteList')}
         </button>
       </div>
 
       {showAdd && (
         <form onSubmit={handleAdd} className="card grid md:grid-cols-2 gap-3">
-          <input className="input" placeholder="Tool name *" value={newTool.name} onChange={e => setNewTool(f => ({ ...f, name: e.target.value }))} required />
-          <input className="input" placeholder="Category (optional)" value={newTool.category} onChange={e => setNewTool(f => ({ ...f, category: e.target.value }))} />
-          <input className="input" placeholder="Price per tool (optional — add later)" type="number" step="0.01" value={newTool.sellPrice} onChange={e => setNewTool(f => ({ ...f, sellPrice: e.target.value }))} />
-          <input className="input md:col-span-2" placeholder="Description (optional)" value={newTool.description} onChange={e => setNewTool(f => ({ ...f, description: e.target.value }))} />
+          <input className="input" placeholder={`${t('notionTools.toolName')} *`} value={newTool.name} onChange={e => setNewTool(f => ({ ...f, name: e.target.value }))} required />
+          <input className="input" placeholder={t('notionTools.category')} value={newTool.category} onChange={e => setNewTool(f => ({ ...f, category: e.target.value }))} />
+          <input className="input" placeholder={t('notionTools.pricePerTool')} type="number" step="0.01" value={newTool.sellPrice} onChange={e => setNewTool(f => ({ ...f, sellPrice: e.target.value }))} />
+          <input className="input md:col-span-2" placeholder={t('notionTools.description')} value={newTool.description} onChange={e => setNewTool(f => ({ ...f, description: e.target.value }))} />
           <div className="flex gap-2 md:col-span-2">
-            <button type="submit" className="btn-primary">Save Tool</button>
-            <button type="button" onClick={() => setShowAdd(false)} className="btn-secondary">Cancel</button>
+            <button type="submit" className="btn-primary">{t('notionTools.saveTool')}</button>
+            <button type="button" onClick={() => setShowAdd(false)} className="btn-secondary">{t('common.cancel')}</button>
           </div>
         </form>
       )}
 
       {showImport && (
         <div className="card space-y-3">
-          <p className="text-sm text-gray-400">Paste your Notion tool list — one tool name per line:</p>
-          <textarea
-            className="input h-40 font-mono text-sm"
-            placeholder={"Tool 1\nTool 2\nTool 3\n..."}
-            value={importText}
-            onChange={e => setImportText(e.target.value)}
-          />
+          <p className="text-sm text-gray-400">{t('notionTools.importHint')}</p>
+          <textarea className="input h-40 font-mono text-sm" placeholder={'Tool 1\nTool 2\n...'} value={importText} onChange={e => setImportText(e.target.value)} />
           <div className="flex gap-2">
-            <button onClick={handleImport} className="btn-primary">Import Tools</button>
-            <button onClick={() => setShowImport(false)} className="btn-secondary">Cancel</button>
+            <button onClick={handleImport} className="btn-primary">{t('notionTools.importTools')}</button>
+            <button onClick={() => setShowImport(false)} className="btn-secondary">{t('common.cancel')}</button>
           </div>
         </div>
       )}
@@ -139,23 +132,23 @@ export default function NotionTools() {
       {tools.length === 0 ? (
         <div className="card text-center py-12 text-gray-500">
           <BookOpen size={40} className="mx-auto mb-3 opacity-50" />
-          <p className="font-medium text-gray-400">No tools imported yet</p>
-          <p className="text-sm mt-2">Paste your 30+ Notion tools using Bulk Import above</p>
+          <p className="font-medium text-gray-400">{t('notionTools.noTools')}</p>
+          <p className="text-sm mt-2">{t('notionTools.noToolsHint')}</p>
         </div>
       ) : (
         <div className="card overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-gray-500 border-b border-gray-800">
-                <th className="text-left py-2">Tool</th>
-                <th className="text-left py-2">Category</th>
-                <th className="text-right py-2">Price</th>
-                <th className="text-right py-2">Stock</th>
-                <th className="text-right py-2">Sold</th>
+                <th className="text-left py-2">{t('notionTools.colTool')}</th>
+                <th className="text-left py-2">{t('notionTools.colCategory')}</th>
+                <th className="text-right py-2">{t('notionTools.colPrice')}</th>
+                <th className="text-right py-2">{t('notionTools.colStock')}</th>
+                <th className="text-right py-2">{t('notionTools.colSold')}</th>
               </tr>
             </thead>
             <tbody>
-              {tools.map(tool => (
+              {tools.map((tool: NotionTool) => (
                 <tr key={tool.id} className="border-b border-gray-800/50 hover:bg-dark-800/30">
                   <td className="py-3">
                     <p className="font-medium text-white">{tool.name}</p>
@@ -165,10 +158,10 @@ export default function NotionTools() {
                   <td className="py-3 text-right">
                     {tool.sellPrice != null ? (
                       <span className="text-money-400 font-semibold flex items-center justify-end gap-1">
-                        <DollarSign size={12} />{tool.sellPrice.toFixed(2)}/tool
+                        <DollarSign size={12} />{tool.sellPrice.toFixed(2)}{t('notionTools.perTool')}
                       </span>
                     ) : (
-                      <span className="text-yellow-400/70 text-xs">No price yet</span>
+                      <span className="text-yellow-400/70 text-xs">{t('notionTools.noPriceYet')}</span>
                     )}
                   </td>
                   <td className="py-3 text-right text-gray-400">

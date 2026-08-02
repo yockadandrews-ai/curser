@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sparkles, Copy, Check, Loader2, Send, RefreshCw, Flame } from 'lucide-react';
 import { api } from '../api';
 import type { Product, GeneratedContent } from '../types';
@@ -21,6 +22,7 @@ function ViralScore({ score }: { score: number }) {
 }
 
 function ContentCard({ content, product }: { content: GeneratedContent; product?: Product }) {
+  const { t, i18n } = useTranslation();
   const [copied, setCopied] = useState(false);
   const fullText = `${content.hook}\n\n${content.caption}\n\n${content.hashtags}`;
 
@@ -31,6 +33,7 @@ function ContentCard({ content, product }: { content: GeneratedContent; product?
   };
 
   const platform = PLATFORMS.find(p => p.id === content.platform);
+  const statusKey = `viral.status${content.status.charAt(0).toUpperCase()}${content.status.slice(1)}` as 'viral.statusDraft';
 
   return (
     <div className="card border-gray-700 hover:border-money-600/30 transition-colors">
@@ -38,17 +41,19 @@ function ContentCard({ content, product }: { content: GeneratedContent; product?
         <div className="flex items-center gap-2">
           <span>{platform?.emoji}</span>
           <span className="font-medium text-white capitalize">{content.platform}</span>
-          {product && (
-            <span className="text-xs text-gray-500">· {product.name}</span>
-          )}
+          {product && <span className="text-xs text-gray-500">· {product.name}</span>}
         </div>
         <div className="flex items-center gap-2">
           <ViralScore score={content.viralScore} />
           <span className={`badge ${content.status === 'posted' ? 'badge-green' : content.status === 'queued' ? 'badge-blue' : 'badge-yellow'}`}>
-            {content.status}
+            {t(statusKey, { defaultValue: content.status })}
           </span>
         </div>
       </div>
+
+      {content.locale && content.locale !== i18n.language && (
+        <p className="text-xs text-gray-500 mb-2">{t('viral.localeTag', { locale: content.locale })}</p>
+      )}
 
       <div className="bg-dark-800/50 rounded-lg p-3 space-y-2 text-sm">
         <p className="font-semibold text-white">{content.hook}</p>
@@ -59,7 +64,7 @@ function ContentCard({ content, product }: { content: GeneratedContent; product?
       <div className="flex gap-2 mt-3">
         <button onClick={copy} className="btn-secondary flex items-center gap-2 text-sm flex-1">
           {copied ? <Check size={14} className="text-money-400" /> : <Copy size={14} />}
-          {copied ? 'Copied!' : 'Copy'}
+          {copied ? t('common.copied') : t('common.copy')}
         </button>
       </div>
     </div>
@@ -67,6 +72,7 @@ function ContentCard({ content, product }: { content: GeneratedContent; product?
 }
 
 export default function ViralCashGenerator() {
+  const { t, i18n } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProductId, setSelectedProductId] = useState('');
   const [selectedPlatforms, setSelectedPlatforms] = useState(['tiktok', 'instagram', 'twitter']);
@@ -80,9 +86,7 @@ export default function ViralCashGenerator() {
     const [p, c] = await Promise.all([api.getProducts(), api.getContent()]);
     setProducts(p);
     setAllContent(c);
-    if (p.length > 0 && !selectedProductId) {
-      setSelectedProductId(p[0].id);
-    }
+    if (p.length > 0 && !selectedProductId) setSelectedProductId(p[0].id);
   }, [selectedProductId]);
 
   useEffect(() => { refresh(); }, [refresh]);
@@ -93,7 +97,7 @@ export default function ViralCashGenerator() {
     if (!selectedProductId) return;
     setGenerating(true);
     try {
-      const preview = await api.previewContent(selectedProductId, selectedPlatforms);
+      const preview = await api.previewContent(selectedProductId, selectedPlatforms, i18n.language);
       setGenerated(preview as GeneratedContent[]);
     } finally {
       setGenerating(false);
@@ -104,7 +108,7 @@ export default function ViralCashGenerator() {
     if (!selectedProductId) return;
     setLoading(true);
     try {
-      const saved = await api.generateContent(selectedProductId, selectedPlatforms);
+      const saved = await api.generateContent(selectedProductId, selectedPlatforms, i18n.language);
       setGenerated(saved);
       await refresh();
     } finally {
@@ -124,9 +128,7 @@ export default function ViralCashGenerator() {
   };
 
   const togglePlatform = (id: string) => {
-    setSelectedPlatforms(prev =>
-      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
-    );
+    setSelectedPlatforms(prev => prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]);
   };
 
   const profit = selectedProduct ? selectedProduct.sellPrice - selectedProduct.cost : 0;
@@ -136,31 +138,24 @@ export default function ViralCashGenerator() {
       <div>
         <h1 className="text-2xl font-bold text-white flex items-center gap-2">
           <Sparkles className="text-money-400" />
-          Viral Cash Generator
+          {t('viral.title')}
         </h1>
-        <p className="text-gray-400 mt-1">Generate viral content for YOUR products — higher profit = higher viral score</p>
+        <p className="text-gray-400 mt-1">{t('viral.subtitle')}</p>
       </div>
 
-      {/* Generator controls */}
       <div className="card">
         <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">Select Your Product</label>
+            <label className="text-sm text-gray-400 mb-2 block">{t('viral.selectProduct')}</label>
             {products.length === 0 ? (
-              <div className="p-4 bg-dark-800/50 rounded-lg text-gray-500 text-sm text-center">
-                No products yet — add products in Real Earnings first
-              </div>
+              <div className="p-4 bg-dark-800/50 rounded-lg text-gray-500 text-sm text-center">{t('viral.noProducts')}</div>
             ) : (
-              <select
-                className="input"
-                value={selectedProductId}
-                onChange={e => setSelectedProductId(e.target.value)}
-              >
+              <select className="input" value={selectedProductId} onChange={e => setSelectedProductId(e.target.value)}>
                 {products.map(p => {
                   const pProfit = p.sellPrice - p.cost;
                   return (
                     <option key={p.id} value={p.id}>
-                      {p.name} — ${pProfit.toFixed(2)} profit (score: {p.viralScore})
+                      {t('viral.profitOption', { name: p.name, profit: pProfit.toFixed(2), score: p.viralScore })}
                     </option>
                   );
                 })}
@@ -169,24 +164,15 @@ export default function ViralCashGenerator() {
 
             {selectedProduct && (
               <div className="mt-3 p-3 bg-dark-800/50 rounded-lg grid grid-cols-3 gap-2 text-sm">
-                <div>
-                  <p className="text-gray-500">Cost</p>
-                  <p className="text-white font-semibold">${selectedProduct.cost.toFixed(2)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Sell Price</p>
-                  <p className="text-white font-semibold">${selectedProduct.sellPrice.toFixed(2)}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Profit</p>
-                  <p className="text-money-400 font-semibold">${profit.toFixed(2)}</p>
-                </div>
+                <div><p className="text-gray-500">{t('viral.cost')}</p><p className="text-white font-semibold">${selectedProduct.cost.toFixed(2)}</p></div>
+                <div><p className="text-gray-500">{t('viral.sellPrice')}</p><p className="text-white font-semibold">${selectedProduct.sellPrice.toFixed(2)}</p></div>
+                <div><p className="text-gray-500">{t('viral.profit')}</p><p className="text-money-400 font-semibold">${profit.toFixed(2)}</p></div>
               </div>
             )}
           </div>
 
           <div>
-            <label className="text-sm text-gray-400 mb-2 block">Platforms</label>
+            <label className="text-sm text-gray-400 mb-2 block">{t('viral.platforms')}</label>
             <div className="flex flex-wrap gap-2">
               {PLATFORMS.map(p => (
                 <button
@@ -204,49 +190,37 @@ export default function ViralCashGenerator() {
             </div>
 
             <div className="flex gap-2 mt-4">
-              <button
-                onClick={handleGenerate}
-                disabled={!selectedProductId || generating || selectedPlatforms.length === 0}
-                className="btn-primary flex items-center gap-2 flex-1 disabled:opacity-50"
-              >
+              <button onClick={handleGenerate} disabled={!selectedProductId || generating || selectedPlatforms.length === 0} className="btn-primary flex items-center gap-2 flex-1 disabled:opacity-50">
                 {generating ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-                Generate Preview
+                {t('viral.generatePreview')}
               </button>
-              <button
-                onClick={handleSaveAndQueue}
-                disabled={!selectedProductId || loading}
-                className="btn-secondary flex items-center gap-2 disabled:opacity-50"
-              >
+              <button onClick={handleSaveAndQueue} disabled={!selectedProductId || loading} className="btn-secondary flex items-center gap-2 disabled:opacity-50">
                 {loading ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
-                Queue for Posting
+                {t('viral.queuePosting')}
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Generated preview */}
       {generated.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-white">Generated Content Preview</h2>
+            <h2 className="font-semibold text-white">{t('viral.previewTitle')}</h2>
             <button onClick={handlePublish} disabled={publishing} className="btn-primary flex items-center gap-2">
               {publishing ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-              Publish Queued Posts
+              {t('viral.publishQueued')}
             </button>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {generated.map(c => (
-              <ContentCard key={c.id} content={c} product={selectedProduct} />
-            ))}
+            {generated.map(c => <ContentCard key={c.id} content={c} product={selectedProduct} />)}
           </div>
         </div>
       )}
 
-      {/* All content history */}
       {allContent.length > 0 && (
         <div>
-          <h2 className="font-semibold text-white mb-4">Content History ({allContent.length})</h2>
+          <h2 className="font-semibold text-white mb-4">{t('viral.historyTitle', { count: allContent.length })}</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {allContent.slice(0, 9).map(c => {
               const product = products.find(p => p.id === c.productId);

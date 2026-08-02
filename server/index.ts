@@ -25,6 +25,10 @@ import { generateDailyRun, getFactoryRuns, getFactoryRun, FACTORY_THEMES, getThe
 } from './factory/generator.js';
 import { getI18nCatalog, resolveRequestLocale, setLocalePreference } from './i18n/index.js';
 import { writeMultilingualPackage } from './i18n/multilingualProposals.js';
+import { buildLeadLocalizedPrompt } from './i18n/leadLocale.js';
+import {
+  getLeads, getLead, addLead, updateLead, setLeadLocale, resolveLeadLocale, enrichLeadWithLocale,
+} from './leads.js';
 import { db } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -49,6 +53,56 @@ app.put('/api/i18n/locale', (req, res) => {
   if (!locale) return res.status(400).json({ error: 'locale required' });
   const saved = setLocalePreference(locale);
   res.json({ locale: saved });
+});
+
+// Leads — per-lead language override (Bridge-Builder & Echo-Scale)
+app.get('/api/leads', (req, res) => {
+  const sourceApp = req.query.sourceApp as string | undefined;
+  const acceptLanguage = req.headers['accept-language'] as string | undefined;
+  const leads = getLeads(sourceApp as import('./leads.js').LeadSourceApp | undefined)
+    .map(l => enrichLeadWithLocale(l, acceptLanguage));
+  res.json(leads);
+});
+app.get('/api/leads/:id', (req, res) => {
+  const lead = getLead(req.params.id);
+  if (!lead) return res.status(404).json({ error: 'Lead not found' });
+  const acceptLanguage = req.headers['accept-language'] as string | undefined;
+  res.json(enrichLeadWithLocale(lead, acceptLanguage));
+});
+app.get('/api/leads/:id/locale', (req, res) => {
+  const lead = getLead(req.params.id);
+  if (!lead) return res.status(404).json({ error: 'Lead not found' });
+  const acceptLanguage = req.headers['accept-language'] as string | undefined;
+  const accountLocale = resolveRequestLocale(acceptLanguage);
+  res.json(resolveLeadLocale(req.params.id, { acceptLanguage, accountLocale }));
+});
+app.post('/api/leads', (req, res) => {
+  const { name, email, company, preferredLocale, sourceApp, acceptLanguage } = req.body;
+  if (!name || !sourceApp) return res.status(400).json({ error: 'name and sourceApp required' });
+  if (!['bridge-builder', 'echo-scale'].includes(sourceApp)) {
+    return res.status(400).json({ error: 'sourceApp must be bridge-builder or echo-scale' });
+  }
+  const lead = addLead({ name, email, company, preferredLocale, sourceApp, acceptLanguage });
+  res.json(enrichLeadWithLocale(lead, req.headers['accept-language'] as string | undefined));
+});
+app.put('/api/leads/:id/locale', (req, res) => {
+  const { locale } = req.body;
+  const lead = setLeadLocale(req.params.id, locale ?? null);
+  if (!lead) return res.status(404).json({ error: 'Lead not found' });
+  res.json(enrichLeadWithLocale(lead, req.headers['accept-language'] as string | undefined));
+});
+app.post('/api/leads/:id/generate-demo', (req, res) => {
+  const lead = getLead(req.params.id);
+  if (!lead) return res.status(404).json({ error: 'Lead not found' });
+  const acceptLanguage = req.headers['accept-language'] as string | undefined;
+  const accountLocale = resolveRequestLocale(acceptLanguage);
+  const { locale, source } = resolveLeadLocale(lead.id, { acceptLanguage, accountLocale });
+  const basePrompt = req.body.prompt || `Generate localized outreach content for ${lead.name}.`;
+  const prompt = buildLeadLocalizedPrompt(
+    { leadId: lead.id, sourceApp: lead.sourceApp, acceptLanguage, accountLocale },
+    basePrompt,
+  );
+  res.json({ leadId: lead.id, locale, source, prompt, sourceApp: lead.sourceApp });
 });
 
 // Stats & dashboard
