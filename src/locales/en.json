@@ -32,7 +32,14 @@
     "noDrafts": "No drafts in queue — generate today's batch or sync from output/",
     "approve": "Approve",
     "confirmApprove": "Approve this draft for manual send review? Sent will remain 0 until proof URL.",
-    "neverAutoSend": "Never: auto-email, auto-LinkedIn, auto-DM, or increment Sent without proof URL."
+    "neverAutoSend": "Never: auto-email, auto-LinkedIn, auto-DM, or increment Sent without proof URL.",
+    "tableShortcut": "Shortcut",
+    "tableTrigger": "Trigger",
+    "tableDoes": "Does",
+    "tableDoesNot": "Does not",
+    "tableTriggerValue": "Manual / daily",
+    "tableDoesValue": "Status + optional generate → DRAFTED",
+    "tableDoesNotValue": "Send, SMTP, outreach"
   },
   "language": {
     "label": "Language",

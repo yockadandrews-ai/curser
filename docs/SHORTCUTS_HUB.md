@@ -25,6 +25,10 @@
 3. **Approval Queue** — mark Approved / Rejected (human only)
 4. **Send** — only with proof URL after Approved; never automatic
 
+## Environment
+
+- `NOTION_APPROVAL_QUEUE_URL` — Notion Autopilot Approval Queue page (default: `https://notion.so`)
+
 ## API
 
 - `GET /api/shortcuts/proposal-status`

@@ -36,6 +36,7 @@ export interface ProposalStatusReport {
   approvedTotal: number;
   todayTheme: string;
   outputRoot: string;
+  approvalQueueUrl: string;
   scannedAt: string;
 }
 

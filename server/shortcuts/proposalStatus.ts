@@ -36,6 +36,7 @@ export interface ProposalStatusReport {
   approvedTotal: number;
   todayTheme: string;
   outputRoot: string;
+  approvalQueueUrl: string;
   scannedAt: string;
 }
 
@@ -73,6 +74,9 @@ db.exec(`
 
 const GOVERNANCE_RULE =
   'Generates markdown proposals only. Does not send. Send only after Approval Queue + L5 proof.';
+
+export const APPROVAL_QUEUE_URL =
+  process.env.NOTION_APPROVAL_QUEUE_URL?.trim() || 'https://notion.so';
 
 function parseBatchDate(folderName: string): string | null {
   const m = folderName.match(/^(\d{4}-\d{2}-\d{2})/);
@@ -184,6 +188,7 @@ export function getProposalStatusReport(): ProposalStatusReport {
     approvedTotal: queue.filter(d => d.status === 'APPROVED').length,
     todayTheme: getThemeForDay(),
     outputRoot: OUTPUT_ROOT,
+    approvalQueueUrl: APPROVAL_QUEUE_URL,
     scannedAt: new Date().toISOString(),
   };
 }

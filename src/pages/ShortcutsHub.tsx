@@ -34,6 +34,7 @@ interface StatusReport {
   approvedTotal: number;
   todayTheme: string;
   outputRoot: string;
+  approvalQueueUrl: string;
   scannedAt: string;
 }
 
@@ -109,6 +110,27 @@ export default function ShortcutsHub() {
         <p className="text-xs text-gray-500 mt-2">{t('shortcuts.neverAutoSend')}</p>
       </div>
 
+      <div className="card overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead>
+            <tr className="text-gray-500 border-b border-gray-800">
+              <th className="py-2 pr-4 font-medium">{t('shortcuts.tableShortcut')}</th>
+              <th className="py-2 pr-4 font-medium">{t('shortcuts.tableTrigger')}</th>
+              <th className="py-2 pr-4 font-medium">{t('shortcuts.tableDoes')}</th>
+              <th className="py-2 font-medium">{t('shortcuts.tableDoesNot')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="text-gray-300">
+              <td className="py-3 pr-4 text-white font-medium">{t('shortcuts.title')}</td>
+              <td className="py-3 pr-4">{t('shortcuts.tableTriggerValue')}</td>
+              <td className="py-3 pr-4">{t('shortcuts.tableDoesValue')}</td>
+              <td className="py-3">{t('shortcuts.tableDoesNotValue')}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       {/* 1. Report */}
       <div className="card">
         <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
@@ -170,7 +192,7 @@ export default function ShortcutsHub() {
             {t('shortcuts.generateToday')}
           </button>
           <a
-            href="https://notion.so"
+            href={report?.approvalQueueUrl ?? 'https://notion.so'}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-secondary flex items-center gap-2 text-sm"
