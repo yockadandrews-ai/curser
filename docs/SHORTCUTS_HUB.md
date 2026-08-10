@@ -1,5 +1,7 @@
 # Shortcuts Hub — SGOS Autopilot Proposal Status
 
+> **Root menu:** See [SGOS_COMMAND.md](./SGOS_COMMAND.md) — item #4 in SGOS Command.
+
 | Shortcut | Trigger | Does | Does not |
 |----------|---------|------|----------|
 | **SGOS Autopilot — Proposal Status** | Manual / daily | Status report + optional generate → `DRAFTED` | Send, SMTP, outreach |
