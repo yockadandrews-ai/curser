@@ -123,4 +123,15 @@ export const api = {
   }) => request<import('./types').Lead>('/leads', { method: 'POST', body: JSON.stringify(data) }),
   setLeadLocale: (id: string, locale: string | null) =>
     request<import('./types').Lead>(`/leads/${id}/locale`, { method: 'PUT', body: JSON.stringify({ locale }) }),
+
+  getProposalStatus: () => request<import('./types/shortcuts').ProposalStatusReport>('/shortcuts/proposal-status'),
+  generateTodayProposals: () =>
+    request<import('./types/shortcuts').GenerateTodayResult>('/shortcuts/generate-today', { method: 'POST' }),
+  getApprovalQueue: () => request<import('./types/shortcuts').ProposalDraftRecord[]>('/shortcuts/approval-queue'),
+  approveDraft: (id: string, approvedBy?: string) =>
+    request<{ draft: import('./types/shortcuts').ProposalDraftRecord; sent: 0 }>(
+      `/shortcuts/approve/${id}`, { method: 'POST', body: JSON.stringify({ approvedBy }) },
+    ),
+  rejectDraft: (id: string) =>
+    request<import('./types/shortcuts').ProposalDraftRecord>(`/shortcuts/reject/${id}`, { method: 'POST' }),
 };

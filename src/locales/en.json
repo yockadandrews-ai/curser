@@ -10,7 +10,29 @@
     "factory": "Daily Factory",
     "notionTools": "Notion Tools",
     "earnings": "Real Earnings",
-    "viral": "Viral Cash Generator"
+    "viral": "Viral Cash Generator",
+    "shortcuts": "Shortcuts Hub"
+  },
+  "shortcuts": {
+    "title": "SGOS Autopilot — Proposal Status",
+    "subtitle": "Status + generate-only. Draft free, send gated.",
+    "report": "1. Report",
+    "lastGenerate": "Last generate date",
+    "sentCount": "Proposals sent (proof-gated)",
+    "todayTheme": "Today's theme (if you generate)",
+    "outputRoot": "Output root",
+    "none": "None yet",
+    "packagesOnDisk": "Packages on disk",
+    "gatedActions": "2. Gated actions only",
+    "generateToday": "Generate today's batch",
+    "openApprovalQueue": "Open Approval Queue (Notion)",
+    "approvalQueueHint": "Opens Notion — approve/reject in Autopilot Activation page",
+    "generateNote": "Writes markdown under output/YYYY-MM-DD_Five_Themes/ · Status=DRAFTED · Sent=0",
+    "localApprovalQueue": "Local Approval Queue (mirror until Notion wired)",
+    "noDrafts": "No drafts in queue — generate today's batch or sync from output/",
+    "approve": "Approve",
+    "confirmApprove": "Approve this draft for manual send review? Sent will remain 0 until proof URL.",
+    "neverAutoSend": "Never: auto-email, auto-LinkedIn, auto-DM, or increment Sent without proof URL."
   },
   "language": {
     "label": "Language",

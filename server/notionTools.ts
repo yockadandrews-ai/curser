@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { buildNotionCatalog } from './data/notionToolsCatalog.js';
+import { buildNotionCatalog, type CatalogToolSeed } from './data/notionToolsCatalog.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = process.env.DB_PATH || path.join(process.cwd(), 'data', 'autopilot.db');
@@ -166,7 +166,7 @@ export function seedNotionCatalog(force = false): { imported: number; total: num
 /** Backfill missing prices from catalog (e.g. Bridge-Builder credits-only pricing) */
 export function syncCatalogPrices(): number {
   const catalog = buildNotionCatalog();
-  const byName = new Map(catalog.map(c => [c.name.toLowerCase(), c]));
+  const byName = new Map(catalog.map((c: CatalogToolSeed) => [c.name.toLowerCase(), c]));
   let updated = 0;
   for (const tool of getNotionTools()) {
     if (tool.sellPrice != null && tool.sellPrice > 0) continue;

@@ -30,6 +30,15 @@ import {
   getLeads, getLead, addLead, updateLead, setLeadLocale, resolveLeadLocale, enrichLeadWithLocale,
 } from './leads.js';
 import { db } from './db.js';
+import {
+  getProposalStatusReport,
+  generateTodayProposalBatch,
+  getApprovalQueue,
+  approveDraft,
+  rejectDraft,
+  markDraftSent,
+  syncDraftsFromDisk,
+} from './shortcuts/proposalStatus.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -41,6 +50,9 @@ if (removed > 0) console.log(`[Cleanup] Removed ${removed} SGOS tools from affil
 
 const pricesSynced = syncCatalogPrices();
 if (pricesSynced > 0) console.log(`[Catalog] Synced ${pricesSynced} Notion tool prices`);
+
+const draftsSynced = syncDraftsFromDisk();
+if (draftsSynced > 0) console.log(`[SGOS] Synced ${draftsSynced} proposal draft(s) from output/`);
 
 app.use(cors());
 app.use(express.json());
@@ -391,6 +403,39 @@ app.post('/api/factory/expand-proposals', (_req, res) => {
 app.post('/api/factory/multilingual-package', (_req, res) => {
   const result = writeMultilingualPackage();
   res.json({ ok: true, outputRoot: OUTPUT_ROOT, ...result });
+});
+
+// Shortcuts Hub — SGOS Autopilot Proposal Status (draft free, send gated)
+app.get('/api/shortcuts/proposal-status', (_req, res) => {
+  res.json(getProposalStatusReport());
+});
+app.post('/api/shortcuts/generate-today', (_req, res) => {
+  try {
+    const result = generateTodayProposalBatch();
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+app.get('/api/shortcuts/approval-queue', (_req, res) => {
+  res.json(getApprovalQueue());
+});
+app.post('/api/shortcuts/approve/:id', (req, res) => {
+  const draft = approveDraft(req.params.id, req.body.approvedBy || 'human');
+  if (!draft) return res.status(404).json({ error: 'Draft not found' });
+  res.json({ draft, sent: 0, note: 'Approved — still Sent=0 until manual send + proof URL' });
+});
+app.post('/api/shortcuts/reject/:id', (req, res) => {
+  const draft = rejectDraft(req.params.id);
+  if (!draft) return res.status(404).json({ error: 'Draft not found' });
+  res.json(draft);
+});
+app.post('/api/shortcuts/mark-sent/:id', (req, res) => {
+  const { proofUrl } = req.body;
+  if (!proofUrl) return res.status(400).json({ error: 'proofUrl required — cannot increment Sent without L5 proof' });
+  const draft = markDraftSent(req.params.id, proofUrl);
+  if (!draft) return res.status(400).json({ error: 'Draft must be APPROVED before marking sent with proof' });
+  res.json(draft);
 });
 
 // Serve frontend in production
