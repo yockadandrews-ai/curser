@@ -38,6 +38,8 @@ import {
   rejectDraft,
   markDraftSent,
   syncDraftsFromDisk,
+  getPendingDrafts,
+  getPendingDraftCount,
 } from './shortcuts/proposalStatus.js';
 import {
   getCommandConfig,
@@ -47,6 +49,12 @@ import {
   logTeslaDrivePrep,
   COMMAND_MENU,
 } from './shortcuts/sgosCommand.js';
+import {
+  buildDailyReminderIcs,
+  buildBatchReviewIcs,
+  getApprovalCalendarLinks,
+  getBatchGoogleCalendarUrl,
+} from './shortcuts/calendar.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -444,6 +452,31 @@ app.post('/api/shortcuts/mark-sent/:id', (req, res) => {
   const draft = markDraftSent(req.params.id, proofUrl);
   if (!draft) return res.status(400).json({ error: 'Draft must be APPROVED before marking sent with proof' });
   res.json(draft);
+});
+app.get('/api/shortcuts/pending', (_req, res) => {
+  res.json({ count: getPendingDraftCount(), drafts: getPendingDrafts() });
+});
+app.get('/api/shortcuts/calendar/links', (_req, res) => {
+  res.json(getApprovalCalendarLinks());
+});
+app.get('/api/shortcuts/calendar/daily.ics', (_req, res) => {
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="sgos-daily-approval-reminder.ics"');
+  res.send(buildDailyReminderIcs());
+});
+app.get('/api/shortcuts/calendar/batch/:id.ics', (req, res) => {
+  const draft = getPendingDrafts().find(d => d.id === req.params.id)
+    ?? getApprovalQueue().find(d => d.id === req.params.id);
+  if (!draft) return res.status(404).json({ error: 'Draft not found' });
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="sgos-review-${draft.batchDate}.ics"`);
+  res.send(buildBatchReviewIcs(draft));
+});
+app.get('/api/shortcuts/calendar/batch/:id/google', (req, res) => {
+  const draft = getPendingDrafts().find(d => d.id === req.params.id)
+    ?? getApprovalQueue().find(d => d.id === req.params.id);
+  if (!draft) return res.status(404).json({ error: 'Draft not found' });
+  res.redirect(getBatchGoogleCalendarUrl(draft));
 });
 
 // SGOS Command — protected shortcuts (confirm → action → notify; never auto-send)

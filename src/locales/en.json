@@ -6,6 +6,7 @@
     "engineNote": "Autopilot handles affiliate products. Notion tools are tracked separately."
   },
   "nav": {
+    "approve": "Approve",
     "command": "SGOS Command",
     "autopilot": "Money Autopilot",
     "factory": "Daily Factory",
@@ -42,6 +43,28 @@
     "tableTriggerValue": "Manual / daily",
     "tableDoesValue": "Status + optional generate → DRAFTED",
     "tableDoesNotValue": "Send, SMTP, outreach"
+  },
+  "approveInbox": {
+    "title": "Quick Approve",
+    "subtitle": "One tap — nothing sends automatically",
+    "pending": "{{count}} waiting for you",
+    "upNext": "Up next",
+    "proposals": "proposals",
+    "noAutoSend": "Approve = ready for manual send later",
+    "approve": "Approve",
+    "decline": "Decline",
+    "approved": "Approved. Sent still = 0 until you manually send with proof.",
+    "declined": "Declined — batch archived from queue.",
+    "allClear": "All clear",
+    "allClearNote": "No drafts waiting. Generate a batch when ready.",
+    "fullStatus": "Full proposal status",
+    "openQuickApprove": "Quick Approve →",
+    "calendarTitle": "Add to calendar",
+    "calendarNote": "Daily reminder at {{time}} ({{tz}}) to review drafts",
+    "addGoogleCalendar": "Google Calendar",
+    "downloadIcs": "Apple / Outlook (.ics)",
+    "calendarHint": "Opens your calendar app — recurring daily review, links back here.",
+    "remindThisBatch": "Remind me to review this batch"
   },
   "command": {
     "title": "SGOS Command",

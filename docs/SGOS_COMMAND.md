@@ -106,6 +106,15 @@ Or use the in-app button: **SGOS Command → #4 → Generate today's batch** (vi
 | `NOTION_HERMES_STATUS_URL` | Hermes / readiness page |
 | `FIELD_BOARD_URL` | Optional — hides menu item #6 if unset |
 | `SGOS_AUDIT_CALENDAR_URL` | Audit booking calendar |
+| `APP_BASE_URL` | Public app URL for calendar links (default `http://localhost:3001`) |
+| `APPROVAL_REMINDER_HOUR` | Daily reminder hour (default `9`) |
+| `APPROVAL_REMINDER_MINUTE` | Daily reminder minute (default `0`) |
+| `APPROVAL_REMINDER_TZ` | Timezone for .ics (default `America/New_York`) |
+
+## Quick Approve inbox
+
+- **Route:** `/approve` — large Approve / Decline buttons, no double confirm
+- **Calendar:** Google Calendar one-click + `.ics` download for daily recurring review
 
 ## Governance rule
 

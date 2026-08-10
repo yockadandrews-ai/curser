@@ -135,6 +135,17 @@ export const api = {
   rejectDraft: (id: string) =>
     request<import('./types/shortcuts').ProposalDraftRecord>(`/shortcuts/reject/${id}`, { method: 'POST' }),
 
+  getPendingDrafts: () =>
+    request<{ count: number; drafts: import('./types/shortcuts').ProposalDraftRecord[] }>('/shortcuts/pending'),
+  getCalendarLinks: () =>
+    request<{
+      approveUrl: string;
+      icsDailyUrl: string;
+      googleCalendarDailyUrl: string;
+      reminderTime: string;
+      timezone: string;
+    }>('/shortcuts/calendar/links'),
+
   getCommandConfig: () =>
     request<{ config: import('./types/sgosCommand').CommandConfig; menu: import('./types/sgosCommand').CommandMenuItem[] }>(
       '/command/config',

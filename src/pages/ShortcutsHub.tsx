@@ -85,8 +85,6 @@ export default function ShortcutsHub() {
   };
 
   const handleApprove = async (id: string) => {
-    if (!confirmProtectedShortcut(t('shortcuts.approve'))) return;
-    if (!confirm(t('shortcuts.confirmApprove'))) return;
     await api.approveDraft(id);
     setNotification(t('shortcuts.notifyApproved'));
     await refresh();
@@ -94,6 +92,7 @@ export default function ShortcutsHub() {
 
   const handleReject = async (id: string) => {
     await api.rejectDraft(id);
+    setNotification(t('approveInbox.declined'));
     await refresh();
   };
 
@@ -222,10 +221,15 @@ export default function ShortcutsHub() {
 
       {/* Approval Queue (local mirror) */}
       <div className="card">
-        <h2 className="font-semibold text-white mb-4 flex items-center gap-2">
-          <AlertTriangle size={18} className="text-yellow-400" />
-          {t('shortcuts.localApprovalQueue')}
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h2 className="font-semibold text-white flex items-center gap-2">
+            <AlertTriangle size={18} className="text-yellow-400" />
+            {t('shortcuts.localApprovalQueue')}
+          </h2>
+          <a href="/approve" className="btn-primary text-sm py-2 px-4 bg-green-600 hover:bg-green-500">
+            {t('approveInbox.openQuickApprove')}
+          </a>
+        </div>
         {(report?.approvalQueue ?? []).length === 0 ? (
           <p className="text-gray-500 text-sm">{t('shortcuts.noDrafts')}</p>
         ) : (
@@ -241,11 +245,17 @@ export default function ShortcutsHub() {
                   <span className="text-xs text-gray-600">sent={d.sent}</span>
                   {d.status === 'DRAFTED' && (
                     <>
-                      <button onClick={() => handleApprove(d.id)} className="btn-primary text-xs py-1 px-2">
-                        {t('shortcuts.approve')}
+                      <button
+                        onClick={() => handleApprove(d.id)}
+                        className="text-xs py-1.5 px-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium"
+                      >
+                        {t('approveInbox.approve')}
                       </button>
-                      <button onClick={() => handleReject(d.id)} className="btn-secondary text-xs py-1 px-2">
-                        <XCircle size={12} />
+                      <button
+                        onClick={() => handleReject(d.id)}
+                        className="text-xs py-1.5 px-3 rounded-lg bg-dark-700 border border-gray-600 hover:border-red-500/50 text-gray-300"
+                      >
+                        {t('approveInbox.decline')}
                       </button>
                     </>
                   )}

@@ -271,6 +271,15 @@ export function getApprovalQueue(): ProposalDraftRecord[] {
     .map(r => mapDraft(r as Record<string, unknown>));
 }
 
+export function getPendingDrafts(): ProposalDraftRecord[] {
+  return db.prepare(`SELECT * FROM proposal_drafts WHERE status = 'DRAFTED' ORDER BY batch_date DESC, created_at DESC`).all()
+    .map(r => mapDraft(r as Record<string, unknown>));
+}
+
+export function getPendingDraftCount(): number {
+  return (db.prepare(`SELECT COUNT(*) as c FROM proposal_drafts WHERE status = 'DRAFTED'`).get() as { c: number }).c;
+}
+
 export function approveDraft(id: string, approvedBy = 'human'): ProposalDraftRecord | null {
   const row = db.prepare('SELECT * FROM proposal_drafts WHERE id = ?').get(id) as Record<string, unknown> | undefined;
   if (!row) return null;
