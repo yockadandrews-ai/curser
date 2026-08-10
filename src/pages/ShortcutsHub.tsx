@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Shield, FolderOpen, CheckCircle2, XCircle, Loader2, FileText, AlertTriangle, ExternalLink,
+  Shield, FolderOpen, CheckCircle2, Loader2, FileText, AlertTriangle, ExternalLink,
 } from 'lucide-react';
 import { api } from '../api';
 import { ShortcutNotification, confirmProtectedShortcut } from '../components/ProtectedShortcut';

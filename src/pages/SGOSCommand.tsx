@@ -78,10 +78,7 @@ export default function SGOSCommand() {
         case 'approval-queue':
           await runProtected(
             shortcutName(id),
-            () => {
-              openUrl(config.approvalQueueUrl);
-              window.location.href = '/approve';
-            },
+            () => { window.location.href = '/approve'; },
             t('command.notify.approvalQueue'),
           );
           break;
