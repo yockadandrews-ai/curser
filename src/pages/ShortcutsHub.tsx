@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Shield, FolderOpen, CheckCircle2, XCircle, Loader2, FileText, AlertTriangle, ExternalLink,
 } from 'lucide-react';
 import { api } from '../api';
+import { ShortcutNotification, confirmProtectedShortcut } from '../components/ProtectedShortcut';
 
 interface StatusReport {
   rule: string;
@@ -50,10 +52,14 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function ShortcutsHub() {
   const { t } = useTranslation();
+  const location = useLocation();
   const [report, setReport] = useState<StatusReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [lastGenerate, setLastGenerate] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(
+    (location.state as { notification?: string } | null)?.notification ?? null,
+  );
 
   const refresh = useCallback(async () => {
     try {
@@ -66,10 +72,12 @@ export default function ShortcutsHub() {
   useEffect(() => { refresh(); }, [refresh]);
 
   const handleGenerateToday = async () => {
+    if (!confirmProtectedShortcut(t('shortcuts.generateToday'))) return;
     setGenerating(true);
     try {
       const result = await api.generateTodayProposals();
       setLastGenerate(result.confirmation);
+      setNotification(`${result.confirmation} Folder: output/${result.folderPath}/`);
       await refresh();
     } finally {
       setGenerating(false);
@@ -77,8 +85,10 @@ export default function ShortcutsHub() {
   };
 
   const handleApprove = async (id: string) => {
+    if (!confirmProtectedShortcut(t('shortcuts.approve'))) return;
     if (!confirm(t('shortcuts.confirmApprove'))) return;
     await api.approveDraft(id);
+    setNotification(t('shortcuts.notifyApproved'));
     await refresh();
   };
 
@@ -245,6 +255,8 @@ export default function ShortcutsHub() {
           </div>
         )}
       </div>
+
+      <ShortcutNotification message={notification} onDismiss={() => setNotification(null)} />
     </div>
   );
 }

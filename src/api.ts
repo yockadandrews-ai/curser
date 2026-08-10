@@ -134,4 +134,22 @@ export const api = {
     ),
   rejectDraft: (id: string) =>
     request<import('./types/shortcuts').ProposalDraftRecord>(`/shortcuts/reject/${id}`, { method: 'POST' }),
+
+  getCommandConfig: () =>
+    request<{ config: import('./types/sgosCommand').CommandConfig; menu: import('./types/sgosCommand').CommandMenuItem[] }>(
+      '/command/config',
+    ),
+  captureSignal: (data: { signal: string; parties?: string; priority?: string }) =>
+    request<import('./types/sgosCommand').CapturedSignal>('/command/capture-signal', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getGovernanceStatus: () =>
+    request<import('./types/sgosCommand').GovernanceStatus>('/command/governance-status'),
+  getMetricsPulse: () => request<import('./types/sgosCommand').MetricsPulse>('/command/metrics-pulse'),
+  teslaDrivePrep: (sentryEnabled = false) =>
+    request<import('./types/sgosCommand').TeslaPrepResult>('/command/tesla-drive-prep', {
+      method: 'POST',
+      body: JSON.stringify({ sentryEnabled }),
+    }),
 };

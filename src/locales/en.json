@@ -6,6 +6,7 @@
     "engineNote": "Autopilot handles affiliate products. Notion tools are tracked separately."
   },
   "nav": {
+    "command": "SGOS Command",
     "autopilot": "Money Autopilot",
     "factory": "Daily Factory",
     "notionTools": "Notion Tools",
@@ -32,6 +33,7 @@
     "noDrafts": "No drafts in queue — generate today's batch or sync from output/",
     "approve": "Approve",
     "confirmApprove": "Approve this draft for manual send review? Sent will remain 0 until proof URL.",
+    "notifyApproved": "Draft approved. Sent=0 until manual send + L5 proof URL.",
     "neverAutoSend": "Never: auto-email, auto-LinkedIn, auto-DM, or increment Sent without proof URL.",
     "tableShortcut": "Shortcut",
     "tableTrigger": "Trigger",
@@ -40,6 +42,45 @@
     "tableTriggerValue": "Manual / daily",
     "tableDoesValue": "Status + optional generate → DRAFTED",
     "tableDoesNotValue": "Send, SMTP, outreach"
+  },
+  "command": {
+    "title": "SGOS Command",
+    "subtitle": "Protected root menu — every item asks for confirmation first.",
+    "protectedPattern": "Protected build pattern",
+    "rebuildHint": "Rebuild guide",
+    "rebuildDoc": "See docs/SGOS_COMMAND.md for the full step-by-step action list to rebuild this menu in Shortcuts or Notion.",
+    "openProposalStatus": "SGOS Autopilot — Proposal Status",
+    "items": {
+      "captureSignal": "Capture Signal",
+      "approvalQueue": "Approval Queue",
+      "governanceStatus": "Governance Status",
+      "proposalStatus": "SGOS Autopilot — Proposal Status",
+      "teslaDrivePrep": "Tesla Drive Prep",
+      "fieldBoard": "Open Field Board",
+      "bookAudit": "Book SGOS Audit",
+      "pressQueue": "Open Press Queue",
+      "metricsPulse": "Metrics Pulse"
+    },
+    "notify": {
+      "captureSignal": "Signal captured locally. Nothing sent.",
+      "approvalQueue": "Review only. No send actions available here.",
+      "governanceStatus": "Status check complete.",
+      "proposalStatus": "Last generate: {{date}}. Sent={{sent}}. Nothing sent automatically.",
+      "teslaDrivePrep": "Tesla prepared. Ready for drive.",
+      "fieldBoard": "Field Board opened.",
+      "bookAudit": "Booking link opened.",
+      "pressQueue": "Press Queue opened. Review only.",
+      "metricsPulse": "Metrics pulse complete."
+    },
+    "captureForm": {
+      "title": "Capture Signal (local draft only)",
+      "signal": "Signal / note",
+      "parties": "Parties involved (optional)",
+      "priorityLow": "Low priority",
+      "priorityNormal": "Normal priority",
+      "priorityHigh": "High priority",
+      "save": "Save local draft"
+    }
   },
   "language": {
     "label": "Language",
@@ -57,6 +98,7 @@
     "suite": "Suite",
     "save": "Save",
     "cancel": "Cancel",
+    "dismiss": "Dismiss",
     "add": "Add",
     "delete": "Delete",
     "copy": "Copy",

@@ -39,6 +39,14 @@ import {
   markDraftSent,
   syncDraftsFromDisk,
 } from './shortcuts/proposalStatus.js';
+import {
+  getCommandConfig,
+  captureSignal,
+  getGovernanceStatus,
+  getMetricsPulse,
+  logTeslaDrivePrep,
+  COMMAND_MENU,
+} from './shortcuts/sgosCommand.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -436,6 +444,25 @@ app.post('/api/shortcuts/mark-sent/:id', (req, res) => {
   const draft = markDraftSent(req.params.id, proofUrl);
   if (!draft) return res.status(400).json({ error: 'Draft must be APPROVED before marking sent with proof' });
   res.json(draft);
+});
+
+// SGOS Command — protected shortcuts (confirm → action → notify; never auto-send)
+app.get('/api/command/config', (_req, res) => {
+  res.json({ config: getCommandConfig(), menu: COMMAND_MENU });
+});
+app.post('/api/command/capture-signal', (req, res) => {
+  const { signal, parties, priority } = req.body;
+  if (!signal?.trim()) return res.status(400).json({ error: 'signal required' });
+  res.json(captureSignal({ signal, parties, priority }));
+});
+app.get('/api/command/governance-status', (_req, res) => {
+  res.json(getGovernanceStatus());
+});
+app.get('/api/command/metrics-pulse', (_req, res) => {
+  res.json(getMetricsPulse());
+});
+app.post('/api/command/tesla-drive-prep', (req, res) => {
+  res.json(logTeslaDrivePrep(Boolean(req.body.sentryEnabled)));
 });
 
 // Serve frontend in production

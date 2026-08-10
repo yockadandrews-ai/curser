@@ -9,9 +9,21 @@ import { THEME_CLUSTERS, getThemeForDay, FACTORY_THEMES } from './themes.js';
 import { formatLanguageSection } from '../i18n/multilingual.js';
 import { CONVERSION_APP_I18N, FACTORY_I18N_QUALITY_GATE } from '../i18n/languages.js';
 import { generateFactoryWorkflowDoc } from '../i18n/factoryWorkflow.js';
+import { withProvenance } from './provenance.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const OUTPUT_ROOT = process.env.FACTORY_OUTPUT || path.join(process.cwd(), 'output');
+
+function writeMd(filePath: string, content: string, batchDate: string, folderPath: string): void {
+  fs.writeFileSync(
+    filePath,
+    withProvenance(content, {
+      batchDate,
+      folderPath,
+      source: 'SGOS Daily Factory via SGOS Autopilot shortcut',
+    }),
+  );
+}
 
 const GLASS_NOTE = 'Liquid Glass UI — frosted panels, smooth micro-interactions, mobile-first';
 
@@ -201,17 +213,19 @@ function writeThemeSubfolder(basePath: string, run: DailyRun, cluster: ThemeClus
   fs.mkdirSync(proposalsPath, { recursive: true });
 
   const appDefs = run.apps.map((a, i) => formatAppDefinition(a, i)).join('\n---\n\n');
-  fs.writeFileSync(
+  writeMd(
     path.join(themePath, 'Apps.md'),
     `# ${run.theme} — Refined Apps\n\n**Date:** ${run.date}\n**Cluster:** ${run.clusterName}\n\n---\n\n${appDefs}`,
+    run.date,
+    `${path.basename(basePath)}/${cluster.folderSlug}`,
   );
 
   for (const proposal of run.proposals) {
     if (proposal.type === 'suite') {
-      fs.writeFileSync(path.join(themePath, 'Suite_Proposal.md'), proposal.markdown);
+      writeMd(path.join(themePath, 'Suite_Proposal.md'), proposal.markdown, run.date, `${path.basename(basePath)}/${cluster.folderSlug}`);
     } else {
       const filename = `Proposal_${proposal.appName!.replace(/[\s-]+/g, '')}.md`;
-      fs.writeFileSync(path.join(proposalsPath, filename), proposal.markdown);
+      writeMd(path.join(proposalsPath, filename), proposal.markdown, run.date, `${path.basename(basePath)}/${cluster.folderSlug}/Proposals`);
     }
   }
 }
@@ -223,21 +237,28 @@ function writeSingleThemeFolder(run: DailyRun): string {
   fs.mkdirSync(path.join(folderPath, '03_SalesAssets'), { recursive: true });
 
   const appDefs = run.apps.map((a, i) => formatAppDefinition(a, i)).join('\n---\n\n');
-  fs.writeFileSync(
+  writeMd(
     path.join(folderPath, '01_AppDefinitions.md'),
     `# ${run.theme} — App Definitions\n\n**Date:** ${run.date}\n**Cluster:** ${run.clusterName}\n\n---\n\n${appDefs}`,
+    run.date,
+    run.folderPath,
   );
 
   for (const proposal of run.proposals) {
     const filename = proposal.type === 'suite'
       ? 'Proposal_Suite.md'
       : `Proposal_${proposal.appName!.replace(/[\s-]+/g, '')}.md`;
-    fs.writeFileSync(path.join(folderPath, '02_Proposals', filename), proposal.markdown);
+    writeMd(path.join(folderPath, '02_Proposals', filename), proposal.markdown, run.date, `${run.folderPath}/02_Proposals`);
   }
 
-  fs.writeFileSync(path.join(folderPath, '04_Notes_for_Cursor.md'), buildCursorNotes(run));
-  fs.writeFileSync(path.join(folderPath, '05_Factory_Workflow_I18N.md'), generateFactoryWorkflowDoc());
-  fs.writeFileSync(path.join(folderPath, 'README.md'), `# ${run.date} — ${run.theme}\n\nDaily Factory output for Cursor.\n\nIncludes Language & Accessibility sections and i18n workflow.\n`);
+  writeMd(path.join(folderPath, '04_Notes_for_Cursor.md'), buildCursorNotes(run), run.date, `${run.folderPath}/04_Notes_for_Cursor.md`);
+  writeMd(path.join(folderPath, '05_Factory_Workflow_I18N.md'), generateFactoryWorkflowDoc(), run.date, `${run.folderPath}/05_Factory_Workflow_I18N.md`);
+  writeMd(
+    path.join(folderPath, 'README.md'),
+    `# ${run.date} — ${run.theme}\n\nDaily Factory output for Cursor.\n\nIncludes Language & Accessibility sections and i18n workflow.\n`,
+    run.date,
+    run.folderPath,
+  );
   return folderPath;
 }
 
@@ -384,10 +405,10 @@ export function generateMultiThemeRun(
   }
 
   const masterNotes = buildMasterNotes(themeRuns);
-  fs.writeFileSync(path.join(basePath, 'Master_Notes_for_Cursor.md'), masterNotes);
-  fs.writeFileSync(path.join(basePath, 'Factory_Workflow_I18N.md'), generateFactoryWorkflowDoc());
+  writeMd(path.join(basePath, 'Master_Notes_for_Cursor.md'), masterNotes, date, folderPath);
+  writeMd(path.join(basePath, 'Factory_Workflow_I18N.md'), generateFactoryWorkflowDoc(), date, `${folderPath}/Factory_Workflow_I18N.md`);
 
-  fs.writeFileSync(
+  writeMd(
     path.join(basePath, 'README.md'),
     `# Daily Factory — ${date} Multi-Theme Run
 
@@ -399,6 +420,8 @@ ${themes.map(t => `- \`${THEME_CLUSTERS[t].folderSlug}/\` — ${t}`).join('\n')}
 
 Drop this folder into Cursor to begin scaffolding.
 `,
+    date,
+    folderPath,
   );
 
   const multi: MultiThemeRun = {

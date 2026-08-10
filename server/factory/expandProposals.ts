@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { OUTPUT_ROOT } from './generator.js';
+import { withProvenance } from './provenance.js';
 import { THEME_CLUSTERS, FACTORY_THEMES } from './themes.js';
 import { generateLongFormSingleProposal, generateLongFormSuiteProposal } from './longFormProposals.js';
 
@@ -13,6 +14,7 @@ export function expandProposalsInFolder(folderName = '2026-07-31_Five_Themes'): 
   paths: string[];
 } {
   const basePath = path.join(OUTPUT_ROOT, folderName);
+  const batchDate = folderName.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] ?? new Date().toISOString().split('T')[0];
   const paths: string[] = [];
   let expandedSingles = 0;
   let expandedSuites = 0;
@@ -30,7 +32,14 @@ export function expandProposalsInFolder(folderName = '2026-07-31_Five_Themes'): 
       const md = generateLongFormSingleProposal(appDef, theme, cluster);
       const filename = `Full_${app.appName.replace(/[\s-]+/g, '')}.md`;
       const filePath = path.join(fullDir, filename);
-      fs.writeFileSync(filePath, md);
+      fs.writeFileSync(
+        filePath,
+        withProvenance(md, {
+          batchDate,
+          folderPath: `${folderName}/${cluster.folderSlug}/Proposals_Full/${filename}`,
+          source: 'SGOS Daily Factory long-form expand via SGOS Autopilot',
+        }),
+      );
       paths.push(filePath);
       expandedSingles++;
     }
@@ -38,13 +47,22 @@ export function expandProposalsInFolder(folderName = '2026-07-31_Five_Themes'): 
     const apps = cluster.apps.map(a => ({ ...a, liquidGlassNote: GLASS }));
     const suiteMd = generateLongFormSuiteProposal(apps, theme, cluster);
     const suitePath = path.join(themePath, 'Suite_Proposal_Full.md');
-    fs.writeFileSync(suitePath, suiteMd);
+    fs.writeFileSync(
+      suitePath,
+      withProvenance(suiteMd, {
+        batchDate,
+        folderPath: `${folderName}/${cluster.folderSlug}/Suite_Proposal_Full.md`,
+        source: 'SGOS Daily Factory long-form expand via SGOS Autopilot',
+      }),
+    );
     paths.push(suitePath);
     expandedSuites++;
   }
 
   const indexPath = path.join(basePath, 'PROPOSALS_FULL_INDEX.md');
-  fs.writeFileSync(indexPath, `# Long-Form Proposals Index
+  fs.writeFileSync(
+    indexPath,
+    withProvenance(`# Long-Form Proposals Index
 
 **Generated:** ${new Date().toISOString().split('T')[0]}
 **Singles expanded:** ${expandedSingles}
@@ -59,7 +77,12 @@ Each theme folder contains:
 ${FACTORY_THEMES.map(t => `- **${t}** → \`${THEME_CLUSTERS[t].folderSlug}/\``).join('\n')}
 
 Use these for email outreach, LinkedIn DMs, and sales calls.
-`);
+`, {
+      batchDate,
+      folderPath: `${folderName}/PROPOSALS_FULL_INDEX.md`,
+      source: 'SGOS Daily Factory long-form expand via SGOS Autopilot',
+    }),
+  );
   paths.push(indexPath);
 
   return { folder: folderName, expandedSingles, expandedSuites, paths };

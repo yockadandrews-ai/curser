@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory, Shield } from 'lucide-react';
+import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory, Shield, Command } from 'lucide-react';
 import AutoPilot from './pages/AutoPilot';
 import RealEarnings from './pages/RealEarnings';
 import ViralCashGenerator from './pages/ViralCashGenerator';
 import NotionTools from './pages/NotionTools';
 import DailyFactory from './pages/DailyFactory';
 import ShortcutsHub from './pages/ShortcutsHub';
+import SGOSCommand from './pages/SGOSCommand';
 import LanguageSwitcher from './components/LanguageSwitcher';
 
 function NavItem({ to, icon: Icon, label }: { to: string; icon: typeof Zap; label: string }) {
@@ -44,6 +45,7 @@ export default function App() {
         </div>
 
         <nav className="flex flex-col gap-1">
+          <NavItem to="/command" icon={Command} label={t('nav.command')} />
           <NavItem to="/" icon={Zap} label={t('nav.autopilot')} />
           <NavItem to="/shortcuts" icon={Shield} label={t('nav.shortcuts')} />
           <NavItem to="/factory" icon={Factory} label={t('nav.factory')} />
@@ -63,6 +65,7 @@ export default function App() {
       <main className="flex-1 ml-64 p-6 overflow-auto">
         <Routes>
           <Route path="/" element={<AutoPilot />} />
+          <Route path="/command" element={<SGOSCommand />} />
           <Route path="/shortcuts" element={<ShortcutsHub />} />
           <Route path="/factory" element={<DailyFactory />} />
           <Route path="/notion-tools" element={<NotionTools />} />
