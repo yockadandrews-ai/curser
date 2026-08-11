@@ -11,7 +11,7 @@
     "autopilot": "Money Autopilot",
     "factory": "Daily Factory",
     "notionTools": "Notion Tools",
-    "earnings": "Real Earnings",
+    "earnings": "Profit Tracker",
     "viral": "Viral Cash Generator",
     "shortcuts": "Shortcuts Hub"
   },
@@ -232,6 +232,29 @@
     "addExpense": "Add Expense",
     "expenseDesc": "Description",
     "noExpenses": "No expenses logged"
+  },
+  "profitTracker": {
+    "title": "Profit Tracker",
+    "subtitle": "Real P&L — export, import, and see your best earners at a glance",
+    "exportCsv": "Export CSV",
+    "importCsv": "Import CSV",
+    "addData": "Add Data",
+    "loadDemo": "Load demo data",
+    "exportSuccess": "Downloaded money-magnet-export CSV",
+    "exportFailed": "Export failed — try again",
+    "importSuccess": "Imported {{sales}} sales and {{expenses}} expenses",
+    "importFailed": "Import failed — check CSV format",
+    "demoLoaded": "Demo data loaded — export and sort to explore",
+    "monthlyGoal": "Monthly profit goal",
+    "goalHint": "Toasts at 25%, 50%, 75%, and 100% when you record sales",
+    "goalSaved": "Goal set to ${{goal}}/month",
+    "productPerformance": "Product Performance — Best Earners",
+    "noPerformance": "No sales yet — record a sale or load demo data",
+    "platform": "Platform",
+    "units": "Units",
+    "revenue": "Revenue",
+    "profit": "Profit",
+    "margin": "Margin %"
   },
   "viral": {
     "title": "Viral Cash Generator",

@@ -55,6 +55,16 @@ import {
   getApprovalCalendarLinks,
   getBatchGoogleCalendarUrl,
 } from './shortcuts/calendar.js';
+import {
+  buildExportCsv,
+  importCsv,
+  getProductPerformance,
+  getProfitGoal,
+  setProfitGoal,
+  computeMonthlyProfit,
+  checkGoalMilestones,
+  seedDemoData,
+} from './profitTracker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -210,9 +220,12 @@ app.post('/api/notion-tools/:id/sell', (req, res) => {
     });
   }
   const qty = Number(req.body.quantity) || 1;
+  const previousMonthly = computeMonthlyProfit();
   const result = addNotionToolSaleRecord(req.params.id, qty);
   if (!result) return res.status(500).json({ error: 'Failed to record sale' });
-  res.json(result);
+  const newMonthly = computeMonthlyProfit();
+  const goalAlert = checkGoalMilestones(previousMonthly, newMonthly);
+  res.json({ ...result, goalAlert: goalAlert ?? undefined });
 });
 app.get('/api/products/top', (req, res) => {
   const limit = parseInt(req.query.limit as string) || 5;
@@ -279,8 +292,11 @@ app.post('/api/sales', (req, res) => {
   const qty = Number(quantity) || 1;
   const revenue = product.sellPrice * qty;
   const profit = (product.sellPrice - product.cost) * qty;
+  const previousMonthly = computeMonthlyProfit();
   const sale = addSale({ id: uuidv4(), productId, quantity: qty, revenue, profit });
-  res.json(sale);
+  const newMonthly = computeMonthlyProfit();
+  const goalAlert = checkGoalMilestones(previousMonthly, newMonthly);
+  res.json({ sale, goalAlert: goalAlert ?? undefined });
 });
 
 // Expenses
@@ -290,6 +306,38 @@ app.post('/api/expenses', (req, res) => {
   if (!description || amount == null) return res.status(400).json({ error: 'description, amount required' });
   const expense = addExpense({ id: uuidv4(), description, amount: Number(amount) });
   res.json(expense);
+});
+
+// Profit Tracker — export/import CSV, product performance, monthly goal
+app.get('/api/profit-tracker/export.csv', (_req, res) => {
+  const date = new Date().toISOString().split('T')[0];
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="money-magnet-export-${date}.csv"`);
+  res.send(buildExportCsv());
+});
+app.post('/api/profit-tracker/import', (req, res) => {
+  const { csv, mode } = req.body as { csv?: string; mode?: 'merge' | 'replace' };
+  if (!csv?.trim()) return res.status(400).json({ error: 'csv content required' });
+  try {
+    res.json(importCsv(csv, mode === 'replace' ? 'replace' : 'merge'));
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
+  }
+});
+app.get('/api/profit-tracker/product-performance', (_req, res) => {
+  res.json(getProductPerformance());
+});
+app.get('/api/profit-tracker/goal', (_req, res) => {
+  const goal = getProfitGoal();
+  res.json({ ...goal, monthlyProfit: computeMonthlyProfit() });
+});
+app.put('/api/profit-tracker/goal', (req, res) => {
+  const { monthlyGoal } = req.body;
+  if (monthlyGoal == null) return res.status(400).json({ error: 'monthlyGoal required' });
+  res.json({ ...setProfitGoal(Number(monthlyGoal)), monthlyProfit: computeMonthlyProfit() });
+});
+app.post('/api/profit-tracker/demo-data', (_req, res) => {
+  res.json(seedDemoData());
 });
 
 // Content generation

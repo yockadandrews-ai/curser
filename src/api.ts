@@ -54,7 +54,9 @@ export const api = {
 
   getSales: () => request<import('./types').Sale[]>('/sales'),
   addSale: (data: { productId: string; quantity: number }) =>
-    request<import('./types').Sale>('/sales', { method: 'POST', body: JSON.stringify(data) }),
+    request<{ sale: import('./types').Sale; goalAlert?: import('./types').GoalAlert }>(
+      '/sales', { method: 'POST', body: JSON.stringify(data) },
+    ),
 
   getExpenses: () => request<import('./types').Expense[]>('/expenses'),
   addExpense: (data: { description: string; amount: number }) =>
@@ -163,4 +165,26 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ sentryEnabled }),
     }),
+
+  exportProfitCsv: () =>
+    fetch(`${BASE}/profit-tracker/export.csv`).then(res => {
+      if (!res.ok) throw new Error('Export failed');
+      return res.blob();
+    }),
+  importProfitCsv: (csv: string, mode: 'merge' | 'replace' = 'merge') =>
+    request<import('./types').ImportResult>('/profit-tracker/import', {
+      method: 'POST',
+      body: JSON.stringify({ csv, mode }),
+    }),
+  getProductPerformance: () =>
+    request<import('./types').ProductPerformanceRow[]>('/profit-tracker/product-performance'),
+  getProfitGoal: () =>
+    request<import('./types').ProfitGoalState>('/profit-tracker/goal'),
+  setProfitGoal: (monthlyGoal: number) =>
+    request<import('./types').ProfitGoalState>('/profit-tracker/goal', {
+      method: 'PUT',
+      body: JSON.stringify({ monthlyGoal }),
+    }),
+  seedProfitDemoData: () =>
+    request<{ products: number; sales: number; expenses: number }>('/profit-tracker/demo-data', { method: 'POST' }),
 };

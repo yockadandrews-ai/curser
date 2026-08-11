@@ -83,6 +83,36 @@ export interface Stats {
   topProducts: Product[];
 }
 
+export interface GoalAlert {
+  milestone: 25 | 50 | 75 | 100;
+  monthlyProfit: number;
+  monthlyGoal: number;
+  message: string;
+}
+
+export interface ProfitGoalState {
+  monthlyGoal: number;
+  monthlyProfit: number;
+}
+
+export interface ProductPerformanceRow {
+  productId: string;
+  productName: string;
+  platform: string;
+  unitsSold: number;
+  totalRevenue: number;
+  totalCost: number;
+  totalProfit: number;
+  marginPct: number;
+}
+
+export interface ImportResult {
+  salesImported: number;
+  expensesImported: number;
+  productsCreated: number;
+  errors: string[];
+}
+
 export interface NotionTool {
   id: string;
   name: string;
