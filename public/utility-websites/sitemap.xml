@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Replace tools.example.com with your live domain -->
-  <url><loc>https://tools.example.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://tools.example.com/1-word-unscrambler.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://tools.example.com/2-age-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://tools.example.com/3-bmi-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://tools.example.com/4-sleep-cycle-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://tools.example.com/5-percentage-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://YOURDOMAIN.com/1-word-unscrambler.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/2-age-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/3-bmi-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/4-sleep-cycle-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/5-percentage-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/6-tip-calculator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/7-password-generator.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/8-text-case.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/9-word-counter.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://YOURDOMAIN.com/10-unit-converter.html</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
 </urlset>

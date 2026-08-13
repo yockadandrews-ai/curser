@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Word Counter — Words, Characters &amp; Reading Time</title>
+  <meta name="description" content="Free word counter: count words, characters, sentences, and paragraphs. Estimate reading time for essays, blogs, and social posts." />
+  <link rel="canonical" href="https://YOURDOMAIN.com/9-word-counter.html" />
+  <meta property="og:title" content="Word Counter — Money Magnet Tools" />
+  <meta property="og:description" content="Count words and characters with reading time estimate." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://YOURDOMAIN.com/9-word-counter.html" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← All tools</a>
+    <header><h1>Word Counter</h1><p>Words, characters, sentences — live count</p></header>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad Placeholder — top (replace with AdSense)</div>
+    <div class="card">
+      <label for="input">Your text</label>
+      <textarea id="input" placeholder="Start typing or paste your essay, article, or post…"></textarea>
+      <div id="output" class="result">
+        <div class="row">
+          <div><span style="color:var(--muted);font-size:0.85rem">Words</span><br><strong id="words">0</strong></div>
+          <div><span style="color:var(--muted);font-size:0.85rem">Characters</span><br><strong id="chars">0</strong></div>
+        </div>
+        <div class="row" style="margin-top:0.75rem">
+          <div><span style="color:var(--muted);font-size:0.85rem">Sentences</span><br><strong id="sentences">0</strong></div>
+          <div><span style="color:var(--muted);font-size:0.85rem">Reading time</span><br><strong id="reading">0 min</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad Placeholder — bottom (replace with AdSense)</div>
+    <section class="related-tools" id="related-tools"></section>
+    <section class="seo-content"><h2>Reading time</h2><p>Based on ~200 words per minute average adult reading speed.</p></section>
+    <footer><p>© Money Magnet Tools</p></footer>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    function update() {
+      const t = document.getElementById('input').value;
+      const words = t.trim() ? t.trim().split(/\s+/).length : 0;
+      const chars = t.length;
+      const sentences = t.trim() ? (t.match(/[^.!?]+[.!?]+/g) || []).length || 1 : 0;
+      const mins = Math.max(1, Math.ceil(words / 200)) || 0;
+      document.getElementById('words').textContent = words;
+      document.getElementById('chars').textContent = chars;
+      document.getElementById('sentences').textContent = sentences;
+      document.getElementById('reading').textContent = words ? `${mins} min` : '0 min';
+    }
+    document.getElementById('input').addEventListener('input', update);
+    update();
+  </script>
+</body>
+</html>

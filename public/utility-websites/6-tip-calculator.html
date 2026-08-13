@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Tip Calculator — Bill, Tip &amp; Split Per Person</title>
+  <meta name="description" content="Free tip calculator: enter bill amount, tip percentage, and number of people. See tip amount and total per person instantly." />
+  <link rel="canonical" href="https://YOURDOMAIN.com/6-tip-calculator.html" />
+  <meta property="og:title" content="Tip Calculator — Money Magnet Tools" />
+  <meta property="og:description" content="Calculate tip and split the bill between friends." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://YOURDOMAIN.com/6-tip-calculator.html" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← All tools</a>
+    <header><h1>Tip Calculator</h1><p>Bill + tip % + split per person</p></header>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad Placeholder — top (replace with AdSense)</div>
+    <div class="card">
+      <label for="bill">Bill amount ($)</label>
+      <input id="bill" type="number" step="0.01" min="0" placeholder="50.00" />
+      <label for="tip">Tip (%)</label>
+      <input id="tip" type="number" step="1" min="0" value="18" />
+      <div class="row" style="margin-bottom:0.85rem">
+        <button type="button" class="btn" style="padding:0.5rem" onclick="document.getElementById('tip').value=15">15%</button>
+        <button type="button" class="btn" style="padding:0.5rem" onclick="document.getElementById('tip').value=18">18%</button>
+        <button type="button" class="btn" style="padding:0.5rem" onclick="document.getElementById('tip').value=20">20%</button>
+        <button type="button" class="btn" style="padding:0.5rem" onclick="document.getElementById('tip').value=25">25%</button>
+      </div>
+      <label for="people">Split between (people)</label>
+      <input id="people" type="number" min="1" value="1" />
+      <button type="button" class="btn" id="calc">Calculate Tip</button>
+      <div id="output" class="result hidden"></div>
+    </div>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad Placeholder — bottom (replace with AdSense)</div>
+    <section class="related-tools" id="related-tools"></section>
+    <section class="seo-content"><h2>Tip Guide</h2><p>US standard: 15–20% sit-down service, 18–25% excellent service. Adjust for tax-included bills as you prefer.</p></section>
+    <footer><p>© Money Magnet Tools</p></footer>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    document.getElementById('calc').onclick = () => {
+      const bill = parseFloat(document.getElementById('bill').value);
+      const tipPct = parseFloat(document.getElementById('tip').value);
+      const people = Math.max(1, parseInt(document.getElementById('people').value, 10) || 1);
+      const out = document.getElementById('output');
+      if (Number.isNaN(bill) || bill < 0) { out.textContent = 'Enter a valid bill amount.'; out.classList.remove('hidden'); return; }
+      const tipAmt = bill * (tipPct / 100);
+      const total = bill + tipAmt;
+      const perPerson = total / people;
+      out.innerHTML = `Tip: <strong>$${tipAmt.toFixed(2)}</strong><br>Total: <strong>$${total.toFixed(2)}</strong><br>Per person (${people}): <strong>$${perPerson.toFixed(2)}</strong>`;
+      out.classList.remove('hidden');
+    };
+  </script>
+</body>
+</html>

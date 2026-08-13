@@ -89,6 +89,8 @@ input, select, textarea {
   margin-bottom: 0.85rem;
 }
 
+textarea { min-height: 120px; resize: vertical; }
+
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--accent);

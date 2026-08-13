@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Text Case Converter — UPPER, lower, Title, camelCase</title>
+  <meta name="description" content="Free text case converter: transform text to UPPERCASE, lowercase, Title Case, Sentence case, camelCase, and snake_case instantly." />
+  <link rel="canonical" href="https://YOURDOMAIN.com/8-text-case.html" />
+  <meta property="og:title" content="Text Case Converter — Money Magnet Tools" />
+  <meta property="og:description" content="Convert text between common case formats." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://YOURDOMAIN.com/8-text-case.html" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← All tools</a>
+    <header><h1>Text Case Converter</h1><p>UPPER, lower, Title, camelCase, snake_case</p></header>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad Placeholder — top (replace with AdSense)</div>
+    <div class="card">
+      <label for="input">Your text</label>
+      <textarea id="input" placeholder="Type or paste text here…"></textarea>
+      <label for="mode">Convert to</label>
+      <select id="mode">
+        <option value="upper">UPPERCASE</option>
+        <option value="lower">lowercase</option>
+        <option value="title">Title Case</option>
+        <option value="sentence">Sentence case</option>
+        <option value="camel">camelCase</option>
+        <option value="snake">snake_case</option>
+      </select>
+      <button type="button" class="btn" id="calc">Convert</button>
+      <div id="output" class="result hidden" style="white-space:pre-wrap"></div>
+    </div>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad Placeholder — bottom (replace with AdSense)</div>
+    <section class="related-tools" id="related-tools"></section>
+    <section class="seo-content"><h2>Use cases</h2><p>Fix caps-lock mistakes, format headings, prepare variable names for code, and clean up pasted text.</p></section>
+    <footer><p>© Money Magnet Tools</p></footer>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    function toTitle(s) { return s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); }
+    function toSentence(s) { return s.toLowerCase().replace(/(^\w|\.\s+\w)/g, c => c.toUpperCase()); }
+    function toCamel(s) {
+      const w = s.replace(/[^a-zA-Z0-9]+/g, ' ').trim().split(/\s+/).filter(Boolean);
+      if (!w.length) return '';
+      return w[0].toLowerCase() + w.slice(1).map(x => x[0].toUpperCase() + x.slice(1).toLowerCase()).join('');
+    }
+    function toSnake(s) { return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '').toLowerCase(); }
+
+    document.getElementById('calc').onclick = () => {
+      const t = document.getElementById('input').value;
+      const mode = document.getElementById('mode').value;
+      const out = document.getElementById('output');
+      if (!t.trim()) { out.textContent = 'Enter some text.'; out.classList.remove('hidden'); return; }
+      const map = { upper: t.toUpperCase(), lower: t.toLowerCase(), title: toTitle(t), sentence: toSentence(t), camel: toCamel(t), snake: toSnake(t) };
+      out.textContent = map[mode];
+      out.classList.remove('hidden');
+    };
+  </script>
+</body>
+</html>

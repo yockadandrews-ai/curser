@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Unit Converter — Length, Weight &amp; Temperature</title>
+  <meta name="description" content="Free unit converter: convert length (m, ft, mi, km), weight (kg, lb, oz), and temperature (°C, °F, K) instantly." />
+  <link rel="canonical" href="https://YOURDOMAIN.com/10-unit-converter.html" />
+  <meta property="og:title" content="Unit Converter — Money Magnet Tools" />
+  <meta property="og:description" content="Convert length, weight, and temperature units." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://YOURDOMAIN.com/10-unit-converter.html" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← All tools</a>
+    <header><h1>Unit Converter</h1><p>Length, weight, and temperature</p></header>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad Placeholder — top (replace with AdSense)</div>
+    <div class="card">
+      <label for="category">Category</label>
+      <select id="category">
+        <option value="length">Length</option>
+        <option value="weight">Weight</option>
+        <option value="temp">Temperature</option>
+      </select>
+      <label for="value">Value</label>
+      <input id="value" type="number" step="any" placeholder="100" />
+      <label for="from">From</label>
+      <select id="from"></select>
+      <label for="to">To</label>
+      <select id="to"></select>
+      <button type="button" class="btn" id="calc">Convert</button>
+      <div id="output" class="result hidden"></div>
+    </div>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad Placeholder — bottom (replace with AdSense)</div>
+    <section class="related-tools" id="related-tools"></section>
+    <section class="seo-content"><h2>Units supported</h2><p>Length: m, km, cm, mm, mi, ft, in. Weight: kg, g, lb, oz. Temperature: Celsius, Fahrenheit, Kelvin.</p></section>
+    <footer><p>© Money Magnet Tools</p></footer>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    const UNITS = {
+      length: { m: 1, km: 1000, cm: 0.01, mm: 0.001, mi: 1609.344, ft: 0.3048, in: 0.0254 },
+      weight: { kg: 1, g: 0.001, lb: 0.453592, oz: 0.0283495 },
+      temp: { C: 'C', F: 'F', K: 'K' },
+    };
+
+    function fillSelects() {
+      const cat = document.getElementById('category').value;
+      const from = document.getElementById('from');
+      const to = document.getElementById('to');
+      const keys = Object.keys(UNITS[cat]);
+      from.innerHTML = keys.map(k => `<option value="${k}">${k}</option>`).join('');
+      to.innerHTML = keys.map(k => `<option value="${k}">${k}</option>`).join('');
+      if (cat === 'length') to.value = 'ft';
+      if (cat === 'weight') to.value = 'lb';
+      if (cat === 'temp') to.value = 'F';
+    }
+
+    function convertTemp(v, from, to) {
+      let c = from === 'C' ? v : from === 'F' ? (v - 32) * 5/9 : v - 273.15;
+      if (to === 'C') return c;
+      if (to === 'F') return c * 9/5 + 32;
+      return c + 273.15;
+    }
+
+    document.getElementById('category').onchange = fillSelects;
+    fillSelects();
+
+    document.getElementById('calc').onclick = () => {
+      const cat = document.getElementById('category').value;
+      const v = parseFloat(document.getElementById('value').value);
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+      const out = document.getElementById('output');
+      if (Number.isNaN(v)) { out.textContent = 'Enter a value.'; out.classList.remove('hidden'); return; }
+      let result;
+      if (cat === 'temp') result = convertTemp(v, from, to);
+      else result = v * UNITS[cat][from] / UNITS[cat][to];
+      out.innerHTML = `<strong>${result.toFixed(4).replace(/\.?0+$/,'')}</strong> ${to}`;
+      out.classList.remove('hidden');
+    };
+  </script>
+</body>
+</html>
