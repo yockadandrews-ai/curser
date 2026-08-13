@@ -27,6 +27,14 @@ npm run build
 npm start
 ```
 
+## Docs
+
+| Doc | Purpose |
+|-----|---------|
+| [APPLE_STORE_SETUP.md](./docs/APPLE_STORE_SETUP.md) | App Store Connect vs Shortcuts vs Profit Tracker — why analytics emails are empty |
+| [SGOS_COMMAND.md](./docs/SGOS_COMMAND.md) | Apple Shortcuts root menu rebuild |
+| [SHORTCUTS_HUB.md](./docs/SHORTCUTS_HUB.md) | Proposal status shortcut governance |
+
 ## Environment Variables (optional — for live posting)
 
 ```env
