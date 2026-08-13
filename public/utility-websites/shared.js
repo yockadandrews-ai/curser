@@ -1,4 +1,4 @@
-/** Money Magnet Tools — analytics, share, ads, related tools */
+/** Money Magnet Tools — analytics, share, ads, related tools, footer */
 const SITE_TOOLS = [
   { href: '1-word-unscrambler.html', name: 'Word Unscrambler', emoji: '🔤', desc: 'Unscramble letters' },
   { href: '2-age-calculator.html', name: 'Age Calculator', emoji: '🎂', desc: 'Exact age' },
@@ -6,14 +6,33 @@ const SITE_TOOLS = [
   { href: '4-sleep-cycle-calculator.html', name: 'Sleep Cycle', emoji: '😴', desc: 'Wake times' },
   { href: '5-percentage-calculator.html', name: 'Percentage', emoji: '📊', desc: 'X% of Y' },
   { href: '6-tip-calculator.html', name: 'Tip Calculator', emoji: '💵', desc: 'Bill + tip split' },
-  { href: '7-password-generator.html', name: 'Password Gen', emoji: '🔐', desc: 'Secure passwords' },
+  { href: '7-password-generator.html', name: 'Password Generator', emoji: '🔐', desc: 'Secure passwords' },
   { href: '8-text-case.html', name: 'Text Case', emoji: '🔠', desc: 'UPPER, lower, Title' },
   { href: '9-word-counter.html', name: 'Word Counter', emoji: '📝', desc: 'Words & characters' },
   { href: '10-unit-converter.html', name: 'Unit Converter', emoji: '📏', desc: 'Length, weight, temp' },
 ];
 
 function cfg() {
-  return window.SITE_CONFIG || { ga4Id: 'G-XXXXXXXX', enableAnalytics: false, siteName: 'Money Magnet Tools' };
+  return window.SITE_CONFIG || {
+    ga4Id: 'G-XXXXXXXX',
+    enableAnalytics: false,
+    adsenseClientId: 'ca-pub-XXXXXXXX',
+    enableAdSense: false,
+    googleSiteVerification: '',
+    siteName: 'Money Magnet Tools',
+    siteUrl: 'https://YOURDOMAIN.com',
+    profitTrackerApiUrl: '',
+  };
+}
+
+function initSearchConsoleMeta() {
+  const token = cfg().googleSiteVerification;
+  if (!token || document.querySelector('meta[name="google-site-verification"]')) return;
+
+  const meta = document.createElement('meta');
+  meta.name = 'google-site-verification';
+  meta.content = token;
+  document.head.appendChild(meta);
 }
 
 function initAnalytics() {
@@ -31,11 +50,50 @@ function initAnalytics() {
   window.gtag('config', ga4Id, { anonymize_ip: true });
 }
 
+/** Fire a GA4 event when analytics is enabled (used by tracker.html). */
+function trackEvent(name, params = {}) {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', name, params);
+  }
+}
+
 function initAdSlots() {
-  document.querySelectorAll('.ad-slot[data-adsense]').forEach(slot => {
-    const client = slot.dataset.adsenseClient;
-    if (client && client !== 'ca-pub-XXXXXXXX') {
-      // Replace placeholder with AdSense when approved — see README.md
+  const { adsenseClientId, enableAdSense } = cfg();
+  const client = adsenseClientId;
+  const slots = document.querySelectorAll('.ad-slot[data-adsense]');
+
+  if (!enableAdSense || !client || client === 'ca-pub-XXXXXXXX') {
+    return;
+  }
+
+  if (!document.querySelector('script[data-adsense-loader]')) {
+    const loader = document.createElement('script');
+    loader.async = true;
+    loader.crossOrigin = 'anonymous';
+    loader.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
+    loader.dataset.adsenseLoader = '1';
+    document.head.appendChild(loader);
+  }
+
+  slots.forEach(slot => {
+    if (slot.dataset.adsenseFilled === '1') return;
+    slot.dataset.adsenseFilled = '1';
+    slot.innerHTML = '';
+    slot.classList.add('ad-slot-live');
+
+    const ins = document.createElement('ins');
+    ins.className = 'adsbygoogle';
+    ins.style.display = 'block';
+    ins.dataset.adClient = client;
+    ins.dataset.adSlot = slot.dataset.adSlot || '0000000000';
+    ins.dataset.adFormat = slot.dataset.adFormat || 'auto';
+    ins.dataset.fullWidthResponsive = 'true';
+    slot.appendChild(ins);
+
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      console.warn('AdSense slot failed:', e);
     }
   });
 }
@@ -52,6 +110,7 @@ async function sharePage(btn) {
   if (navigator.share) {
     try {
       await navigator.share({ title: data.title, text: data.text, url: data.url });
+      trackEvent('share', { method: 'native', page: location.pathname });
       return;
     } catch (e) {
       if (e.name === 'AbortError') return;
@@ -61,6 +120,7 @@ async function sharePage(btn) {
     await navigator.clipboard.writeText(data.url);
     const prev = btn.textContent;
     btn.textContent = 'Link copied!';
+    trackEvent('share', { method: 'clipboard', page: location.pathname });
     setTimeout(() => { btn.textContent = prev; }, 2000);
   } catch {
     prompt('Copy this link:', data.url);
@@ -73,7 +133,7 @@ function injectShareButton() {
 
   const wrap = document.createElement('div');
   wrap.className = 'header-actions';
-  wrap.innerHTML = `<button type="button" class="share-btn" aria-label="Share this tool">Share ↗</button>`;
+  wrap.innerHTML = '<button type="button" class="share-btn" aria-label="Share this tool">Share ↗</button>';
   header.appendChild(wrap);
 
   wrap.querySelector('.share-btn').addEventListener('click', e => {
@@ -102,11 +162,34 @@ function injectRelatedTools() {
   `;
 }
 
+function injectSiteFooter() {
+  const footers = document.querySelectorAll('footer');
+  if (!footers.length) return;
+
+  const year = new Date().getFullYear();
+  const html = `
+    <p class="site-footer-line">
+      © ${year} Money Magnet Tools ·
+      <a href="privacy.html">Privacy</a> ·
+      <a href="terms.html">Terms</a> ·
+      <a href="tracker.html">Profit Tracker</a>
+    </p>
+  `;
+
+  footers.forEach(footer => {
+    if (footer.dataset.footerEnhanced === '1') return;
+    footer.dataset.footerEnhanced = '1';
+    footer.innerHTML = html;
+  });
+}
+
 function boot() {
+  initSearchConsoleMeta();
   initAnalytics();
   initAdSlots();
   injectShareButton();
   injectRelatedTools();
+  injectSiteFooter();
 }
 
 if (document.readyState === 'loading') {

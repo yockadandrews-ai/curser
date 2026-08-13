@@ -1,6 +1,6 @@
 # Money Magnet Tools — Cursor Handoff
 
-**10 free tools · 15 files · pure static HTML · no build system · no dependencies**
+**10 free tools · static HTML · no build step · Hostinger-ready**
 
 ## Package contents
 
@@ -17,78 +17,97 @@
 | 8 | Text Case Converter | `8-text-case.html` |
 | 9 | Word Counter | `9-word-counter.html` |
 | 10 | Unit Converter | `10-unit-converter.html` |
+| — | Profit Tracker | `tracker.html` + `tracker.webmanifest` |
+| — | Legal (AdSense) | `privacy.html` + `terms.html` |
+| — | AdSense crawl | `ads.txt` |
 | — | SEO / crawl | `robots.txt` + `sitemap.xml` |
-| — | Shared assets | `shared.css` + `shared.js` |
+| — | Config | `config.js` (GA4, AdSense, GSC, API URL) |
+| — | Shared | `shared.css` + `shared.js` |
+| — | Deploy prompts | `HOSTINGER.md` (7 Horizons prompts) |
 
-## Cursor setup (60 seconds)
+## Deploy in 60 seconds
 
-1. **Unzip** and open the folder in Cursor
-2. **Replace `YOURDOMAIN.com`** in `sitemap.xml`, `robots.txt`, and all HTML `canonical` / `og:url` tags
-3. **Upload** the whole folder so `index.html` is at the site root (e.g. `tools.yourdomain.com`)
-4. **Search Console** → submit `https://YOURDOMAIN.com/sitemap.xml`
+1. **Replace domain** (from repo root):
+   ```bash
+   npm run utility:replace-domain -- tools.yourdomain.com
+   npm run utility:verify-deploy
+   ```
+2. **Zip & upload**:
+   ```bash
+   npm run zip:utility-sites
+   ```
+   Upload `utility-websites.zip` contents to Hostinger subdomain root.
+3. **Search Console** → submit `https://tools.yourdomain.com/sitemap.xml`
+4. **GA4** → set `ga4Id` + `enableAnalytics: true` in `config.js`
+5. **AdSense** (after ~100 daily sessions) → update `ads.txt`, set `enableAdSense: true`
 
-## Launch checklist
+## Hostinger Horizons (all 7 prompts)
 
-1. Unzip → upload whole folder (`index.html` at root)
-2. Subdomain: `tools.yourdomain.com`
-3. Google Search Console → sitemap + homepage URL
-4. After ~100+ daily sessions → apply for AdSense
-5. Replace **Ad Placeholder** boxes with real AdSense code in `shared.js`
+See **`HOSTINGER.md`** — copy-paste prompts for:
 
-## Hostinger
+1. Static upload + subdomain  
+2. DNS + SSL  
+3. Domain placeholder replace  
+4. Google Search Console  
+5. AdSense prep  
+6. GA4 verification  
+7. Profit Tracker + home-screen shortcut  
 
-- hPanel → **Files** → upload to subdomain folder
-- Enable SSL (AutoSSL)
-- DNS: A record for subdomain → Hostinger IP
+## config.js reference
 
-## Netlify / Vercel / Cloudflare Pages
+```javascript
+window.SITE_CONFIG = {
+  ga4Id: 'G-XXXXXXXX',
+  enableAnalytics: false,
+  adsenseClientId: 'ca-pub-XXXXXXXX',
+  enableAdSense: false,
+  googleSiteVerification: '',  // Search Console HTML tag token
+  siteName: 'Money Magnet Tools',
+  siteUrl: 'https://tools.yourdomain.com',
+  profitTrackerApiUrl: '',     // optional Money Autopilot API base
+};
+```
 
-- **Build command:** none  
-- **Publish directory:** this folder as-is  
-- `netlify deploy --dir=. --prod`
+## Google Analytics 4
+
+1. Create GA4 property for your tools subdomain  
+2. Edit **`config.js`** → real `ga4Id`, `enableAnalytics: true`  
+3. Open site → GA4 **Realtime**  
+4. Test custom events on tracker.html (`revenue_logged`) and Share button (`share`)
+
+## AdSense
+
+- **privacy.html** + **terms.html** — required policy pages (linked in footer on every page)  
+- **ads.txt** — update `pub-XXXXXXXXXXXXXXXX` after approval  
+- **shared.js** — loads AdSense when `enableAdSense: true`
+
+## Profit Tracker
+
+- **`tracker.html`** — monthly revenue summary, manual AdSense log (localStorage)  
+- **`tracker.webmanifest`** — Add to Home Screen on mobile  
+- Optional API sync → set `profitTrackerApiUrl` in config.js  
+
+## Preview locally
+
+```bash
+npm run dev
+# → http://localhost:5173/utility-websites/
+```
 
 ## Every page includes
 
-- Unique title + meta description + Open Graph
-- `robots: index, follow` + `theme-color`
-- Mobile-friendly dark layout
-- Ad placeholders (top + bottom)
-- **Related tools** internal links (via `shared.js`)
-- Client-side only — works offline once loaded
-
-## Suggested Cursor prompts (next polish)
-
-Copy into Cursor chat when ready:
-
-```
-Add Google Analytics 4 snippet slot to shared.js — load only after cookie consent.
-```
-
-```
-Add Web Share API button on each tool page — share title + current URL.
-```
-
-```
-Expand Word Unscrambler dictionary — load a larger word list from words.json without blocking first paint.
-```
-
-```
-Add optional light/dark theme toggle — persist preference in localStorage, default dark.
-```
-
-```
-Generate og:image PNG placeholders (1200×630) for each tool and wire og:image meta tags.
-```
-
-```
-Add Tip Calculator preset buttons: 15%, 18%, 20%, 25% — one tap.
-```
+- Unique title + meta description + Open Graph  
+- Share button + Related tools (via `shared.js`)  
+- Footer links: Privacy · Terms · Profit Tracker  
+- GA4 + AdSense slots (via `config.js` — off until you enable)  
+- Client-side only — works offline once loaded  
 
 ## Track revenue (Money Autopilot)
 
 When AdSense pays out:
 
-- **Manual:** Profit Tracker → Record Sale  
+- **Tracker page:** log on `tracker.html`  
+- **Manual:** Profit Tracker → Record Sale (`/earnings` in main app)  
 - **API:** `POST /api/profit-tracker/record-revenue`  
 - **Shortcut:** see main repo `docs/SHORTCUTS_ADSENSE.md`
 
@@ -96,8 +115,9 @@ When AdSense pays out:
 
 ```bash
 npm run zip:utility-sites
+npm run utility:verify-deploy
 ```
 
 ---
 
-*Money Magnet Tools · ship-ready · Cursor can edit any file immediately*
+*Money Magnet Tools · ship-ready · all 7 Hostinger Horizons prompts in HOSTINGER.md*
