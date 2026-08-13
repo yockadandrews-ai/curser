@@ -1,4 +1,4 @@
-/** Money Magnet Tools — shared: AdSense slots + related tools */
+/** Money Magnet Tools — analytics, share, ads, related tools */
 const SITE_TOOLS = [
   { href: '1-word-unscrambler.html', name: 'Word Unscrambler', emoji: '🔤', desc: 'Unscramble letters' },
   { href: '2-age-calculator.html', name: 'Age Calculator', emoji: '🎂', desc: 'Exact age' },
@@ -12,12 +12,72 @@ const SITE_TOOLS = [
   { href: '10-unit-converter.html', name: 'Unit Converter', emoji: '📏', desc: 'Length, weight, temp' },
 ];
 
+function cfg() {
+  return window.SITE_CONFIG || { ga4Id: 'G-XXXXXXXX', enableAnalytics: false, siteName: 'Money Magnet Tools' };
+}
+
+function initAnalytics() {
+  const { ga4Id, enableAnalytics } = cfg();
+  if (!enableAnalytics || !ga4Id || ga4Id === 'G-XXXXXXXX') return;
+
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = `https://www.googletagmanager.com/gtag/js?id=${ga4Id}`;
+  document.head.appendChild(s);
+
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function gtag() { window.dataLayer.push(arguments); };
+  window.gtag('js', new Date());
+  window.gtag('config', ga4Id, { anonymize_ip: true });
+}
+
 function initAdSlots() {
   document.querySelectorAll('.ad-slot[data-adsense]').forEach(slot => {
     const client = slot.dataset.adsenseClient;
     if (client && client !== 'ca-pub-XXXXXXXX') {
       // Replace placeholder with AdSense when approved — see README.md
     }
+  });
+}
+
+function getShareData() {
+  const title = document.title || cfg().siteName;
+  const text = document.querySelector('meta[name="description"]')?.content || cfg().siteName;
+  const url = location.href;
+  return { title, text, url };
+}
+
+async function sharePage(btn) {
+  const data = getShareData();
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: data.title, text: data.text, url: data.url });
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(data.url);
+    const prev = btn.textContent;
+    btn.textContent = 'Link copied!';
+    setTimeout(() => { btn.textContent = prev; }, 2000);
+  } catch {
+    prompt('Copy this link:', data.url);
+  }
+}
+
+function injectShareButton() {
+  const header = document.querySelector('header');
+  if (!header || header.querySelector('.share-btn')) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'header-actions';
+  wrap.innerHTML = `<button type="button" class="share-btn" aria-label="Share this tool">Share ↗</button>`;
+  header.appendChild(wrap);
+
+  wrap.querySelector('.share-btn').addEventListener('click', e => {
+    sharePage(e.currentTarget);
   });
 }
 
@@ -43,7 +103,9 @@ function injectRelatedTools() {
 }
 
 function boot() {
+  initAnalytics();
   initAdSlots();
+  injectShareButton();
   injectRelatedTools();
 }
 

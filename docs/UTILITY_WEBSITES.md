@@ -2,6 +2,8 @@
 
 Five client-side calculator tools + hub page, ready for static deploy and AdSense.
 
+**Full package:** 10 tools, 15 files — see `public/utility-websites/README.md`
+
 ## Location in repo
 
 ```
@@ -12,6 +14,12 @@ public/utility-websites/
 ├── 3-bmi-calculator.html
 ├── 4-sleep-cycle-calculator.html
 ├── 5-percentage-calculator.html
+├── 6-tip-calculator.html
+├── 7-password-generator.html
+├── 8-text-case.html
+├── 9-word-counter.html
+├── 10-unit-converter.html
+├── robots.txt
 ├── shared.css
 └── shared.js
 ```

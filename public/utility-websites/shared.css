@@ -34,6 +34,50 @@ header {
 header h1 { font-size: 1.5rem; font-weight: 700; }
 header p { color: var(--muted); font-size: 0.9rem; margin-top: 0.35rem; }
 
+header { position: relative; }
+
+.header-actions {
+  margin-top: 0.75rem;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.share-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.toast-share {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card);
+  border: 1px solid var(--accent);
+  color: var(--text);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;
@@ -72,6 +116,15 @@ label {
   font-size: 0.85rem;
   color: var(--muted);
   margin-bottom: 0.35rem;
+}
+
+label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  cursor: pointer;
 }
 
 input, select, textarea, button {
