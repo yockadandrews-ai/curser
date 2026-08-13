@@ -191,4 +191,24 @@ export const api = {
     request<{ ok: boolean; saleId: string; revenue: number; profit: number; productName: string; goalAlert?: import('./types').GoalAlert; message: string }>(
       '/profit-tracker/record-revenue', { method: 'POST', body: JSON.stringify(data) },
     ),
+
+  getHermesDashboard: () =>
+    request<{
+      state: import('./types/hermes').HermesStateSnapshot;
+      tasks: import('./types/hermes').HermesTaskRecord[];
+      ledger: import('./types/hermes').ChaosLedgerRow[];
+      briefs: import('./types/hermes').NotionBriefTemplate[];
+      calendar: import('./types/hermes').ContentCalendarPlan;
+    }>('/hermes/dashboard'),
+  getHermesTasks: () => request<import('./types/hermes').HermesTaskRecord[]>('/hermes/tasks'),
+  hermesIngest: (data: { source: string; title: string; summary?: string; productSlug?: string; amount?: number }) =>
+    request<import('./types/hermes').HermesIngestResult>('/hermes/ingest', { method: 'POST', body: JSON.stringify(data) }),
+  hermesDecision: (taskId: string, data: { decision: 'approve' | 'reject' | 'modify'; notes?: string; proofUrl?: string }) =>
+    request<import('./types/hermes').HermesDecisionResult>(`/hermes/tasks/${taskId}/decision`, {
+      method: 'POST', body: JSON.stringify(data),
+    }),
+  hermesSimulateCalendar: (eventType: string, productSlug: string) =>
+    request<import('./types/hermes').HermesIngestResult>('/hermes/simulate-calendar', {
+      method: 'POST', body: JSON.stringify({ eventType, productSlug }),
+    }),
 };

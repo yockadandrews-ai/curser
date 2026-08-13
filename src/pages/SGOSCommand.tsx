@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Command, Radio, ListChecks, Shield, Car, Map, Calendar, Newspaper, Activity,
-  ChevronRight, Loader2, ExternalLink,
+  ChevronRight, Loader2, ExternalLink, Layers,
 } from 'lucide-react';
 import { api } from '../api';
 import { ShortcutNotification, useProtectedShortcut, confirmProtectedShortcut } from '../components/ProtectedShortcut';
@@ -21,6 +21,7 @@ const ICONS: Record<string, IconType> = {
   'book-sgos-audit': Calendar,
   'press-queue': Newspaper,
   'metrics-pulse': Activity,
+  'hermes-supervisor': Layers,
 };
 
 const ITEM_LABEL_KEYS: Record<string, string> = {
@@ -33,6 +34,7 @@ const ITEM_LABEL_KEYS: Record<string, string> = {
   'book-sgos-audit': 'bookAudit',
   'press-queue': 'pressQueue',
   'metrics-pulse': 'metricsPulse',
+  'hermes-supervisor': 'hermesSupervisor',
 };
 
 export default function SGOSCommand() {
@@ -177,6 +179,13 @@ export default function SGOSCommand() {
               });
             },
             t('command.notify.metricsPulse'),
+          );
+          break;
+        case 'hermes-supervisor':
+          await runProtected(
+            shortcutName(id),
+            () => { navigate('/hermes'); },
+            t('command.notify.hermesSupervisor'),
           );
           break;
         default:

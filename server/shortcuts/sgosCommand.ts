@@ -212,4 +212,5 @@ export const COMMAND_MENU = [
   { id: 'book-sgos-audit', order: 7, requiresConfirmation: true },
   { id: 'press-queue', order: 8, requiresConfirmation: true },
   { id: 'metrics-pulse', order: 9, requiresConfirmation: true },
+  { id: 'hermes-supervisor', order: 10, requiresConfirmation: true },
 ] as const;

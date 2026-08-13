@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory, Shield, Command, Inbox } from 'lucide-react';
+import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory, Shield, Command, Inbox, Layers } from 'lucide-react';
 import AutoPilot from './pages/AutoPilot';
 import RealEarnings from './pages/RealEarnings';
 import ViralCashGenerator from './pages/ViralCashGenerator';
@@ -10,6 +10,7 @@ import DailyFactory from './pages/DailyFactory';
 import ShortcutsHub from './pages/ShortcutsHub';
 import SGOSCommand from './pages/SGOSCommand';
 import ApprovalInbox from './pages/ApprovalInbox';
+import HermesHub from './pages/HermesHub';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { api } from './api';
 
@@ -72,6 +73,7 @@ export default function App() {
 
         <nav className="flex flex-col gap-1">
           <NavItem to="/approve" icon={Inbox} label={t('nav.approve')} badge={pendingCount} />
+          <NavItem to="/hermes" icon={Layers} label={t('nav.hermes')} />
           <NavItem to="/command" icon={Command} label={t('nav.command')} />
           <NavItem to="/" icon={Zap} label={t('nav.autopilot')} />
           <NavItem to="/shortcuts" icon={Shield} label={t('nav.shortcuts')} />
@@ -93,6 +95,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<AutoPilot />} />
           <Route path="/approve" element={<ApprovalInbox />} />
+          <Route path="/hermes" element={<HermesHub />} />
           <Route path="/command" element={<SGOSCommand />} />
           <Route path="/shortcuts" element={<ShortcutsHub />} />
           <Route path="/factory" element={<DailyFactory />} />

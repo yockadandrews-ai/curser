@@ -56,6 +56,22 @@ import {
   getBatchGoogleCalendarUrl,
 } from './shortcuts/calendar.js';
 import {
+  getHermesState,
+  getHermesTasks,
+  getHermesTask,
+  ingestHermesSignal,
+  founderDecision,
+  simulateCalendarTrigger,
+  getLedgerForTask,
+} from './hermes/orchestrator.js';
+import {
+  generateContentCalendarPlan,
+  buildContentCalendarIcs,
+  getContentCalendarGoogleLinks,
+} from './hermes/contentCalendar.js';
+import { getLedgerRows } from './hermes/chaosLedger.js';
+import { NOTION_BRIEF_TEMPLATES, getNotionBriefTemplate } from './data/notionBriefTemplates.js';
+import {
   buildExportCsv,
   importCsv,
   getProductPerformance,
@@ -557,6 +573,93 @@ app.get('/api/command/metrics-pulse', (_req, res) => {
 });
 app.post('/api/command/tesla-drive-prep', (req, res) => {
   res.json(logTeslaDrivePrep(Boolean(req.body.sentryEnabled)));
+});
+
+// Hermes Supervisor — orchestration (draft free, publish gated, Chaos Ledger attribution)
+app.get('/api/hermes/dashboard', (_req, res) => {
+  const calendar = generateContentCalendarPlan({ startFromSlug: 'gas-station' });
+  res.json({
+    state: getHermesState(),
+    tasks: getHermesTasks(30),
+    ledger: getLedgerRows(20),
+    briefs: NOTION_BRIEF_TEMPLATES,
+    calendar,
+  });
+});
+app.get('/api/hermes/status', (_req, res) => {
+  res.json(getHermesState());
+});
+app.get('/api/hermes/tasks', (_req, res) => {
+  res.json(getHermesTasks(100));
+});
+app.get('/api/hermes/tasks/:id', (req, res) => {
+  const task = getHermesTask(req.params.id);
+  if (!task) return res.status(404).json({ error: 'Task not found' });
+  res.json({ task, ledger: getLedgerForTask(task.id) });
+});
+app.post('/api/hermes/ingest', (req, res) => {
+  const { source, title, summary, productSlug, platform, amount, payload } = req.body;
+  if (!source || !title) return res.status(400).json({ error: 'source and title required' });
+  try {
+    const task = ingestHermesSignal({
+      source,
+      title,
+      summary,
+      productSlug,
+      platform,
+      payload: amount != null ? { ...(payload || {}), amount, source: source === 'gumroad_sale' ? 'Gumroad' : source } : payload,
+    });
+    res.json({ task });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+app.post('/api/hermes/tasks/:id/decision', (req, res) => {
+  const { decision, notes, proofUrl, approvedBy } = req.body;
+  if (!decision) return res.status(400).json({ error: 'decision required: approve | reject | modify' });
+  try {
+    const result = founderDecision({
+      taskId: req.params.id,
+      decision,
+      notes,
+      proofUrl,
+      approvedBy,
+    });
+    res.json(result);
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
+  }
+});
+app.post('/api/hermes/simulate-calendar', (req, res) => {
+  const { eventType, productSlug } = req.body;
+  if (!eventType || !productSlug) return res.status(400).json({ error: 'eventType and productSlug required' });
+  const task = simulateCalendarTrigger(eventType, productSlug);
+  res.json({ task });
+});
+app.get('/api/hermes/calendar/plan', (req, res) => {
+  const startFromSlug = typeof req.query.from === 'string' ? req.query.from : 'gas-station';
+  res.json(generateContentCalendarPlan({ startFromSlug }));
+});
+app.get('/api/hermes/calendar/content.ics', (_req, res) => {
+  const plan = generateContentCalendarPlan({ startFromSlug: 'gas-station' });
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="sgos-content-factory.ics"');
+  res.send(buildContentCalendarIcs(plan));
+});
+app.get('/api/hermes/calendar/google-links', (_req, res) => {
+  const plan = generateContentCalendarPlan({ startFromSlug: 'gas-station' });
+  res.json(getContentCalendarGoogleLinks(plan));
+});
+app.get('/api/hermes/briefs', (_req, res) => {
+  res.json(NOTION_BRIEF_TEMPLATES);
+});
+app.get('/api/hermes/briefs/:id', (req, res) => {
+  const template = getNotionBriefTemplate(req.params.id);
+  if (!template) return res.status(404).json({ error: 'Template not found' });
+  res.json(template);
+});
+app.get('/api/hermes/ledger', (_req, res) => {
+  res.json(getLedgerRows(100));
 });
 
 // Serve frontend in production
