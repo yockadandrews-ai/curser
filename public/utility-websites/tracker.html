@@ -9,184 +9,96 @@
   <meta name="description" content="Lightweight revenue tracker for AdSense payouts and monthly earnings summary." />
   <link rel="canonical" href="https://YOURDOMAIN.com/tracker.html" />
   <link rel="manifest" href="tracker.webmanifest" />
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%2322c55e' width='100' height='100' rx='20'/%3E%3Ctext x='50' y='62' font-size='48' text-anchor='middle' fill='%230a0a0f'%3E%24%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
   <link rel="stylesheet" href="shared.css" />
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <div class="container">
     <a class="back-link" href="index.html">← All tools</a>
     <header>
       <h1>Profit Tracker</h1>
-      <p>AdSense payouts · monthly revenue · quick shortcut dashboard</p>
+      <p>AdSense payouts · monthly revenue · one-tap shortcut</p>
     </header>
 
-    <section class="card tracker-summary" aria-live="polite">
-      <h2 class="tracker-heading">Revenue this month</h2>
-      <p class="tracker-big" id="month-total">$0.00</p>
-      <p class="tracker-muted" id="month-label">—</p>
-    </section>
+    <main id="main">
+      <div class="tracker-stats" aria-live="polite">
+        <section class="card tracker-summary">
+          <p class="tracker-stat-label">This month</p>
+          <p class="tracker-big" id="month-total">$0.00</p>
+          <p class="tracker-muted" id="month-label">—</p>
+          <p class="tracker-muted" id="month-delta">—</p>
+        </section>
+        <section class="card tracker-summary tracker-summary-alt">
+          <p class="tracker-stat-label">Year to date</p>
+          <p class="tracker-big tracker-big-sm" id="ytd-total">$0.00</p>
+          <p class="tracker-muted">All logged payouts in <span id="ytd-year"></span></p>
+        </section>
+      </div>
 
-    <section class="card">
-      <h2 class="tracker-heading">Log AdSense payout</h2>
-      <label for="amount">Amount (USD)</label>
-      <input id="amount" type="number" min="0" step="0.01" placeholder="42.50" />
-      <label for="note">Note (optional)</label>
-      <input id="note" type="text" placeholder="March AdSense deposit" maxlength="120" />
-      <button type="button" class="btn" id="log-revenue">Log revenue</button>
-      <p class="tracker-muted" id="log-status" role="status"></p>
-    </section>
+      <div class="goal-wrap hidden card">
+        <div class="tracker-heading-row">
+          <h2 class="tracker-heading">Monthly goal</h2>
+          <span class="tracker-muted" id="goal-label">—</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar" id="goal-bar"></div>
+        </div>
+      </div>
 
-    <section class="card">
-      <h2 class="tracker-heading">Recent entries</h2>
-      <ul class="tracker-list" id="entries"></ul>
-      <button type="button" class="btn btn-secondary" id="clear-entries">Clear local entries</button>
-    </section>
+      <section class="card">
+        <h2 class="tracker-heading">Log AdSense payout</h2>
+        <div class="row">
+          <div>
+            <label for="amount">Amount (USD)</label>
+            <input id="amount" type="number" min="0" step="0.01" placeholder="42.50" inputmode="decimal" />
+          </div>
+          <div>
+            <label for="note">Note (optional)</label>
+            <input id="note" type="text" placeholder="March deposit" maxlength="120" />
+          </div>
+        </div>
+        <button type="button" class="btn" id="log-revenue">Log revenue</button>
+        <p class="tracker-muted status-line" id="log-status" role="status"></p>
+      </section>
 
-    <section class="card tracker-shortcut">
-      <h2 class="tracker-heading">Mobile shortcut</h2>
-      <p>Add this page to your home screen for one-tap access:</p>
-      <ul>
-        <li><strong>iPhone:</strong> Share → Add to Home Screen</li>
-        <li><strong>Android:</strong> Menu (⋮) → Add to Home screen</li>
-      </ul>
-      <p class="tracker-muted">Bookmark URL: <code id="bookmark-url">tracker.html</code></p>
-    </section>
+      <section class="card">
+        <div class="tracker-heading-row">
+          <h2 class="tracker-heading">Recent entries</h2>
+          <button type="button" class="btn-inline" id="export-csv">Export CSV</button>
+        </div>
+        <ul class="tracker-list" id="entries"></ul>
+        <p class="tracker-muted status-line" id="export-status" role="status"></p>
+        <button type="button" class="btn btn-secondary" id="clear-entries">Clear local entries</button>
+      </section>
 
-    <section class="card tracker-api hidden" id="api-section">
-      <h2 class="tracker-heading">Money Autopilot API</h2>
-      <p class="tracker-muted">Configured API: <code id="api-base">—</code></p>
-      <button type="button" class="btn btn-secondary" id="sync-api">Sync last entry to API</button>
-      <p class="tracker-muted" id="api-status" role="status"></p>
-    </section>
+      <section class="card tracker-shortcut">
+        <h2 class="tracker-heading">Mobile shortcut</h2>
+        <p>Add this page to your home screen for one-tap access:</p>
+        <ul>
+          <li><strong>iPhone:</strong> Share → Add to Home Screen</li>
+          <li><strong>Android:</strong> Menu (⋮) → Add to Home screen</li>
+        </ul>
+        <div class="bookmark-row">
+          <code id="bookmark-url">tracker.html</code>
+          <button type="button" class="btn-inline" id="copy-bookmark">Copy URL</button>
+        </div>
+      </section>
+
+      <section class="card tracker-api hidden" id="api-section">
+        <h2 class="tracker-heading">Money Autopilot API</h2>
+        <p class="tracker-muted">Configured API: <code id="api-base">—</code></p>
+        <button type="button" class="btn btn-secondary" id="sync-api">Sync last entry to API</button>
+        <p class="tracker-muted status-line" id="api-status" role="status"></p>
+      </section>
+    </main>
 
     <footer><p>© Money Magnet Tools</p></footer>
   </div>
   <script src="config.js"></script>
   <script src="shared.js"></script>
-  <script>
-    const STORAGE_KEY = 'mmt_profit_entries';
-
-    function loadEntries() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      } catch {
-        return [];
-      }
-    }
-
-    function saveEntries(entries) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-    }
-
-    function monthKey(date = new Date()) {
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    }
-
-    function formatMoney(n) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n);
-    }
-
-    function render() {
-      const entries = loadEntries();
-      const key = monthKey();
-      const monthEntries = entries.filter(e => e.month === key);
-      const total = monthEntries.reduce((s, e) => s + e.amount, 0);
-
-      document.getElementById('month-total').textContent = formatMoney(total);
-      document.getElementById('month-label').textContent =
-        `${monthEntries.length} entr${monthEntries.length === 1 ? 'y' : 'ies'} in ${key}`;
-
-      const list = document.getElementById('entries');
-      if (!entries.length) {
-        list.innerHTML = '<li class="tracker-empty">No entries yet — log your first AdSense payout above.</li>';
-        return;
-      }
-
-      list.innerHTML = entries.slice(0, 12).map(e => `
-        <li>
-          <span>${formatMoney(e.amount)}</span>
-          <span class="tracker-muted">${e.date}${e.note ? ' · ' + e.note : ''}</span>
-        </li>
-      `).join('');
-    }
-
-    document.getElementById('log-revenue').addEventListener('click', () => {
-      const amount = parseFloat(document.getElementById('amount').value);
-      const note = document.getElementById('note').value.trim();
-      const status = document.getElementById('log-status');
-
-      if (!Number.isFinite(amount) || amount <= 0) {
-        status.textContent = 'Enter a valid amount greater than zero.';
-        return;
-      }
-
-      const now = new Date();
-      const entry = {
-        id: crypto.randomUUID?.() || String(Date.now()),
-        amount,
-        note,
-        date: now.toISOString().slice(0, 10),
-        month: monthKey(now),
-        createdAt: now.toISOString(),
-      };
-
-      const entries = loadEntries();
-      entries.unshift(entry);
-      saveEntries(entries);
-
-      document.getElementById('amount').value = '';
-      document.getElementById('note').value = '';
-      status.textContent = `Logged ${formatMoney(amount)}.`;
-      render();
-
-      if (typeof trackEvent === 'function') {
-        trackEvent('revenue_logged', { value: amount, currency: 'USD' });
-      }
-    });
-
-    document.getElementById('clear-entries').addEventListener('click', () => {
-      if (!confirm('Clear all local profit tracker entries on this device?')) return;
-      localStorage.removeItem(STORAGE_KEY);
-      document.getElementById('log-status').textContent = 'Local entries cleared.';
-      render();
-    });
-
-    const c = window.SITE_CONFIG || {};
-    const siteUrl = (c.siteUrl || location.origin).replace(/\/$/, '');
-    document.getElementById('bookmark-url').textContent = `${siteUrl}/tracker.html`;
-
-    const apiUrl = (c.profitTrackerApiUrl || '').replace(/\/$/, '');
-    if (apiUrl) {
-      document.getElementById('api-section').classList.remove('hidden');
-      document.getElementById('api-base').textContent = apiUrl;
-
-      document.getElementById('sync-api').addEventListener('click', async () => {
-        const entries = loadEntries();
-        const latest = entries[0];
-        const statusEl = document.getElementById('api-status');
-        if (!latest) {
-          statusEl.textContent = 'No entries to sync.';
-          return;
-        }
-        statusEl.textContent = 'Syncing…';
-        try {
-          const res = await fetch(`${apiUrl}/api/profit-tracker/record-revenue`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ source: 'AdSense', amount: latest.amount, note: latest.note }),
-          });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          statusEl.textContent = `Synced ${formatMoney(latest.amount)} to Money Autopilot.`;
-          if (typeof trackEvent === 'function') {
-            trackEvent('revenue_synced', { value: latest.amount, currency: 'USD' });
-          }
-        } catch (err) {
-          statusEl.textContent = `API sync failed: ${err.message}`;
-        }
-      });
-    }
-
-    render();
-  </script>
+  <script src="tracker.js"></script>
+  <script>document.getElementById('ytd-year').textContent = new Date().getFullYear();</script>
 </body>
 </html>

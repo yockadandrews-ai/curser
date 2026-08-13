@@ -31,4 +31,7 @@ window.SITE_CONFIG = {
    * Leave empty to use local-only tracker (localStorage).
    */
   profitTrackerApiUrl: '',
+
+  /** Optional monthly revenue goal for tracker.html progress bar (USD, 0 = hidden) */
+  monthlyRevenueGoal: 0,
 };

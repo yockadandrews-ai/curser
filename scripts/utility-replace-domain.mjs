@@ -26,7 +26,7 @@ const host = domainArg.replace(/^https?:\/\//, '').replace(/\/$/, '');
 const siteUrl = `https://${host}`;
 
 const TEXT_EXTENSIONS = new Set([
-  '.html', '.js', '.css', '.xml', '.txt', '.md', '.webmanifest', '.json',
+  '.html', '.js', '.css', '.xml', '.txt', '.md', '.webmanifest', '.json', '.svg',
 ]);
 
 const replacements = [

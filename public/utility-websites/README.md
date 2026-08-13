@@ -65,6 +65,7 @@ window.SITE_CONFIG = {
   siteName: 'Money Magnet Tools',
   siteUrl: 'https://tools.yourdomain.com',
   profitTrackerApiUrl: '',     // optional Money Autopilot API base
+  monthlyRevenueGoal: 0,       // optional USD goal for tracker progress bar
 };
 ```
 
