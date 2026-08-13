@@ -108,6 +108,8 @@ Products from `gas-station` through `growth-compass`:
 
 Import: **GET `/api/hermes/calendar/content.ics`** into primary Google Calendar (same TZ as Founder Stack).
 
+**Live calendar (Aug 2026):** Primary Google Calendar events are mapped in `server/data/liveCalendarEvents.ts`. n8n triggers via **`POST /api/hermes/calendar/trigger`** — see `docs/N8N_HERMES_WIRING.md`.
+
 Env: `HERMES_CALENDAR_TZ` or `APPROVAL_REMINDER_TZ` (default `America/New_York`).
 
 ---

@@ -70,6 +70,11 @@ import {
   getContentCalendarGoogleLinks,
 } from './hermes/contentCalendar.js';
 import { getLedgerRows } from './hermes/chaosLedger.js';
+import { triggerFromCalendarEvent } from './hermes/calendarTrigger.js';
+import { getRegistryJson } from './data/productRegistry.js';
+import { LIVE_CALENDAR_EVENTS, listUpcomingLiveEvents } from './data/liveCalendarEvents.js';
+import { CONTENT_FACTORY_TASK_SCHEMA, HERMES_HANDOFF_RULES } from './schemas/contentFactoryTask.js';
+import { seedSprint2VaultIfMissing } from './hermes/contentFactory.js';
 import { NOTION_BRIEF_TEMPLATES, getNotionBriefTemplate } from './data/notionBriefTemplates.js';
 import {
   buildExportCsv,
@@ -577,13 +582,15 @@ app.post('/api/command/tesla-drive-prep', (req, res) => {
 
 // Hermes Supervisor — orchestration (draft free, publish gated, Chaos Ledger attribution)
 app.get('/api/hermes/dashboard', (_req, res) => {
-  const calendar = generateContentCalendarPlan({ startFromSlug: 'gas-station' });
   res.json({
     state: getHermesState(),
     tasks: getHermesTasks(30),
     ledger: getLedgerRows(20),
     briefs: NOTION_BRIEF_TEMPLATES,
-    calendar,
+    calendar: { live: LIVE_CALENDAR_EVENTS, upcoming: listUpcomingLiveEvents() },
+    registry: getRegistryJson(),
+    schema: CONTENT_FACTORY_TASK_SCHEMA,
+    handoffRules: HERMES_HANDOFF_RULES,
   });
 });
 app.get('/api/hermes/status', (_req, res) => {
@@ -660,6 +667,42 @@ app.get('/api/hermes/briefs/:id', (req, res) => {
 });
 app.get('/api/hermes/ledger', (_req, res) => {
   res.json(getLedgerRows(100));
+});
+app.get('/api/hermes/registry', (_req, res) => {
+  res.json(getRegistryJson());
+});
+app.get('/api/hermes/schema/content-factory', (_req, res) => {
+  res.json({ schema: CONTENT_FACTORY_TASK_SCHEMA, handoffRules: HERMES_HANDOFF_RULES });
+});
+app.get('/api/hermes/calendar/live', (_req, res) => {
+  res.json({ events: LIVE_CALENDAR_EVENTS, upcoming: listUpcomingLiveEvents() });
+});
+app.post('/api/hermes/calendar/trigger', (req, res) => {
+  const secret = process.env.HERMES_WEBHOOK_SECRET?.trim();
+  if (secret && req.headers['x-hermes-secret'] !== secret) {
+    return res.status(401).json({ error: 'Invalid X-Hermes-Secret' });
+  }
+  const { title, startDate, productId, eventType, source } = req.body;
+  if (!title && !productId) return res.status(400).json({ error: 'title or productId required' });
+  try {
+    const result = triggerFromCalendarEvent({
+      title: title || '',
+      startDate,
+      productId,
+      eventType,
+      source: source || 'n8n',
+    });
+    res.status(result.matched ? 200 : 404).json(result);
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+app.post('/api/hermes/seed/sprint-2', (_req, res) => {
+  try {
+    res.json(seedSprint2VaultIfMissing());
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
 });
 
 // Serve frontend in production

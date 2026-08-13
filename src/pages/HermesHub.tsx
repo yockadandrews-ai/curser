@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Layers, Calendar, FileText, Shield, Loader2, Download, Play, Check, X, RefreshCw,
+  Layers, Calendar, FileText, Shield, Loader2, Play, Check, X, RefreshCw,
 } from 'lucide-react';
 import { api } from '../api';
 import type {
   ChaosLedgerRow,
-  ContentCalendarPlan,
   HermesStateSnapshot,
   HermesTaskRecord,
   NotionBriefTemplate,
@@ -17,7 +16,8 @@ export default function HermesHub() {
   const [tasks, setTasks] = useState<HermesTaskRecord[]>([]);
   const [ledger, setLedger] = useState<ChaosLedgerRow[]>([]);
   const [briefs, setBriefs] = useState<NotionBriefTemplate[]>([]);
-  const [calendar, setCalendar] = useState<ContentCalendarPlan | null>(null);
+  const [calendar, setCalendar] = useState<{ live?: unknown[]; upcoming?: unknown[] } | null>(null);
+  const [registry, setRegistry] = useState<{ products: Array<{ id: string; name: string; status: string }> } | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -29,6 +29,7 @@ export default function HermesHub() {
     setLedger(data.ledger);
     setBriefs(data.briefs);
     setCalendar(data.calendar);
+    setRegistry(data.registry);
     setLoading(false);
   }, []);
 
@@ -47,17 +48,6 @@ export default function HermesHub() {
       await refresh();
     } catch (e) {
       setMsg(String(e));
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const simulate = async (productSlug: string) => {
-    setBusy('simulate');
-    try {
-      await api.hermesSimulateCalendar('build_weekend', productSlug);
-      setMsg(`Calendar trigger simulated for ${productSlug}`);
-      await refresh();
     } finally {
       setBusy(null);
     }
@@ -105,7 +95,7 @@ export default function HermesHub() {
           { label: 'Awaiting approval', value: state?.awaitingApproval ?? 0, color: 'text-yellow-400' },
           { label: 'Executed handoffs', value: state?.executedTotal ?? 0, color: 'text-emerald-400' },
           { label: 'Ledger rows', value: state?.ledgerRows ?? 0, color: 'text-blue-400' },
-          { label: 'Active sprint', value: state?.activeSprint || '—', color: 'text-gray-300' },
+          { label: 'Active sprint', value: registry?.products.find(p => p.status === 'queued')?.name?.slice(0, 20) || state?.activeSprint || '—', color: 'text-gray-300' },
         ].map(stat => (
           <div key={stat.label} className="card">
             <p className="text-xs text-gray-500 uppercase tracking-wide">{stat.label}</p>
@@ -117,31 +107,42 @@ export default function HermesHub() {
       <section className="card space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="font-semibold text-white flex items-center gap-2">
-            <Calendar size={18} className="text-emerald-400" /> Content Calendar (Gas Station →)
+            <Calendar size={18} className="text-emerald-400" /> Live Calendar (primary · ET)
           </h2>
-          <div className="flex gap-2">
-            <a
-              href="/api/hermes/calendar/content.ics"
-              className="btn-secondary text-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-700"
-            >
-              <Download size={14} /> Download .ics
-            </a>
+          <div className="flex gap-2 flex-wrap">
             <button
               type="button"
               className="btn-secondary text-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-700"
               disabled={busy === 'simulate'}
-              onClick={() => simulate('gas-station')}
+              onClick={async () => {
+                setBusy('simulate');
+                try {
+                  const r = await api.hermesCalendarTrigger({
+                    title: 'SGOS Sprint 2 Build — Gas Station Snack Rankings',
+                    startDate: '2026-08-16',
+                    source: 'manual',
+                  });
+                  setMsg(r.message);
+                  await refresh();
+                } catch (e) {
+                  setMsg(String(e));
+                } finally {
+                  setBusy(null);
+                }
+              }}
             >
-              <Play size={14} /> Simulate Build Day
+              <Play size={14} /> Trigger Sprint 2 Build
             </button>
           </div>
         </div>
-        {calendar && (
-          <p className="text-sm text-gray-400">
-            {calendar.events.length} events · {calendar.products.length} product sprints · TZ {calendar.timezone}
-          </p>
+        {calendar?.live && (
+          <ul className="text-sm text-gray-400 space-y-1 max-h-40 overflow-y-auto">
+            {(calendar.live as Array<{ summary: string; startDate: string; eventType: string }>).map(ev => (
+              <li key={ev.summary}>· {ev.startDate} — {ev.summary} <span className="text-gray-600">({ev.eventType})</span></li>
+            ))}
+          </ul>
         )}
-        <p className="text-xs text-gray-500">{calendar?.googleCalendarNote}</p>
+        <p className="text-xs text-gray-500">n8n → POST /api/hermes/calendar/trigger · see docs/N8N_HERMES_WIRING.md</p>
       </section>
 
       <section className="card space-y-3">

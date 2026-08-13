@@ -20,6 +20,8 @@ import {
   type RiskTag,
 } from '../schemas/hermes.js';
 import { getContentProduct } from '../data/contentProducts.js';
+import { getRegistryProduct } from '../data/productRegistry.js';
+import { runContentFactory } from './contentFactory.js';
 import { buildProductBriefTemplate, getNotionBriefTemplate, renderNotionBriefPage } from '../data/notionBriefTemplates.js';
 import { writeLedgerEntry, getLedgerForTask, countLedgerRows } from './chaosLedger.js';
 import { processRevenueEvent } from './pulseEngine.js';
@@ -225,8 +227,9 @@ function produceDraft(task: HermesTaskRecord): HermesTaskRecord {
   task.updatedAt = new Date().toISOString();
   saveTask(task);
 
+  const registryProduct = task.productSlug ? getRegistryProduct(task.productSlug) : undefined;
   const product = task.productSlug ? getContentProduct(task.productSlug) : undefined;
-  const vaultRel = product?.vaultFolder || `vault/task-${task.id.slice(0, 8)}`;
+  const vaultRel = registryProduct?.vaultFolder || product?.vaultFolder || `vault/task-${task.id.slice(0, 8)}`;
   const vaultAbs = path.join(VAULT_ROOT, vaultRel.replace(/^vault\//, ''));
   fs.mkdirSync(vaultAbs, { recursive: true });
 
@@ -241,6 +244,21 @@ function produceDraft(task: HermesTaskRecord): HermesTaskRecord {
     });
     draftMarkdown = result.receiptDraftMarkdown;
     fs.writeFileSync(path.join(vaultAbs, 'impact-receipt-draft.md'), draftMarkdown);
+  } else if (registryProduct) {
+    const factory = runContentFactory({
+      productId: registryProduct.id,
+      schema: registryProduct.schema,
+      trigger: task.source === 'n8n' ? 'n8n' : task.source === 'calendar' ? 'calendar_event' : 'hermes_schedule',
+      calendarEventId: task.calendarEventUid,
+    });
+    draftMarkdown = `# ${registryProduct.name} — Content Factory Complete
+
+**Status:** DRAFTED · **Sent:** 0  
+**Files:** ${factory.filesWritten.join(', ')}
+
+See vault for reel scripts, captions, Gumroad copy, receipt template.
+`;
+    fs.writeFileSync(path.join(vaultAbs, 'content-draft.md'), draftMarkdown);
   } else if (product) {
     draftMarkdown = buildContentDraft(product, task);
     fs.writeFileSync(path.join(vaultAbs, 'content-draft.md'), draftMarkdown);

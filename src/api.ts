@@ -198,7 +198,8 @@ export const api = {
       tasks: import('./types/hermes').HermesTaskRecord[];
       ledger: import('./types/hermes').ChaosLedgerRow[];
       briefs: import('./types/hermes').NotionBriefTemplate[];
-      calendar: import('./types/hermes').ContentCalendarPlan;
+      calendar: import('./types/hermes').ContentCalendarPlan | { live?: unknown[]; upcoming?: unknown[] };
+      registry: { products: Array<{ id: string; name: string; status: string }> };
     }>('/hermes/dashboard'),
   getHermesTasks: () => request<import('./types/hermes').HermesTaskRecord[]>('/hermes/tasks'),
   hermesIngest: (data: { source: string; title: string; summary?: string; productSlug?: string; amount?: number }) =>
@@ -211,4 +212,8 @@ export const api = {
     request<import('./types/hermes').HermesIngestResult>('/hermes/simulate-calendar', {
       method: 'POST', body: JSON.stringify({ eventType, productSlug }),
     }),
+  hermesCalendarTrigger: (data: { title?: string; startDate?: string; productId?: string; eventType?: string; source?: string }) =>
+    request<{ matched: boolean; message: string; task?: import('./types/hermes').HermesTaskRecord }>(
+      '/hermes/calendar/trigger', { method: 'POST', body: JSON.stringify(data) },
+    ),
 };
