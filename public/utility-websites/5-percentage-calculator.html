@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Percentage Calculator — What is X% of Y?</title>
+  <meta name="description" content="Free percentage calculator: find X% of Y, percentage change, increase/decrease, and what percent one number is of another. Tips and discounts included." />
+  <link rel="canonical" href="https://tools.example.com/utility-websites/5-percentage-calculator.html" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← All tools</a>
+    <header>
+      <h1>Percentage Calculator</h1>
+      <p>What is X% of Y? Change, difference, and more</p>
+    </header>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad space — top</div>
+    <div class="card">
+      <label for="mode">Calculation type</label>
+      <select id="mode">
+        <option value="of">What is X% of Y?</option>
+        <option value="is">X is what % of Y?</option>
+        <option value="change">% change from X to Y</option>
+        <option value="increase">Increase X by Y%</option>
+        <option value="decrease">Decrease X by Y%</option>
+      </select>
+      <label for="a">Value X</label>
+      <input id="a" type="number" step="any" placeholder="50" />
+      <label for="b" id="label-b">Value Y (or %)</label>
+      <input id="b" type="number" step="any" placeholder="20" />
+      <button type="button" class="btn" id="calc">Calculate</button>
+      <div id="output" class="result hidden"></div>
+    </div>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad space — bottom</div>
+    <section class="seo-content">
+      <h2>Common Uses</h2>
+      <ul>
+        <li>Restaurant tips (15%, 18%, 20%)</li>
+        <li>Sale discounts and markups</li>
+        <li>Grade percentages and test scores</li>
+        <li>Business growth rate year-over-year</li>
+      </ul>
+    </section>
+    <footer><p>© Money Magnet Tools</p></footer>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    const labels = {
+      of: 'Percentage (%)',
+      is: 'Of total (Y)',
+      change: 'New value (Y)',
+      increase: 'Increase by (%)',
+      decrease: 'Decrease by (%)',
+    };
+    document.getElementById('mode').onchange = e => {
+      document.getElementById('label-b').textContent = labels[e.target.value];
+    };
+
+    document.getElementById('calc').onclick = () => {
+      const mode = document.getElementById('mode').value;
+      const x = parseFloat(document.getElementById('a').value);
+      const y = parseFloat(document.getElementById('b').value);
+      const out = document.getElementById('output');
+      if (Number.isNaN(x) || Number.isNaN(y)) { out.textContent = 'Enter both values.'; out.classList.remove('hidden'); return; }
+      let text = '';
+      switch (mode) {
+        case 'of': text = `<strong>${(x * y / 100).toFixed(2)}</strong> (${x}% of ${y})`; break;
+        case 'is': text = y === 0 ? 'Cannot divide by zero' : `<strong>${(x / y * 100).toFixed(2)}%</strong> (${x} is ${(x/y*100).toFixed(1)}% of ${y})`; break;
+        case 'change': text = x === 0 ? 'Cannot compute from zero' : `<strong>${(((y - x) / x) * 100).toFixed(2)}%</strong> change`; break;
+        case 'increase': text = `<strong>${(x * (1 + y / 100)).toFixed(2)}</strong> (${x} + ${y}%)`; break;
+        case 'decrease': text = `<strong>${(x * (1 - y / 100)).toFixed(2)}</strong> (${x} − ${y}%)`; break;
+      }
+      out.innerHTML = text;
+      out.classList.remove('hidden');
+    };
+  </script>
+</body>
+</html>

@@ -8,6 +8,7 @@
     "dev:server": "tsx watch server/index.ts",
     "dev:client": "vite",
     "build": "tsc -p tsconfig.server.json && vite build",
+    "zip:utility-sites": "cd public && zip -r ../utility-websites.zip utility-websites/",
     "start": "node dist/server/index.js",
     "preview": "vite preview"
   },

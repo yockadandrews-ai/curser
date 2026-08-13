@@ -189,8 +189,11 @@ export default function RealEarnings() {
             <TrendingUp className="text-money-400" />
             {t('profitTracker.title')}
           </h1>
-          <p className="text-gray-400 mt-1">{t('profitTracker.subtitle')}</p>
-        </div>
+        <p className="text-gray-400 mt-1">{t('profitTracker.subtitle')}</p>
+        <a href="/utility-websites/" target="_blank" rel="noopener noreferrer" className="text-sm text-purple-400 hover:underline mt-1 inline-block">
+          {t('profitTracker.viewUtilitySites')} →
+        </a>
+      </div>
         <div className="flex flex-wrap items-center gap-2">
           <button onClick={handleExportCsv} className="btn-secondary flex items-center gap-2 text-sm">
             <Download size={16} />

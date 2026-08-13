@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sleep Cycle Calculator — Best Wake &amp; Bed Times</title>
+  <meta name="description" content="Sleep cycle calculator: find optimal wake-up or bedtime based on 90-minute sleep cycles plus 15 min to fall asleep. Wake refreshed, not groggy." />
+  <link rel="canonical" href="https://tools.example.com/utility-websites/4-sleep-cycle-calculator.html" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← All tools</a>
+    <header>
+      <h1>Sleep Cycle Calculator</h1>
+      <p>Wake between 90-minute cycles — not mid-REM</p>
+    </header>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad space — top</div>
+    <div class="card">
+      <label for="mode">I want to…</label>
+      <select id="mode">
+        <option value="wake">Wake up at a specific time</option>
+        <option value="sleep">Go to sleep now</option>
+      </select>
+      <label for="time">Time</label>
+      <input id="time" type="time" />
+      <button type="button" class="btn" id="calc">Calculate</button>
+      <div id="output" class="result hidden"></div>
+    </div>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad space — bottom</div>
+    <section class="seo-content">
+      <h2>Sleep Science Basics</h2>
+      <p>Average sleep cycles last ~90 minutes. We add 15 minutes for falling asleep. Aim for 4–6 complete cycles (6–9 hours) for most adults.</p>
+    </section>
+    <footer><p>© Money Magnet Tools</p></footer>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    const CYCLE = 90;
+    const FALL_ASLEEP = 15;
+
+    function fmt(d) {
+      return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+
+    function setDefaultTime() {
+      const now = new Date();
+      document.getElementById('time').value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    }
+    setDefaultTime();
+
+    document.getElementById('calc').onclick = () => {
+      const mode = document.getElementById('mode').value;
+      const [h, m] = document.getElementById('time').value.split(':').map(Number);
+      const base = new Date();
+      base.setHours(h, m, 0, 0);
+      const out = document.getElementById('output');
+      const times = [];
+
+      if (mode === 'wake') {
+        for (let cycles = 6; cycles >= 3; cycles--) {
+          const d = new Date(base.getTime() - (cycles * CYCLE + FALL_ASLEEP) * 60000);
+          times.push(`${fmt(d)} <span style="color:var(--muted)">(${cycles} cycles)</span>`);
+        }
+        out.innerHTML = `<strong>Go to sleep at:</strong><br>${times.join('<br>')}`;
+      } else {
+        const start = new Date();
+        start.setHours(h, m, 0, 0);
+        if (start < new Date()) start.setTime(Date.now());
+        for (let cycles = 3; cycles <= 6; cycles++) {
+          const d = new Date(start.getTime() + (FALL_ASLEEP + cycles * CYCLE) * 60000);
+          times.push(`${fmt(d)} <span style="color:var(--muted)">(${cycles} cycles)</span>`);
+        }
+        out.innerHTML = `<strong>Wake up at:</strong><br>${times.join('<br>')}`;
+      }
+      out.classList.remove('hidden');
+    };
+  </script>
+</body>
+</html>

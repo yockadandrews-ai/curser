@@ -32,6 +32,8 @@ npm start
 | Doc | Purpose |
 |-----|---------|
 | [APPLE_STORE_SETUP.md](./docs/APPLE_STORE_SETUP.md) | App Store Connect vs Shortcuts vs Profit Tracker — why analytics emails are empty |
+| [UTILITY_WEBSITES.md](./docs/UTILITY_WEBSITES.md) | Deploy calculator tools + AdSense slots |
+| [SHORTCUTS_ADSENSE.md](./docs/SHORTCUTS_ADSENSE.md) | Apple Shortcut to log AdSense payouts → Profit Tracker |
 | [SGOS_COMMAND.md](./docs/SGOS_COMMAND.md) | Apple Shortcuts root menu rebuild |
 | [SHORTCUTS_HUB.md](./docs/SHORTCUTS_HUB.md) | Proposal status shortcut governance |
 
@@ -43,6 +45,7 @@ TIKTOK_ACCESS_TOKEN=     # Live TikTok posting
 INSTAGRAM_ACCESS_TOKEN=  # Live Instagram posting
 TWITTER_BEARER_TOKEN=    # Live Twitter/X posting
 FACEBOOK_ACCESS_TOKEN=   # Live Facebook posting
+APP_BASE_URL=         # Public URL for calendar links & Shortcuts (e.g. https://yourdomain.com)
 PORT=3001
 DB_PATH=./data/autopilot.db
 ```

@@ -477,3 +477,48 @@ export function seedDemoData(): { products: number; sales: number; expenses: num
 
   return { products: demoProducts.length, sales: 12, expenses: 2 };
 }
+
+/** Quick revenue entry — for Apple Shortcuts (AdSense, affiliate payouts) */
+export function recordExternalRevenue(input: {
+  source: string;
+  amount: number;
+  description?: string;
+  cost?: number;
+}): { saleId: string; revenue: number; profit: number; productName: string; goalAlert: GoalAlert | null } {
+  const source = input.source?.trim() || 'AdSense';
+  const amount = Math.max(0, Number(input.amount) || 0);
+  const cost = Math.max(0, Number(input.cost) || 0);
+  const profit = amount - cost;
+
+  let product = getProducts().find(p => p.name.toLowerCase() === source.toLowerCase());
+  if (!product) {
+    const id = uuidv4();
+    addProduct({
+      id,
+      name: source,
+      cost: 0,
+      sellPrice: amount || 1,
+      category: 'external',
+      source: 'manual',
+      viralScore: 50,
+      productType: 'product',
+      brand: 'other',
+      description: input.description || `External revenue: ${source}`,
+    });
+    product = getProduct(id)!;
+  }
+
+  const previousMonthly = computeMonthlyProfit();
+  const saleId = uuidv4();
+  addSale({
+    id: saleId,
+    productId: product.id,
+    quantity: 1,
+    revenue: amount,
+    profit,
+  });
+  const newMonthly = computeMonthlyProfit();
+  const goalAlert = checkGoalMilestones(previousMonthly, newMonthly);
+
+  return { saleId, revenue: amount, profit, productName: product.name, goalAlert };
+}

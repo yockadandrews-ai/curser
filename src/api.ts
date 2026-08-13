@@ -187,4 +187,8 @@ export const api = {
     }),
   seedProfitDemoData: () =>
     request<{ products: number; sales: number; expenses: number }>('/profit-tracker/demo-data', { method: 'POST' }),
+  recordExternalRevenue: (data: { source: string; amount: number; description?: string; cost?: number }) =>
+    request<{ ok: boolean; saleId: string; revenue: number; profit: number; productName: string; goalAlert?: import('./types').GoalAlert; message: string }>(
+      '/profit-tracker/record-revenue', { method: 'POST', body: JSON.stringify(data) },
+    ),
 };

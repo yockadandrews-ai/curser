@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Age Calculator — Exact Age in Years, Months &amp; Days</title>
+  <meta name="description" content="Calculate your exact age from birth date to today. Free age calculator shows years, months, days, and total days lived." />
+  <link rel="canonical" href="https://tools.example.com/utility-websites/2-age-calculator.html" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← All tools</a>
+    <header>
+      <h1>Age Calculator</h1>
+      <p>Exact age from your birth date to any target date</p>
+    </header>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad space — top</div>
+    <div class="card">
+      <label for="birth">Date of birth</label>
+      <input id="birth" type="date" />
+      <label for="target">Calculate age on (optional)</label>
+      <input id="target" type="date" />
+      <button type="button" class="btn" id="calc">Calculate Age</button>
+      <div id="output" class="result hidden"></div>
+    </div>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad space — bottom</div>
+    <section class="seo-content">
+      <h2>How It Works</h2>
+      <p>Enter your birth date and optionally a future or past date to see your age on that day. Useful for forms, eligibility checks, and milestone planning.</p>
+    </section>
+    <footer><p>© Money Magnet Tools</p></footer>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('target').value = today;
+    document.getElementById('birth').max = today;
+
+    function ageBetween(birth, target) {
+      let y = target.getFullYear() - birth.getFullYear();
+      let m = target.getMonth() - birth.getMonth();
+      let d = target.getDate() - birth.getDate();
+      if (d < 0) { m--; d += new Date(target.getFullYear(), target.getMonth(), 0).getDate(); }
+      if (m < 0) { y--; m += 12; }
+      const totalDays = Math.floor((target - birth) / 86400000);
+      return { y, m, d, totalDays };
+    }
+
+    document.getElementById('calc').onclick = () => {
+      const b = document.getElementById('birth').value;
+      const t = document.getElementById('target').value || today;
+      const out = document.getElementById('output');
+      if (!b) { out.textContent = 'Please enter your birth date.'; out.classList.remove('hidden'); return; }
+      const birth = new Date(b + 'T12:00:00');
+      const target = new Date(t + 'T12:00:00');
+      if (target < birth) { out.textContent = 'Target date must be after birth date.'; out.classList.remove('hidden'); return; }
+      const a = ageBetween(birth, target);
+      out.innerHTML = `<strong>${a.y}</strong> years, <strong>${a.m}</strong> months, <strong>${a.d}</strong> days<br><span style="font-size:0.9rem;color:var(--muted)">${a.totalDays.toLocaleString()} total days</span>`;
+      out.classList.remove('hidden');
+    };
+  </script>
+</body>
+</html>

@@ -64,6 +64,7 @@ import {
   computeMonthlyProfit,
   checkGoalMilestones,
   seedDemoData,
+  recordExternalRevenue,
 } from './profitTracker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -338,6 +339,18 @@ app.put('/api/profit-tracker/goal', (req, res) => {
 });
 app.post('/api/profit-tracker/demo-data', (_req, res) => {
   res.json(seedDemoData());
+});
+app.post('/api/profit-tracker/record-revenue', (req, res) => {
+  const { source, amount, description, cost } = req.body;
+  if (amount == null || Number(amount) <= 0) {
+    return res.status(400).json({ error: 'amount required (positive number)' });
+  }
+  const result = recordExternalRevenue({ source, amount: Number(amount), description, cost: cost != null ? Number(cost) : 0 });
+  res.json({
+    ok: true,
+    ...result,
+    message: `Recorded $${result.profit.toFixed(2)} profit from ${result.productName}`,
+  });
 });
 
 // Content generation

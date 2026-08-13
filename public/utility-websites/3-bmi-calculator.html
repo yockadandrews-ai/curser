@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BMI Calculator — Body Mass Index &amp; Health Category</title>
+  <meta name="description" content="Free BMI calculator for metric (kg/cm) or imperial (lb/ft). Instant Body Mass Index with WHO underweight, normal, overweight, and obese categories." />
+  <link rel="canonical" href="https://tools.example.com/utility-websites/3-bmi-calculator.html" />
+  <link rel="stylesheet" href="shared.css" />
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="index.html">← All tools</a>
+    <header>
+      <h1>BMI Calculator</h1>
+      <p>Body Mass Index with standard health categories</p>
+    </header>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad space — top</div>
+    <div class="card">
+      <label for="units">Units</label>
+      <select id="units">
+        <option value="metric">Metric (kg / cm)</option>
+        <option value="imperial">Imperial (lb / ft + in)</option>
+      </select>
+      <div id="metric-fields">
+        <label for="weight-kg">Weight (kg)</label>
+        <input id="weight-kg" type="number" step="0.1" min="1" placeholder="70" />
+        <label for="height-cm">Height (cm)</label>
+        <input id="height-cm" type="number" step="0.1" min="50" placeholder="175" />
+      </div>
+      <div id="imperial-fields" style="display:none">
+        <label for="weight-lb">Weight (lb)</label>
+        <input id="weight-lb" type="number" step="0.1" min="1" placeholder="154" />
+        <div class="row">
+          <div>
+            <label for="height-ft">Height (ft)</label>
+            <input id="height-ft" type="number" min="1" max="8" placeholder="5" />
+          </div>
+          <div>
+            <label for="height-in">Inches</label>
+            <input id="height-in" type="number" min="0" max="11" placeholder="9" />
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn" id="calc">Calculate BMI</button>
+      <div id="output" class="result hidden"></div>
+    </div>
+    <div class="ad-slot" data-adsense data-adsense-client="ca-pub-XXXXXXXX">Ad space — bottom</div>
+    <section class="seo-content">
+      <h2>Understanding BMI</h2>
+      <p>BMI = weight (kg) ÷ height (m)². Categories follow WHO guidelines. BMI is a screening tool — consult a doctor for personal health advice.</p>
+    </section>
+    <footer><p>© Money Magnet Tools</p></footer>
+  </div>
+  <script src="shared.js"></script>
+  <script>
+    document.getElementById('units').onchange = e => {
+      const imp = e.target.value === 'imperial';
+      document.getElementById('metric-fields').style.display = imp ? 'none' : 'block';
+      document.getElementById('imperial-fields').style.display = imp ? 'block' : 'none';
+    };
+
+    function category(bmi) {
+      if (bmi < 18.5) return { label: 'Underweight', color: '#60a5fa' };
+      if (bmi < 25) return { label: 'Normal weight', color: '#22c55e' };
+      if (bmi < 30) return { label: 'Overweight', color: '#fbbf24' };
+      return { label: 'Obese', color: '#f87171' };
+    }
+
+    document.getElementById('calc').onclick = () => {
+      const imp = document.getElementById('units').value === 'imperial';
+      let kg, m;
+      if (imp) {
+        const lb = parseFloat(document.getElementById('weight-lb').value);
+        const ft = parseFloat(document.getElementById('height-ft').value) || 0;
+        const inches = parseFloat(document.getElementById('height-in').value) || 0;
+        kg = lb * 0.453592;
+        m = (ft * 12 + inches) * 0.0254;
+      } else {
+        kg = parseFloat(document.getElementById('weight-kg').value);
+        m = parseFloat(document.getElementById('height-cm').value) / 100;
+      }
+      const out = document.getElementById('output');
+      if (!kg || !m || m <= 0) { out.textContent = 'Enter valid weight and height.'; out.classList.remove('hidden'); return; }
+      const bmi = kg / (m * m);
+      const cat = category(bmi);
+      out.innerHTML = `BMI: <strong>${bmi.toFixed(1)}</strong><br><span style="color:${cat.color}">${cat.label}</span>`;
+      out.classList.remove('hidden');
+    };
+  </script>
+</body>
+</html>
