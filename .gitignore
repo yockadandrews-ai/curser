@@ -6,6 +6,7 @@ data/
 output/
 !output/**/
 !output/**/*
+utility-websites.zip
 *.db
 .env
 .env.local
