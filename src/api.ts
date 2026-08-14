@@ -200,6 +200,13 @@ export const api = {
       briefs: import('./types/hermes').NotionBriefTemplate[];
       calendar: import('./types/hermes').ContentCalendarPlan | { live?: unknown[]; upcoming?: unknown[] };
       registry: { products: Array<{ id: string; name: string; status: string }> };
+      n8n?: {
+        webhookUrl: string;
+        hermesReviewUrl: string;
+        secretRequired: boolean;
+        workflowImportPath: string;
+        governance: string;
+      };
     }>('/hermes/dashboard'),
   getHermesTasks: () => request<import('./types/hermes').HermesTaskRecord[]>('/hermes/tasks'),
   hermesIngest: (data: { source: string; title: string; summary?: string; productSlug?: string; amount?: number }) =>

@@ -1,0 +1,170 @@
+{
+  "name": "SGOS Hermes — Primary Calendar → Content Factory",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 15 }]
+        }
+      },
+      "id": "schedule-15m",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": "primary",
+        "returnAll": false,
+        "limit": 20,
+        "options": {
+          "timeMin": "={{ $now.minus({ hours: 1 }).toISO() }}",
+          "timeMax": "={{ $now.plus({ hours: 2 }).toISO() }}",
+          "singleEvents": true,
+          "orderBy": "startTime"
+        }
+      },
+      "id": "google-calendar",
+      "name": "Google Calendar — Upcoming",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [220, 0],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "CONFIGURE_ME",
+          "name": "Google Calendar — primary"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "filter-sgos",
+              "leftValue": "={{ $json.summary }}",
+              "rightValue": "SGOS",
+              "operator": { "type": "string", "operation": "contains" }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "filter-sgos",
+      "name": "Filter SGOS Events",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.APP_BASE_URL || 'http://localhost:3001' }}/api/hermes/calendar/trigger",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Hermes-Secret",
+              "value": "={{ $env.HERMES_WEBHOOK_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.summary }}\",\n  \"startDate\": \"{{ $json.start.date || $json.start.dateTime.slice(0,10) }}\",\n  \"source\": \"n8n\"\n}",
+        "options": {}
+      },
+      "id": "hermes-trigger",
+      "name": "Hermes Calendar Trigger",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "matched",
+              "leftValue": "={{ $json.matched }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-matched",
+      "name": "IF Matched",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [880, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "subject", "name": "subject", "value": "={{ $json.notify.subject }}", "type": "string" },
+            { "id": "body", "name": "body", "value": "={{ $json.notify.body }}", "type": "string" },
+            { "id": "hermesUrl", "name": "hermesUrl", "value": "={{ $json.notify.hermesUrl }}", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-notify",
+      "name": "Prepare Notification",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1100, -80]
+    },
+    {
+      "parameters": {
+        "content": "## SGOS Hermes — wired\n\n**Does NOT publish.** Creates Hermes draft + APPROVAL task only.\n\n1. Connect Google Calendar OAuth (primary calendar)\n2. Set env `APP_BASE_URL` + optional `HERMES_WEBHOOK_SECRET`\n3. Wire Gmail/Slack after **Prepare Notification**\n4. Review at /hermes → Approve before any post",
+        "height": 220,
+        "width": 380
+      },
+      "id": "sticky-note",
+      "name": "Governance Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [-40, -200]
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes": {
+      "main": [[{ "node": "Google Calendar — Upcoming", "type": "main", "index": 0 }]]
+    },
+    "Google Calendar — Upcoming": {
+      "main": [[{ "node": "Filter SGOS Events", "type": "main", "index": 0 }]]
+    },
+    "Filter SGOS Events": {
+      "main": [[{ "node": "Hermes Calendar Trigger", "type": "main", "index": 0 }]]
+    },
+    "Hermes Calendar Trigger": {
+      "main": [[{ "node": "IF Matched", "type": "main", "index": 0 }]]
+    },
+    "IF Matched": {
+      "main": [
+        [{ "node": "Prepare Notification", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "Poll primary Google Calendar for SGOS/Hermes events → POST to Money Autopilot Hermes supervisor. Draft only; Sent=0."
+  }
+}

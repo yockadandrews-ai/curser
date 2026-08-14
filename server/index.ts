@@ -71,6 +71,7 @@ import {
 } from './hermes/contentCalendar.js';
 import { getLedgerRows } from './hermes/chaosLedger.js';
 import { triggerFromCalendarEvent } from './hermes/calendarTrigger.js';
+import { getN8nHermesConfig, verifyN8nSecret } from './hermes/n8nConfig.js';
 import { getRegistryJson } from './data/productRegistry.js';
 import { LIVE_CALENDAR_EVENTS, listUpcomingLiveEvents, buildLiveCalendarIcs } from './data/liveCalendarEvents.js';
 import { CONTENT_FACTORY_TASK_SCHEMA, HERMES_HANDOFF_RULES } from './schemas/contentFactoryTask.js';
@@ -591,6 +592,7 @@ app.get('/api/hermes/dashboard', (_req, res) => {
     registry: getRegistryJson(),
     schema: CONTENT_FACTORY_TASK_SCHEMA,
     handoffRules: HERMES_HANDOFF_RULES,
+    n8n: getN8nHermesConfig(),
   });
 });
 app.get('/api/hermes/status', (_req, res) => {
@@ -678,11 +680,10 @@ app.get('/api/hermes/calendar/live', (_req, res) => {
   res.json({ events: LIVE_CALENDAR_EVENTS, upcoming: listUpcomingLiveEvents() });
 });
 app.post('/api/hermes/calendar/trigger', (req, res) => {
-  const secret = process.env.HERMES_WEBHOOK_SECRET?.trim();
-  if (secret && req.headers['x-hermes-secret'] !== secret) {
+  if (!verifyN8nSecret(req.headers['x-hermes-secret'] as string | undefined)) {
     return res.status(401).json({ error: 'Invalid X-Hermes-Secret' });
   }
-  const { title, startDate, productId, eventType, source } = req.body;
+  const { title, startDate, productId, eventType, source, force } = req.body;
   if (!title && !productId) return res.status(400).json({ error: 'title or productId required' });
   try {
     const result = triggerFromCalendarEvent({
@@ -691,11 +692,27 @@ app.post('/api/hermes/calendar/trigger', (req, res) => {
       productId,
       eventType,
       source: source || 'n8n',
+      force: Boolean(force),
     });
     res.status(result.matched ? 200 : 404).json(result);
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }
+});
+app.get('/api/hermes/n8n/config', (_req, res) => {
+  res.json(getN8nHermesConfig());
+});
+app.post('/api/hermes/n8n/test', (req, res) => {
+  if (!verifyN8nSecret(req.headers['x-hermes-secret'] as string | undefined)) {
+    return res.status(401).json({ error: 'Invalid X-Hermes-Secret' });
+  }
+  const result = triggerFromCalendarEvent({
+    title: req.body.title || 'SGOS Sprint 2 Build — Gas Station Snack Rankings',
+    startDate: req.body.startDate || '2026-08-16',
+    source: 'n8n',
+    force: Boolean(req.body.force),
+  });
+  res.json({ ok: result.matched, ...result, config: getN8nHermesConfig() });
 });
 app.get('/api/hermes/calendar/live.ics', (_req, res) => {
   res.setHeader('Content-Type', 'text/calendar; charset=utf-8');

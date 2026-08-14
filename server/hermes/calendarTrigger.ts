@@ -1,11 +1,13 @@
 /**
  * Calendar trigger resolver — maps live Google Calendar events → Hermes ingest
+ * Idempotent: same live event ID will not create duplicate tasks.
  */
 
 import { resolveCalendarEvent, type LiveCalendarEvent } from '../data/liveCalendarEvents.js';
 import { getRegistryProduct } from '../data/productRegistry.js';
-import { ingestHermesSignal } from './orchestrator.js';
+import { ingestHermesSignal, findTaskByCalendarEventUid } from './orchestrator.js';
 import { writeLedgerEntry } from './chaosLedger.js';
+import { getN8nHermesConfig } from './n8nConfig.js';
 import type { HermesTaskRecord } from '../schemas/hermes.js';
 import type { HermesAgentId } from '../schemas/hermes.js';
 
@@ -14,11 +16,43 @@ export interface CalendarTriggerResult {
   liveEvent?: LiveCalendarEvent;
   task?: HermesTaskRecord;
   factoryFiles?: string[];
+  deduplicated?: boolean;
   message: string;
+  /** Ready for n8n Gmail/Slack node — no credentials in Hermes */
+  notify?: {
+    subject: string;
+    body: string;
+    hermesUrl: string;
+    approveUrl: string;
+    sent: 0;
+  };
 }
 
 function agentForEvent(event: LiveCalendarEvent): HermesAgentId {
   return event.hermesAgent;
+}
+
+function buildNotify(liveEvent: LiveCalendarEvent, task: HermesTaskRecord, deduplicated: boolean) {
+  const cfg = getN8nHermesConfig();
+  const action = deduplicated ? 'Existing task (no duplicate)' : 'New task created';
+  return {
+    subject: `[SGOS Hermes] ${liveEvent.summary}`,
+    body: [
+      action,
+      `Event: ${liveEvent.eventType}`,
+      `Task: ${task.id}`,
+      `Status: ${task.status}`,
+      `Sent: 0`,
+      '',
+      `Review: ${cfg.hermesReviewUrl}`,
+      `Approve: ${cfg.approveUrl}`,
+      '',
+      cfg.governance,
+    ].join('\n'),
+    hermesUrl: cfg.hermesReviewUrl,
+    approveUrl: cfg.approveUrl,
+    sent: 0 as const,
+  };
 }
 
 export function triggerFromCalendarEvent(input: {
@@ -27,6 +61,7 @@ export function triggerFromCalendarEvent(input: {
   productId?: string;
   eventType?: string;
   source?: 'calendar' | 'n8n' | 'webhook';
+  force?: boolean;
 }): CalendarTriggerResult {
   const liveEvent = resolveCalendarEvent({
     title: input.title,
@@ -47,6 +82,20 @@ export function triggerFromCalendarEvent(input: {
     return { matched: false, message: `Registry missing product: ${liveEvent.productId}` };
   }
 
+  if (!input.force) {
+    const existing = findTaskByCalendarEventUid(liveEvent.id);
+    if (existing) {
+      return {
+        matched: true,
+        liveEvent,
+        task: existing,
+        deduplicated: true,
+        message: `Existing task ${existing.id} · ${liveEvent.eventType} · Sent=0`,
+        notify: buildNotify(liveEvent, existing, true),
+      };
+    }
+  }
+
   writeLedgerEntry({
     kind: 'calendar_event',
     agentId: 'hermes_supervisor',
@@ -57,7 +106,6 @@ export function triggerFromCalendarEvent(input: {
     sent: 0,
   });
 
-  let factoryFiles: string[] | undefined;
   const task = ingestHermesSignal({
     source: input.source || 'calendar',
     title: liveEvent.summary,
@@ -68,10 +116,10 @@ export function triggerFromCalendarEvent(input: {
       liveEventId: liveEvent.id,
       eventType: liveEvent.eventType,
       agent: agentForEvent(liveEvent),
-      factoryFiles,
     },
   });
 
+  let factoryFiles: string[] | undefined;
   if (liveEvent.eventType === 'build_weekend' && task.vaultPath) {
     factoryFiles = [
       `${task.vaultPath}/reel-scripts.md`,
@@ -86,6 +134,8 @@ export function triggerFromCalendarEvent(input: {
     liveEvent,
     task,
     factoryFiles,
+    deduplicated: false,
     message: `Hermes task ${task.id} · ${liveEvent.eventType} · Sent=0`,
+    notify: buildNotify(liveEvent, task, false),
   };
 }

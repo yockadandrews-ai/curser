@@ -18,6 +18,13 @@ export default function HermesHub() {
   const [briefs, setBriefs] = useState<NotionBriefTemplate[]>([]);
   const [calendar, setCalendar] = useState<{ live?: unknown[]; upcoming?: unknown[] } | null>(null);
   const [registry, setRegistry] = useState<{ products: Array<{ id: string; name: string; status: string }> } | null>(null);
+  const [n8n, setN8n] = useState<{
+    webhookUrl: string;
+    hermesReviewUrl: string;
+    secretRequired: boolean;
+    workflowImportPath: string;
+    governance: string;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -30,6 +37,7 @@ export default function HermesHub() {
     setBriefs(data.briefs);
     setCalendar(data.calendar);
     setRegistry(data.registry);
+    setN8n(data.n8n ?? null);
     setLoading(false);
   }, []);
 
@@ -153,8 +161,19 @@ export default function HermesHub() {
             </ul>
           </>
         )}
-        <p className="text-xs text-gray-500">n8n → POST /api/hermes/calendar/trigger · see docs/N8N_HERMES_WIRING.md</p>
+        <p className="text-xs text-gray-500">n8n → POST /api/hermes/calendar/trigger · import {n8n?.workflowImportPath || 'docs/n8n/sgos-hermes-calendar.workflow.json'}</p>
       </section>
+
+      {n8n && (
+        <section className="card space-y-2 border-blue-500/20 bg-blue-950/10">
+          <h2 className="font-semibold text-white text-sm">n8n webhook (primary calendar)</h2>
+          <p className="text-xs text-gray-400 font-mono break-all">{n8n.webhookUrl}</p>
+          <p className="text-xs text-gray-500">
+            {n8n.secretRequired ? '🔐 X-Hermes-Secret required' : '○ No secret set — add HERMES_WEBHOOK_SECRET for production'}
+          </p>
+          <p className="text-xs text-blue-300/80">{n8n.governance}</p>
+        </section>
+      )}
 
       <section className="card space-y-3">
         <div className="flex items-center justify-between">

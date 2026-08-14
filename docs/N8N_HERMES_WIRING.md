@@ -6,6 +6,22 @@ Wire n8n to watch your **live primary Google Calendar** and instantiate Content 
 
 ---
 
+## Quick start (5 minutes)
+
+1. **Import workflow** in n8n: `docs/n8n/sgos-hermes-calendar.workflow.json`
+2. **Connect** Google Calendar OAuth → primary calendar
+3. **Set n8n env:** `APP_BASE_URL` = your Money Autopilot URL
+4. **Optional:** set `HERMES_WEBHOOK_SECRET` on server + n8n (same value)
+5. **Activate** workflow — polls every 15 min for SGOS events
+6. **Wire Gmail/Slack** after "Prepare Notification" node (uses `notify.subject` + `notify.body` from Hermes response)
+
+Config endpoint: `GET /api/hermes/n8n/config`  
+Smoke test: `POST /api/hermes/n8n/test`
+
+See **`.env.example`** for all Hermes env vars.
+
+---
+
 ## Endpoint
 
 ```
@@ -47,9 +63,19 @@ Or explicit match:
   "liveEvent": { "id": "live-s2-build", "eventType": "build_weekend", ... },
   "task": { "id": "...", "status": "awaiting_approval", "sent": 0, ... },
   "factoryFiles": ["data/hermes/vault/sprint-2-gas-station/reel-scripts.md", ...],
+  "deduplicated": false,
+  "notify": {
+    "subject": "[SGOS Hermes] SGOS Sprint 2 Build — Gas Station Snack Rankings",
+    "body": "New task created\n...",
+    "hermesUrl": "https://.../hermes",
+    "approveUrl": "https://.../approve",
+    "sent": 0
+  },
   "message": "Hermes task uuid · build_weekend · Sent=0"
 }
 ```
+
+**Idempotent:** Re-firing the same calendar event returns `deduplicated: true` without creating a second task. Pass `"force": true` to override.
 
 ---
 

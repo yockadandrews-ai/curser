@@ -57,6 +57,7 @@ db.exec(`
     executed_at TEXT
   );
   CREATE INDEX IF NOT EXISTS idx_hermes_tasks_status ON hermes_tasks(status);
+  CREATE INDEX IF NOT EXISTS idx_hermes_tasks_calendar ON hermes_tasks(calendar_event_uid);
 `);
 
 function ensureDirs() {
@@ -487,6 +488,17 @@ export function getHermesState(): HermesStateSnapshot {
     activeSprint: active?.productSlug,
     scannedAt: new Date().toISOString(),
   };
+}
+
+export function findTaskByCalendarEventUid(calendarEventUid: string): HermesTaskRecord | null {
+  const row = db.prepare(`
+    SELECT * FROM hermes_tasks
+    WHERE calendar_event_uid = ?
+      AND status NOT IN ('rejected', 'cancelled')
+    ORDER BY created_at DESC
+    LIMIT 1
+  `).get(calendarEventUid) as Record<string, unknown> | undefined;
+  return row ? mapTask(row) : null;
 }
 
 export function simulateCalendarTrigger(eventType: string, productSlug: string): HermesTaskRecord {
