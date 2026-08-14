@@ -92,13 +92,31 @@ POST /api/33333/leads
 ```json
 {
   "email": "user@example.com",
+  "firstName": "Alex",
   "brand": "vaultverse",
   "leadMagnet": "3-loop-pack",
   "utmSource": "instagram"
 }
 ```
 
-Public landing: `/33333/index.html`
+Subscribes to ConvertKit welcome sequence when configured. Public landing: `/33333/index.html`
+
+### Store / Stripe checkout links
+
+```
+GET /api/33333/store
+```
+
+Returns products with `stripeUrl` when `STRIPE_LINK_*` env vars are set. Landing page loads this dynamically.
+
+### Abandoned cart email
+
+```
+POST /api/33333/email/abandoned-cart
+{ "email": "...", "productName": "7-Loop Beat Pack" }
+```
+
+Also triggered automatically from Stripe `checkout.session.expired` webhook.
 
 ---
 

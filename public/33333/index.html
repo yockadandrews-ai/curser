@@ -52,10 +52,23 @@
       font-size: 0.95rem;
       cursor: pointer;
       border: none;
+      transition: filter 0.15s;
     }
     .btn-primary { background: var(--crown); color: #fff; }
     .btn-primary:hover { filter: brightness(1.1); }
     .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-buy {
+      background: var(--earth);
+      color: #0a0a0f;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+    }
+    .btn-buy:hover { filter: brightness(1.08); }
+    .btn-buy.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
     .cycle {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -84,11 +97,25 @@
       border-radius: 12px;
       padding: 1.5rem;
       display: grid;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
     .brand-card h3 { font-size: 1.25rem; }
     .brand-card .tagline { color: var(--muted); font-size: 0.9rem; }
-    .brand-card .price { color: var(--earth); font-weight: 600; font-size: 0.85rem; }
+    .product-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+      border-top: 1px solid var(--border);
+    }
+    .product-row:first-of-type { border-top: none; padding-top: 0; }
+    .product-name { font-size: 0.9rem; }
+    .product-price { color: var(--earth); font-weight: 600; font-size: 0.85rem; }
+    .product-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn-free { font-size: 0.8rem; padding: 0.45rem 0.85rem; border: 1px solid var(--border); background: transparent; color: var(--muted); border-radius: 8px; text-decoration: none; }
+    .btn-free:hover { color: var(--text); border-color: var(--muted); }
     #free {
       background: var(--card);
       border: 1px solid var(--border);
@@ -111,6 +138,16 @@
     }
     .success { color: var(--water); margin-top: 1rem; display: none; }
     .error { color: var(--fire); margin-top: 1rem; display: none; }
+    .setup-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
     footer {
       text-align: center;
       padding: 3rem 0;
@@ -151,37 +188,15 @@
       <div class="phase lock"><div class="time">9PM</div><h3>Lockdown</h3><p>Review revenue. Queue tomorrow.</p></div>
     </section>
 
-    <section class="brands">
-      <div class="brand-card" id="vaultverse">
-        <h3 style="color:var(--fire)">VaultVerse</h3>
-        <p class="tagline">Loops that breathe. Templates that ship.</p>
-        <p class="price">Beat packs from $27 · Templates $67 · Course $197</p>
-      </div>
-      <div class="brand-card" id="aurascript">
-        <h3 style="color:var(--air)">AuraScript</h3>
-        <p class="tagline">Your day, decoded. Your balance, restored.</p>
-        <p class="price">Daily readings $9/mo · Guidebook $37 · Charts $47</p>
-      </div>
-      <div class="brand-card" id="mirrorme">
-        <h3 style="color:var(--water)">MirrorMe</h3>
-        <p class="tagline">See yourself clearly. Move with intention.</p>
-        <p class="price">Journal $19 · 30-day program $49 · App $4.99/mo</p>
-      </div>
-      <div class="brand-card" id="resume">
-        <h3 style="color:var(--earth)">Resume SaaS</h3>
-        <p class="tagline">ATS-proof resumes in 60 seconds.</p>
-        <p class="price">Scan $9 · Unlimited $29/mo · Agency $199/mo</p>
-      </div>
-      <div class="brand-card" id="membership">
-        <h3 style="color:var(--crown)">33333 Membership</h3>
-        <p class="tagline">Everything. One container.</p>
-        <p class="price">The Practice $29/mo · The Forge $99/mo · The Crown $497/mo</p>
-      </div>
+    <p class="setup-note" id="setup-note"></p>
+
+    <section class="brands" id="brands-container">
+      <!-- populated by /api/33333/store -->
     </section>
 
     <section id="free">
       <h2>Start free. No credit card.</h2>
-      <p>Pick a lead magnet. Instant delivery to your inbox.</p>
+      <p>Pick a lead magnet. Instant delivery to your inbox — welcome sequence starts automatically.</p>
       <form id="lead-form">
         <div>
           <label for="name">First name</label>
@@ -203,7 +218,7 @@
         </div>
         <button type="submit" class="btn btn-primary">Get Instant Access</button>
       </form>
-      <p class="success" id="success">You're in! Check your inbox — delivery link arrives in 60 seconds.</p>
+      <p class="success" id="success">You're in! Check your inbox — your welcome sequence starts now.</p>
       <p class="error" id="error"></p>
     </section>
   </main>
@@ -214,8 +229,131 @@
   </footer>
 
   <script>
+    const BRAND_COLORS = {
+      vaultverse: 'var(--fire)',
+      aurascript: 'var(--air)',
+      mirrorme: 'var(--water)',
+      resume: 'var(--earth)',
+      '33333': 'var(--crown)',
+    };
+
+    const BRAND_TAGLINES = {
+      vaultverse: 'Loops that breathe. Templates that ship.',
+      aurascript: 'Your day, decoded. Your balance, restored.',
+      mirrorme: 'See yourself clearly. Move with intention.',
+      resume: 'ATS-proof resumes in 60 seconds.',
+      '33333': 'Everything. One container.',
+    };
+
+    const BRAND_SECTION_IDS = {
+      vaultverse: 'vaultverse',
+      aurascript: 'aurascript',
+      mirrorme: 'mirrorme',
+      resume: 'resume',
+      '33333': 'membership',
+    };
+
+    const LEAD_MAGNETS = {
+      vaultverse: '3-loop-pack',
+      aurascript: 'moon-calendar',
+      mirrorme: '7-day-prompts',
+      resume: 'free-score',
+      '33333': 'foundations',
+    };
+
+    function utmParams() {
+      const p = new URLSearchParams(location.search);
+      const utm = new URLSearchParams();
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(k => {
+        if (p.get(k)) utm.set(k, p.get(k));
+      });
+      return utm;
+    }
+
+    function stripeUrlWithUtm(url) {
+      if (!url) return null;
+      const utm = utmParams();
+      if ([...utm.keys()].length === 0) return url;
+      const u = new URL(url);
+      utm.forEach((v, k) => u.searchParams.set(k, v));
+      return u.toString();
+    }
+
+    function renderStore(data) {
+      const container = document.getElementById('brands-container');
+      const note = document.getElementById('setup-note');
+
+      if (data.stripeLinksConfigured === 0) {
+        note.style.display = 'block';
+        note.textContent = 'Stripe checkout links not configured yet — set STRIPE_LINK_* env vars on the server. Free downloads work now.';
+      }
+
+      container.innerHTML = '';
+      const order = ['vaultverse', 'aurascript', 'mirrorme', 'resume', '33333'];
+
+      for (const brand of order) {
+        const products = data.byBrand[brand] || [];
+        if (!products.length) continue;
+
+        const card = document.createElement('div');
+        card.className = 'brand-card';
+        card.id = BRAND_SECTION_IDS[brand];
+        card.innerHTML = `
+          <h3 style="color:${BRAND_COLORS[brand]}">${brand === '33333' ? '33333 Membership' : brand.charAt(0).toUpperCase() + brand.slice(1).replace('mirrorme', 'MirrorMe').replace('vaultverse', 'VaultVerse').replace('aurascript', 'AuraScript').replace('resume', 'Resume SaaS')}</h3>
+          <p class="tagline">${BRAND_TAGLINES[brand]}</p>
+        `;
+
+        const list = document.createElement('div');
+        for (const p of products) {
+          const row = document.createElement('div');
+          row.className = 'product-row';
+          const checkoutUrl = stripeUrlWithUtm(p.stripeUrl);
+          row.innerHTML = `
+            <div>
+              <div class="product-name">${p.name}</div>
+              <div class="product-price">${p.priceLabel}</div>
+            </div>
+            <div class="product-actions">
+              <a href="#free" class="btn-free" data-brand="${brand}">Free sample</a>
+              ${checkoutUrl
+                ? `<a href="${checkoutUrl}" class="btn btn-buy" target="_blank" rel="noopener">Buy now →</a>`
+                : `<span class="btn btn-buy disabled">Coming soon</span>`}
+            </div>
+          `;
+          list.appendChild(row);
+        }
+        card.appendChild(list);
+        container.appendChild(card);
+      }
+
+      container.querySelectorAll('.btn-free').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const brand = btn.dataset.brand;
+          const magnet = LEAD_MAGNETS[brand];
+          const sel = document.getElementById('resource');
+          for (const opt of sel.options) {
+            if (opt.value === `${brand}:${magnet}`) { sel.value = opt.value; break; }
+          }
+          document.getElementById('free').scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    }
+
+    async function loadStore() {
+      try {
+        const res = await fetch('/api/33333/store');
+        if (!res.ok) throw new Error('Store unavailable');
+        renderStore(await res.json());
+      } catch {
+        document.getElementById('brands-container').innerHTML =
+          '<p style="color:var(--muted)">Could not load products. Free downloads still work below.</p>';
+      }
+    }
+
     document.getElementById('lead-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const firstName = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const resource = document.getElementById('resource').value.split(':');
       const brand = resource[0];
@@ -231,19 +369,26 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             email,
+            firstName,
             brand,
             leadMagnet,
             utmSource: new URLSearchParams(location.search).get('utm_source') || 'landing',
           }),
         });
-        if (!res.ok) throw new Error((await res.json()).error || 'Failed');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
         success.style.display = 'block';
+        if (data.email?.simulated) {
+          success.textContent = "You're in! Lead saved — connect ConvertKit to start email sequences automatically.";
+        }
         e.target.reset();
       } catch (err) {
         error.textContent = err.message || 'Something went wrong. Try again.';
         error.style.display = 'block';
       }
     });
+
+    loadStore();
   </script>
 </body>
 </html>

@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { logActivity } from '../db.js';
 import { convertBrandLead, recordRevenueEvent, addEngagement } from './db.js';
 import { isBrand33333 } from './brands.js';
+import { tagAbandonedCart, subscribeToMembership } from './convertkit.js';
 import type { Brand33333 } from './types.js';
 
 function resolveBrand(metadata: Record<string, string | undefined>): Brand33333 {
@@ -57,6 +58,13 @@ export function handleStripeEvent(event: {
       });
 
       if (email) convertBrandLead(email, brand, amount);
+
+      if (email && brand === '33333') {
+        const product = metadata.product ?? '';
+        const tier = product.includes('forge') ? 'forge' : product.includes('crown') ? 'crown' : 'practice';
+        void subscribeToMembership(email, tier as 'practice' | 'forge' | 'crown').catch(() => {});
+      }
+
       logActivity('33333_sale', `Stripe checkout ${txnId} · ${brand} · $${(amount / 100).toFixed(2)}`);
       return { handled: true, message: `Recorded sale ${txnId}` };
     }
@@ -75,6 +83,10 @@ export function handleStripeEvent(event: {
         sessionId,
         status: 'pending',
       });
+
+      if (email) {
+        void tagAbandonedCart(email, metadata.product).catch(() => {});
+      }
 
       logActivity('33333_abandoned_cart', `Cart expired ${sessionId}`);
       return { handled: true, message: `Abandoned cart logged ${sessionId}` };

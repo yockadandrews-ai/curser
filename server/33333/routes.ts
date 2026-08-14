@@ -18,6 +18,8 @@ import { getN8n33333Config, verify33333Secret } from './n8nConfig.js';
 import { parsePublishBody, publishBrandContent, publishByContentId } from './publisher.js';
 import { syndicateContent } from './syndicate.js';
 import { handleStripeEvent, verifyStripeSignature } from './stripeWebhook.js';
+import { getStoreProducts, getStoreByBrand, getFeaturedCheckoutLinks, countConfiguredStripeLinks } from './stripeLinks.js';
+import { getConvertKitConfig, subscribeToWelcomeSequence, tagAbandonedCart } from './convertkit.js';
 import type { Brand33333 } from './types.js';
 
 function require33333Secret(req: Request, res: Response): boolean {
@@ -86,11 +88,25 @@ export function register33333Routes(app: Express): void {
       stats: get33333DashboardStats(),
       brands: BRAND_META,
       products: BRAND_PRODUCTS,
+      store: getStoreProducts(),
+      stripeLinksConfigured: countConfiguredStripeLinks(),
+      convertkit: getConvertKitConfig(),
       contentQueue: getBrandContentQueue().slice(0, 20),
       leads: getBrandLeads(20),
       revenue: getRevenueEvents(20),
       engagements: getPendingEngagements(10),
       n8n: getN8n33333Config(),
+    });
+  });
+
+  app.get('/api/33333/store', (_req, res) => {
+    res.json({
+      products: getStoreProducts(),
+      byBrand: getStoreByBrand(),
+      featured: getFeaturedCheckoutLinks(),
+      stripeLinksConfigured: countConfiguredStripeLinks(),
+      totalProducts: BRAND_PRODUCTS.length,
+      convertkitConfigured: getConvertKitConfig().configured,
     });
   });
 
@@ -131,18 +147,35 @@ export function register33333Routes(app: Express): void {
     res.json(result);
   });
 
-  app.post('/api/33333/leads', (req, res) => {
-    const { email, brand, lead_magnet, leadMagnet, utm_source, utmSource } = req.body;
+  app.post('/api/33333/leads', async (req, res) => {
+    const { email, firstName, first_name, brand, lead_magnet, leadMagnet, utm_source, utmSource } = req.body;
     if (!email || typeof email !== 'string') return res.status(400).json({ error: 'email required' });
     if (!brand || !isBrand33333(brand)) return res.status(400).json({ error: 'valid brand required' });
 
+    const magnet = lead_magnet ?? leadMagnet ?? 'general';
     const lead = addBrandLead({
       email,
       brand: brand as Brand33333,
-      leadMagnet: lead_magnet ?? leadMagnet ?? 'general',
+      leadMagnet: magnet,
       utmSource: utm_source ?? utmSource,
     });
-    res.status(201).json({ ok: true, lead });
+
+    const emailResult = await subscribeToWelcomeSequence({
+      email,
+      firstName: firstName ?? first_name,
+      brand: brand as Brand33333,
+      leadMagnet: magnet,
+      utmSource: utm_source ?? utmSource,
+    });
+
+    res.status(201).json({ ok: true, lead, email: emailResult });
+  });
+
+  app.post('/api/33333/email/abandoned-cart', async (req, res) => {
+    const { email, productName, product_name } = req.body;
+    if (!email) return res.status(400).json({ error: 'email required' });
+    const result = await tagAbandonedCart(email, productName ?? product_name);
+    res.json(result);
   });
 
   app.get('/api/33333/engagements', (_req, res) => {

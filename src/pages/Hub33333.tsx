@@ -28,6 +28,8 @@ interface DashboardData {
   leads: Array<{ id: string; email: string; brand: string; funnelStage: string; capturedAt: string }>;
   revenue: Array<{ id: string; brand: string; product: string; grossCents: number; createdAt: string }>;
   engagements: Array<{ id: string; brand: string; platform: string; message: string; replyDraft: string | null; status: string }>;
+  stripeLinksConfigured?: number;
+  convertkit?: { configured: boolean };
   n8n: {
     endpoints: Record<string, string>;
     schedule: Record<string, string>;
@@ -135,6 +137,18 @@ export default function Hub33333() {
         <div className="text-sm text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
           {msg}
           <button type="button" className="ml-3 text-gray-500" onClick={() => setMsg(null)}>×</button>
+        </div>
+      )}
+
+      {(data.stripeLinksConfigured === 0 || !data.convertkit?.configured) && (
+        <div className="text-sm text-amber-400/90 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 space-y-1">
+          <p className="font-medium">Setup to collect revenue:</p>
+          {data.stripeLinksConfigured === 0 && (
+            <p>→ Add <code className="text-amber-200/80">STRIPE_LINK_*</code> env vars for Buy buttons on landing page</p>
+          )}
+          {!data.convertkit?.configured && (
+            <p>→ Add <code className="text-amber-200/80">CONVERTKIT_API_KEY</code> + form IDs — see <code className="text-amber-200/80">docs/33333/CONVERTKIT_SETUP.md</code></p>
+          )}
         </div>
       )}
 

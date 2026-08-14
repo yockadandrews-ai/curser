@@ -13,10 +13,22 @@
 | 4 | [33333_LANDING_PAGE_COPY.md](./33333_LANDING_PAGE_COPY.md) | Complete Carrd/Webflow/Framer copy |
 | 5 | [33333_ANALYTICS_DASHBOARD_SPEC.md](./33333_ANALYTICS_DASHBOARD_SPEC.md) | Google Sheets + n8n tracking spec |
 | 6 | [33333_QUICK_START_GUIDE.md](./33333_QUICK_START_GUIDE.md) | 7-day launch plan — Day 1 to first dollar |
+| 7 | [CONVERTKIT_SETUP.md](./CONVERTKIT_SETUP.md) | Wire welcome sequences + abandoned cart |
 
+## Live Implementation
+
+| URL | Purpose |
+|-----|---------|
+| `/33333` | Dashboard — approve, publish, KPIs |
+| `/33333/index.html` | Landing page — Stripe Buy buttons + lead capture |
+| `GET /api/33333/store` | Product catalog with Payment Link URLs |
+| `POST /api/33333/leads` | Lead capture → ConvertKit welcome sequence |
+
+## First 3 Steps
+
+1. Import n8n JSON → configure Gemini API key + Google Service Account
+2. Set `STRIPE_LINK_VV_BEAT_PACK` (and other `STRIPE_LINK_*`) + `CONVERTKIT_API_KEY`
 ## Revenue Streams
-
-| Brand | Monthly Target |
 |-------|----------------|
 | VaultVerse (music) | $2,500–5,000 |
 | AuraScript (balance) | $1,500–3,000 |
