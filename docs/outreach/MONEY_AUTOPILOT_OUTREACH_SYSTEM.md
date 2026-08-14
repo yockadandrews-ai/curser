@@ -256,5 +256,16 @@ Track in Profit Tracker + spreadsheet:
 | [DM_OUTREACH_CHEAT_SHEET.md](./DM_OUTREACH_CHEAT_SHEET.md) | Copy-paste scripts |
 | [LANDING_PAGE_COPY_CHEAT_SHEET.md](./LANDING_PAGE_COPY_CHEAT_SHEET.md) | Page sections |
 | [7_DAY_EXECUTION_CHECKLIST.md](./7_DAY_EXECUTION_CHECKLIST.md) | Hour-by-hour sprint |
+| [COMPETITOR_TEARDOWN.md](./COMPETITOR_TEARDOWN.md) | Buffer/Hootsuite positioning |
+| [N8N_OUTREACH_AUTOMATION.md](../N8N_OUTREACH_AUTOMATION.md) | Stripe + welcome/sale automation |
+
+### Deployable assets
+
+| Asset | Path |
+|-------|------|
+| Marketing landing page | `public/utility-websites/autopilot-landing.html` |
+| Checkout success → Approval Inbox | `public/utility-websites/checkout-success.html` |
+| Stripe checkout API | `POST /api/checkout/engine` |
+| n8n outreach workflow | `docs/n8n/outreach-welcome-sale.workflow.json` |
 
 **Governance reminder:** Draft free, send gated. Never auto-email, auto-DM, or increment Sent without proof URL.
