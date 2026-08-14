@@ -20,7 +20,7 @@ function cfg() {
     enableAdSense: false,
     googleSiteVerification: '',
     siteName: 'Money Magnet Tools',
-    siteUrl: 'https://YOURDOMAIN.com',
+    siteUrl: 'https://tools.moneymagnettools.com',
     profitTrackerApiUrl: '',
     monthlyRevenueGoal: 0,
   };

@@ -22,15 +22,15 @@ window.SITE_CONFIG = {
   /** Site name for share sheet */
   siteName: 'Money Magnet Tools',
 
-  /** Replace YOURDOMAIN.com before deploy — include https:// and no trailing slash */
-  siteUrl: 'https://YOURDOMAIN.com',
+  /** Replace tools.moneymagnettools.com before deploy — include https:// and no trailing slash */
+  siteUrl: 'https://tools.moneymagnettools.com',
 
   /**
    * Optional: Money Autopilot Profit Tracker API base (no trailing slash)
    * Example: https://autopilot.yourdomain.com
    * Leave empty to use local-only tracker (localStorage).
    */
-  profitTrackerApiUrl: '',
+  profitTrackerApiUrl: 'https://autopilot.moneymagnettools.com',
 
   /** Optional monthly revenue goal for tracker.html progress bar (USD, 0 = hidden) */
   monthlyRevenueGoal: 0,

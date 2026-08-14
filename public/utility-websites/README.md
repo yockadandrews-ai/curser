@@ -117,7 +117,7 @@ window.SITE_CONFIG = {
 
 ```bash
 npm run dev
-# → http://localhost:5173/utility-websites/
+# → https://tools.moneymagnettools.com/
 ```
 
 ## Every page includes
