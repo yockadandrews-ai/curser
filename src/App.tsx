@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory, Shield, Command, Inbox, Layers } from 'lucide-react';
+import { Zap, DollarSign, Sparkles, Rocket, BookOpen, Factory, Shield, Command, Inbox, Layers, Crown } from 'lucide-react';
 import AutoPilot from './pages/AutoPilot';
 import RealEarnings from './pages/RealEarnings';
 import ViralCashGenerator from './pages/ViralCashGenerator';
@@ -11,6 +11,7 @@ import ShortcutsHub from './pages/ShortcutsHub';
 import SGOSCommand from './pages/SGOSCommand';
 import ApprovalInbox from './pages/ApprovalInbox';
 import HermesHub from './pages/HermesHub';
+import Hub33333 from './pages/Hub33333';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import { api } from './api';
 
@@ -72,6 +73,7 @@ export default function App() {
         </div>
 
         <nav className="flex flex-col gap-1">
+          <NavItem to="/33333" icon={Crown} label="33333 Revenue" />
           <NavItem to="/approve" icon={Inbox} label={t('nav.approve')} badge={pendingCount} />
           <NavItem to="/hermes" icon={Layers} label={t('nav.hermes')} />
           <NavItem to="/command" icon={Command} label={t('nav.command')} />
@@ -93,6 +95,7 @@ export default function App() {
 
       <main className="flex-1 ml-64 p-6 overflow-auto">
         <Routes>
+          <Route path="/33333" element={<Hub33333 />} />
           <Route path="/" element={<AutoPilot />} />
           <Route path="/approve" element={<ApprovalInbox />} />
           <Route path="/hermes" element={<HermesHub />} />

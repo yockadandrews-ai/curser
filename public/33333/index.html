@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>33333 — Lead. Flow. Rise.</title>
+  <meta name="description" content="Music, balance, and reflection — automated. Beat packs, daily readings, reflection tools, and career tools." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --text: #f5f5f0;
+      --muted: #888;
+      --air: #7eb8da;
+      --fire: #e85d4c;
+      --water: #4caf8a;
+      --earth: #c4a35a;
+      --crown: #9b7ddb;
+      --card: #12121a;
+      --border: #2a2a35;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    h1, h2, h3 { font-family: 'Playfair Display', serif; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+    header {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    nav { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.85rem; }
+    nav a { color: var(--muted); text-decoration: none; }
+    nav a:hover { color: var(--text); }
+    .hero {
+      text-align: center;
+      padding: 4rem 0 3rem;
+    }
+    .hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: -0.02em; }
+    .hero p { color: var(--muted); max-width: 520px; margin: 1rem auto 2rem; font-size: 1.05rem; }
+    .cta-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: var(--crown); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .cycle {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 3rem 0;
+    }
+    .phase {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .phase .time { font-size: 0.75rem; color: var(--muted); }
+    .phase h3 { font-size: 1rem; margin: 0.25rem 0; font-family: Inter, sans-serif; font-weight: 600; }
+    .phase p { font-size: 0.75rem; color: var(--muted); }
+    .phase.air h3 { color: var(--air); }
+    .phase.fire h3 { color: var(--fire); }
+    .phase.water h3 { color: var(--water); }
+    .phase.earth h3 { color: var(--earth); }
+    .phase.lock h3 { color: var(--crown); }
+    .brands { display: grid; gap: 1.5rem; margin: 3rem 0; }
+    .brand-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+    .brand-card h3 { font-size: 1.25rem; }
+    .brand-card .tagline { color: var(--muted); font-size: 0.9rem; }
+    .brand-card .price { color: var(--earth); font-weight: 600; font-size: 0.85rem; }
+    #free {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 3rem 0;
+    }
+    #free h2 { margin-bottom: 0.5rem; }
+    #free > p { color: var(--muted); margin-bottom: 1.5rem; font-size: 0.9rem; }
+    form { display: grid; gap: 1rem; max-width: 400px; }
+    label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+    input, select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .success { color: var(--water); margin-top: 1rem; display: none; }
+    .error { color: var(--fire); margin-top: 1rem; display: none; }
+    footer {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <nav>
+      <a href="#vaultverse">VaultVerse</a>
+      <a href="#aurascript">AuraScript</a>
+      <a href="#mirrorme">MirrorMe</a>
+      <a href="#resume">Resume</a>
+      <a href="#membership">33333</a>
+      <a href="#free">Free Downloads</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Lead. Flow. Rise.</h1>
+      <p>The first brain, monetized. Music at Fire. Balance at Air. Reflection at Water. Five brands. One practice.</p>
+      <div class="cta-row">
+        <a href="#free" class="btn btn-primary">Start Free</a>
+        <a href="#membership" class="btn btn-secondary">Explore Membership</a>
+      </div>
+    </section>
+
+    <section class="cycle">
+      <div class="phase air"><div class="time">7AM</div><h3>Air</h3><p>AI drafts content. You review in 5 min.</p></div>
+      <div class="phase fire"><div class="time">10AM</div><h3>Fire</h3><p>Publish with lead magnet CTAs.</p></div>
+      <div class="phase water"><div class="time">2PM</div><h3>Water</h3><p>Engage, nurture, recover carts.</p></div>
+      <div class="phase earth"><div class="time">6PM</div><h3>Earth</h3><p>Syndicate winners. Backup assets.</p></div>
+      <div class="phase lock"><div class="time">9PM</div><h3>Lockdown</h3><p>Review revenue. Queue tomorrow.</p></div>
+    </section>
+
+    <section class="brands">
+      <div class="brand-card" id="vaultverse">
+        <h3 style="color:var(--fire)">VaultVerse</h3>
+        <p class="tagline">Loops that breathe. Templates that ship.</p>
+        <p class="price">Beat packs from $27 · Templates $67 · Course $197</p>
+      </div>
+      <div class="brand-card" id="aurascript">
+        <h3 style="color:var(--air)">AuraScript</h3>
+        <p class="tagline">Your day, decoded. Your balance, restored.</p>
+        <p class="price">Daily readings $9/mo · Guidebook $37 · Charts $47</p>
+      </div>
+      <div class="brand-card" id="mirrorme">
+        <h3 style="color:var(--water)">MirrorMe</h3>
+        <p class="tagline">See yourself clearly. Move with intention.</p>
+        <p class="price">Journal $19 · 30-day program $49 · App $4.99/mo</p>
+      </div>
+      <div class="brand-card" id="resume">
+        <h3 style="color:var(--earth)">Resume SaaS</h3>
+        <p class="tagline">ATS-proof resumes in 60 seconds.</p>
+        <p class="price">Scan $9 · Unlimited $29/mo · Agency $199/mo</p>
+      </div>
+      <div class="brand-card" id="membership">
+        <h3 style="color:var(--crown)">33333 Membership</h3>
+        <p class="tagline">Everything. One container.</p>
+        <p class="price">The Practice $29/mo · The Forge $99/mo · The Crown $497/mo</p>
+      </div>
+    </section>
+
+    <section id="free">
+      <h2>Start free. No credit card.</h2>
+      <p>Pick a lead magnet. Instant delivery to your inbox.</p>
+      <form id="lead-form">
+        <div>
+          <label for="name">First name</label>
+          <input id="name" name="name" type="text" required placeholder="Your name" />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="you@example.com" />
+        </div>
+        <div>
+          <label for="resource">Free resource</label>
+          <select id="resource" name="resource" required>
+            <option value="vaultverse:3-loop-pack">🎵 VaultVerse — 3-Loop Beat Pack</option>
+            <option value="aurascript:moon-calendar">🌙 AuraScript — Moon Calendar</option>
+            <option value="mirrorme:7-day-prompts">🪞 MirrorMe — 7-Day Reflection Prompts</option>
+            <option value="resume:free-score">📄 Resume SaaS — Free ATS Score</option>
+            <option value="33333:foundations">🎓 33333 — Foundations Mini-Course</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Get Instant Access</button>
+      </form>
+      <p class="success" id="success">You're in! Check your inbox — delivery link arrives in 60 seconds.</p>
+      <p class="error" id="error"></p>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <p>33333 © 2026 · Lead. Flow. Rise.</p>
+    <p style="margin-top:0.5rem">30 min/day active · The rest runs on autopilot</p>
+  </footer>
+
+  <script>
+    document.getElementById('lead-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const resource = document.getElementById('resource').value.split(':');
+      const brand = resource[0];
+      const leadMagnet = resource[1];
+      const success = document.getElementById('success');
+      const error = document.getElementById('error');
+      success.style.display = 'none';
+      error.style.display = 'none';
+
+      try {
+        const res = await fetch('/api/33333/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            brand,
+            leadMagnet,
+            utmSource: new URLSearchParams(location.search).get('utm_source') || 'landing',
+          }),
+        });
+        if (!res.ok) throw new Error((await res.json()).error || 'Failed');
+        success.style.display = 'block';
+        e.target.reset();
+      } catch (err) {
+        error.textContent = err.message || 'Something went wrong. Try again.';
+        error.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

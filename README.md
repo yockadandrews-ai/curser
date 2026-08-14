@@ -31,6 +31,7 @@ npm start
 
 | Doc | Purpose |
 |-----|---------|
+| [N8N_33333_WIRING.md](./docs/N8N_33333_WIRING.md) | Wire 33333 n8n workflow to API endpoints |
 | [33333 Autopilot Revenue](./docs/33333/README.md) | First-brain monetization — 5 streams, n8n engine, email sequences, 7-day launch |
 | [APPLE_STORE_SETUP.md](./docs/APPLE_STORE_SETUP.md) | App Store Connect vs Shortcuts vs Profit Tracker — why analytics emails are empty |
 | [UTILITY_WEBSITES.md](./docs/UTILITY_WEBSITES.md) | Deploy calculator tools + AdSense slots |

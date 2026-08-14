@@ -223,4 +223,16 @@ export const api = {
     request<{ matched: boolean; message: string; task?: import('./types/hermes').HermesTaskRecord }>(
       '/hermes/calendar/trigger', { method: 'POST', body: JSON.stringify(data) },
     ),
+
+  get33333Dashboard: () => request<Record<string, unknown>>('/33333/dashboard'),
+  approve33333Content: (id: string) =>
+    request<Record<string, unknown>>(`/33333/content-queue/${id}/approve`, { method: 'PUT' }),
+  publish33333Content: (id: string) =>
+    request<Record<string, unknown>>(`/33333/content-queue/${id}/publish`, { method: 'POST' }),
+  send33333Engagement: (id: string) =>
+    request<Record<string, unknown>>(`/33333/engagements/${id}/send`, { method: 'POST' }),
+  capture33333Lead: (data: { email: string; brand: string; leadMagnet: string; utmSource?: string }) =>
+    request<{ ok: boolean; lead: Record<string, unknown> }>('/33333/leads', {
+      method: 'POST', body: JSON.stringify(data),
+    }),
 };

@@ -88,6 +88,7 @@ import {
   seedDemoData,
   recordExternalRevenue,
 } from './profitTracker.js';
+import { register33333Routes, registerStripeWebhook } from './33333/routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -104,6 +105,10 @@ const draftsSynced = syncDraftsFromDisk();
 if (draftsSynced > 0) console.log(`[SGOS] Synced ${draftsSynced} proposal draft(s) from output/`);
 
 app.use(cors());
+
+// Stripe webhook needs raw body — must register before express.json()
+registerStripeWebhook(app);
+
 app.use(express.json());
 
 // i18n — language catalog and user preference
@@ -733,6 +738,9 @@ app.post('/api/hermes/seed/sprint-2', (_req, res) => {
     res.status(500).json({ error: String(e) });
   }
 });
+
+// 33333 Autopilot Revenue — consumer lane (separate from SGOS/Hermes)
+register33333Routes(app);
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');
