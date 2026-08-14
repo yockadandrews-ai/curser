@@ -1,0 +1,30 @@
+{
+  "vertical": "solar",
+  "emissionsPerWeek": 3,
+  "platforms": ["linkedin", "twitter", "youtube_shorts"],
+  "autoTriggers": {
+    "new_deployment": "case_study within 24h",
+    "cohort_full": "waitlist_sequence",
+    "competitor_mention": "differentiation_content"
+  },
+  "weeklyEmissions": [
+    {
+      "type": "case_study",
+      "title": "Solar installer booked {{appointments}} inspections in week 1",
+      "bodyTemplate": "{{company}} was losing leads after 5pm. We deployed Solar Setter AI — {{appointments}} inspections booked, {{hours_saved}} rep hours recovered. Receipt on file. #solar #AIagents",
+      "platforms": ["linkedin", "twitter"]
+    },
+    {
+      "type": "contrarian_thread",
+      "title": "Stop hiring SDRs for solar. Hire an agent.",
+      "bodyTemplate": "Thread: Why $80K/year setters lose to a $15K agent that never sleeps.\n\n1/ Solar leads don't wait until 9am\n2/ Your CRM already has the data — you need response speed\n3/ AI qualifies; humans close\n\nCohort opens {{cohort_date}}. Reply SOLAR for the deck.",
+      "platforms": ["twitter", "linkedin"]
+    },
+    {
+      "type": "cohort_invite",
+      "title": "Solar AI Agent cohort — {{spots}} spots",
+      "bodyTemplate": "Building {{spots}} Solar Setter AI deployments this month.\n\nIncludes: CRM wire, 50 simulated convos, weekly A/B on prompts.\n\n$15K entry · 48h launch.\n\nApply: {{apply_link}}",
+      "platforms": ["linkedin", "youtube_shorts"]
+    }
+  ]
+}
