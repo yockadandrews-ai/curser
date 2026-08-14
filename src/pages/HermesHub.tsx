@@ -110,6 +110,12 @@ export default function HermesHub() {
             <Calendar size={18} className="text-emerald-400" /> Live Calendar (primary · ET)
           </h2>
           <div className="flex gap-2 flex-wrap">
+            <a
+              href="/api/hermes/calendar/live.ics"
+              className="text-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-700 text-gray-300 hover:border-emerald-500"
+            >
+              Download Sprints 2–8 .ics
+            </a>
             <button
               type="button"
               className="btn-secondary text-sm inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-700"
@@ -136,11 +142,16 @@ export default function HermesHub() {
           </div>
         </div>
         {calendar?.live && (
-          <ul className="text-sm text-gray-400 space-y-1 max-h-40 overflow-y-auto">
-            {(calendar.live as Array<{ summary: string; startDate: string; eventType: string }>).map(ev => (
-              <li key={ev.summary}>· {ev.startDate} — {ev.summary} <span className="text-gray-600">({ev.eventType})</span></li>
-            ))}
-          </ul>
+          <>
+            <p className="text-sm text-gray-400">
+              {(calendar.live as unknown[]).length} Hermes-mapped events · Sprints 2–8 + Bundle Day (Oct 4)
+            </p>
+            <ul className="text-sm text-gray-400 space-y-1 max-h-48 overflow-y-auto">
+              {(calendar.live as Array<{ summary: string; startDate: string; eventType: string }>).map(ev => (
+                <li key={`${ev.startDate}-${ev.summary}`}>· {ev.startDate} — {ev.summary} <span className="text-gray-600">({ev.eventType})</span></li>
+              ))}
+            </ul>
+          </>
         )}
         <p className="text-xs text-gray-500">n8n → POST /api/hermes/calendar/trigger · see docs/N8N_HERMES_WIRING.md</p>
       </section>

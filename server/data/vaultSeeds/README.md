@@ -3,11 +3,13 @@
 These files are the **first-pass Sprint 2 assets** for Gas Station Snack Rankings.
 At runtime, `runContentFactory()` writes the same structure to `data/hermes/sprint-2-gas-station/` (gitignored).
 
-To regenerate locally:
+To regenerate all sprint vault assets locally:
 
 ```bash
-curl -X POST http://localhost:3001/api/hermes/seed/sprint-2
+curl -X POST http://localhost:3001/api/hermes/seed/all-sprints
 ```
+
+Seeds committed under `server/data/vaultSeeds/{sprint-id}/` for Sprints 2–8 + Bundle.
 
 Or trigger the live calendar event:
 

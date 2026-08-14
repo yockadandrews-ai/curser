@@ -1,9 +1,9 @@
 {
-  "product_id": "sprint-2-gas-station",
+  "product_id": "sprint-3-too-late",
   "status": "DRAFTED",
   "sent": 0,
   "trigger": "manual",
-  "assets_folder": "vault/sprint-2-gas-station",
+  "assets_folder": "vault/sprint-3-too-late",
   "governance": "Hermes orchestrates drafts and routing only. No irreversible external action without founder approval recorded on brief + proof.",
-  "generated_at": "2026-08-14T07:19:43.844Z"
+  "generated_at": "2026-08-14T07:19:43.846Z"
 }

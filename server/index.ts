@@ -72,9 +72,9 @@ import {
 import { getLedgerRows } from './hermes/chaosLedger.js';
 import { triggerFromCalendarEvent } from './hermes/calendarTrigger.js';
 import { getRegistryJson } from './data/productRegistry.js';
-import { LIVE_CALENDAR_EVENTS, listUpcomingLiveEvents } from './data/liveCalendarEvents.js';
+import { LIVE_CALENDAR_EVENTS, listUpcomingLiveEvents, buildLiveCalendarIcs } from './data/liveCalendarEvents.js';
 import { CONTENT_FACTORY_TASK_SCHEMA, HERMES_HANDOFF_RULES } from './schemas/contentFactoryTask.js';
-import { seedSprint2VaultIfMissing } from './hermes/contentFactory.js';
+import { seedSprint2VaultIfMissing, seedAllSprintVaults } from './hermes/contentFactory.js';
 import { NOTION_BRIEF_TEMPLATES, getNotionBriefTemplate } from './data/notionBriefTemplates.js';
 import {
   buildExportCsv,
@@ -693,6 +693,18 @@ app.post('/api/hermes/calendar/trigger', (req, res) => {
       source: source || 'n8n',
     });
     res.status(result.matched ? 200 : 404).json(result);
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+app.get('/api/hermes/calendar/live.ics', (_req, res) => {
+  res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="sgos-live-sprints-2-8-bundle.ics"');
+  res.send(buildLiveCalendarIcs());
+});
+app.post('/api/hermes/seed/all-sprints', (_req, res) => {
+  try {
+    res.json(seedAllSprintVaults());
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }

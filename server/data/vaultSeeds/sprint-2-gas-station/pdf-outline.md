@@ -21,20 +21,16 @@ Schema: {
   ],
   "scoring": {
     "exclusivity": {
-      "weight": 0.35,
-      "label": "Can you only get this here?"
+      "weight": 0.35
     },
     "crunch": {
-      "weight": 0.25,
-      "label": "Texture payoff"
+      "weight": 0.25
     },
     "regional_pride": {
-      "weight": 0.25,
-      "label": "Locals would fight for it"
+      "weight": 0.25
     },
     "hot_take": {
-      "weight": 0.15,
-      "label": "Spicy opinion slot"
+      "weight": 0.15
     }
   },
   "regions": [

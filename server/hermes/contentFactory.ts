@@ -130,31 +130,88 @@ STATUS: DRAFTED · Founder Stack records proof`,
 }
 
 function buildSprint3TooLate(product: ProductRegistryEntry): ContentFactoryTaskOutput {
+  const bands = (product.schema.timeBands as Array<{ maxHours: number | null; verdict: string }>) || [];
   return {
     assetsFolder: product.vaultFolder,
-    gumroadDescription: `# Is It Too Late to Reply? — $${product.price}\n\nSingle-page flowchart. Time since text → exact verdict.\n\n${product.schemaNotes}\n\nDRAFTED · Sent=0`,
-    receiptTemplate: `Receipt: Sprint 3 flowchart shipped. Verdict distribution: [stats]. Proof in Founder Stack.`,
-    pdfOutline: `# PDF — decision tree by hours since message\n\n${JSON.stringify(product.schema.timeBands, null, 2)}`,
+    gumroadDescription: `# Is It Too Late to Reply? — $${product.price}
+
+**Single-page flowchart.** Time since text → exact verdict + script.
+
+Bands:
+${bands.map(b => `- ${b.maxHours ?? '∞'}h → ${b.verdict}`).join('\n')}
+
+${product.schemaNotes}
+
+DRAFTED · Sent=0 until founder approval`,
+    receiptTemplate: `# Receipt — Sprint 3 Flowchart
+
+> Sprint 3 receipt: "Is It Too Late to Reply?" shipped — $${product.price}.
+> Top verdict branch: [most common from comments].
+> Proof in Founder Stack · Chaos Ledger row required.
+
+Launch: Tue 26 Aug 2026 · Receipt: Fri 28 Aug`,
+    pdfOutline: `# PDF Outline — Reply Flowchart\n\n${JSON.stringify(product.schema, null, 2)}`,
     reelScripts: [
-      `[REEL 1] Hook: "Read at 2pm. Replied at midnight. Was that insane?" → Flowchart PDF`,
-      `[REEL 2] Walk one branch: 24–72h band · self-deprecate then value`,
-      `[REEL 3] Worst case branch + Day Review → Ledger`,
+      `[REEL 1 — 08:00 ET]
+HOOK: "Read at 2pm. Replied at midnight. Was that insane?"
+VISUAL: Phone lock screen → flowchart zoom
+VO: "There's a decision tree for this. Hours since text → exact verdict."
+CTA: "Flowchart PDF — link in bio — $${product.price}"
+STATUS: DRAFTED · APPROVAL required`,
+
+      `[REEL 2 — 12:00 ET]
+HOOK: "24–72 hour band is the danger zone."
+VISUAL: Walk through self-deprecate → value branch
+VO: "Don't over-explain. One line of humor, then the actual point."
+CTA: "Save for your next panic-reply moment."
+STATUS: DRAFTED · Sent=0`,
+
+      `[REEL 3 + DAY REVIEW — 18:00 ET]
+HOOK: Worst case branch — "New thread or voice note only"
+DAY REVIEW: Log saves + comment verdicts → Chaos Ledger
+CTA: "Comment your worst reply window — receipt Friday."
+STATUS: DRAFTED · Founder Stack proof`,
     ],
     captions: [
-      `The reply window flowchart nobody gave you. $${product.price} · DRAFTED`,
-      `24–72 hours? There's a script for that. DRAFTED · Sent=0`,
-      `Day Review → Chaos Ledger. DRAFTED`,
+      `The reply-window flowchart nobody gave you. ⏰ $${product.price} · DRAFTED\n\n#texting #productivity\n\n[Do not post until APPROVAL]`,
+      `24–72 hours late? Self-deprecate lightly, then value. Script inside. DRAFTED · Sent=0`,
+      `Day Review → Chaos Ledger → Receipt Fri. DRAFTED · human gate`,
     ],
   };
 }
 
 function buildGenericFactoryOutput(product: ProductRegistryEntry): ContentFactoryTaskOutput {
+  const n = product.sprintNumber;
+  const [t1, t2, t3] = product.reelTimesEt;
   return {
     assetsFolder: product.vaultFolder,
-    gumroadDescription: `# ${product.name} — $${product.price}\n\n${product.schemaNotes}`,
-    receiptTemplate: `# Receipt — ${product.name}\n\nDRAFTED · Sent=0`,
-    reelScripts: [`[REEL 1] ${product.name}`, `[REEL 2] ${product.name}`, `[REEL 3] ${product.name}`],
-    captions: [`Caption 1 — DRAFTED`, `Caption 2 — DRAFTED`, `Caption 3 — DRAFTED`],
+    gumroadDescription: `# ${product.name} — $${product.price}
+
+${product.schemaNotes}
+
+**Sprint ${n}** · Launch ${product.launchDate} · Receipt ${product.receiptDate}
+
+${product.schemaNotes}
+
+DRAFTED · Sent=0`,
+    receiptTemplate: `# Receipt — Sprint ${n} · ${product.name}
+
+> Sprint ${n} receipt: ${product.name} shipped — $${product.price}.
+> Metric: [fill from Chaos Ledger]
+> Proof: Founder Stack + L5 link
+
+DRAFTED · Sent=0`,
+    pdfOutline: `# PDF Outline — ${product.name}\n\nSchema:\n${JSON.stringify(product.schema, null, 2)}`,
+    reelScripts: [
+      `[REEL 1 — ${t1} ET] Hook + problem → ${product.name}. DRAFTED · APPROVAL required`,
+      `[REEL 2 — ${t2} ET] Walk core schema feature. DRAFTED · Sent=0`,
+      `[REEL 3 — ${t3} ET] CTA + Day Review → Chaos Ledger. DRAFTED`,
+    ],
+    captions: [
+      `${product.name} — $${product.price}. Sprint ${n}. DRAFTED [APPROVAL gate]`,
+      `Inside: ${product.schemaNotes.slice(0, 80)}… DRAFTED · Sent=0`,
+      `Day Review → Ledger. DRAFTED`,
+    ],
   };
 }
 
@@ -165,4 +222,20 @@ export function seedSprint2VaultIfMissing(): { seeded: boolean; path: string } {
     trigger: 'manual',
   });
   return { seeded: true, path: result.assetsFolder };
+}
+
+export function seedAllSprintVaults(): { seeded: string[]; count: number } {
+  const ids = [
+    'sprint-2-gas-station', 'sprint-3-too-late', 'sprint-4-memory-jogger',
+    'sprint-5-receipt-reel', 'sprint-6-margin-map', 'sprint-7-trust-vault',
+    'sprint-8-ops-pulse', 'bundle-growth-compass',
+  ];
+  const seeded: string[] = [];
+  for (const id of ids) {
+    const p = getRegistryProduct(id);
+    if (!p) continue;
+    const r = runContentFactory({ productId: id, schema: p.schema, trigger: 'manual' });
+    seeded.push(r.assetsFolder);
+  }
+  return { seeded, count: seeded.length };
 }

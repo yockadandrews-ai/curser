@@ -75,16 +75,22 @@ Or explicit match:
 
 ---
 
-## Live events Hermes recognizes (Aug 2026)
+## Live events Hermes recognizes (Aug–Oct 2026)
 
-| Calendar title (match) | productId | eventType |
-|------------------------|-----------|-----------|
-| SGOS Sprint 2 Build | sprint-2-gas-station | build_weekend |
-| LAUNCH · Sprint 2 (+ Reel #1) | sprint-2-gas-station | launch_reel_1 |
-| Reel #2 | sprint-2-gas-station | launch_reel_2 |
-| Reel #3 | sprint-2-gas-station | launch_reel_3_day_review |
-| Sprint 2 Receipt | sprint-2-gas-station | receipt_sprint_prep |
-| SGOS Sprint 3 Build | sprint-3-too-late | build_weekend |
+**43 calendar mappings** — Sprints 2–8 + Bundle Day.
+
+| Sprint | Product | Build | Launch (Tue) | Receipt (Fri) |
+|--------|---------|-------|--------------|---------------|
+| 2 | Gas Station Snack Rankings | Aug 16–17 | Aug 19 | Aug 21 |
+| 3 | Too Late to Reply? | Aug 23–24 | Aug 26 | Aug 28 |
+| 4 | Memory Jogger PDF | Aug 30–31 | Sep 2 | Sep 4 |
+| 5 | Receipt Reel Pack | Sep 6–7 | Sep 9 | Sep 11 |
+| 6 | Margin Map Workbook | Sep 13–14 | Sep 16 | Sep 18 |
+| 7 | Trust Vault Checklist | Sep 20–21 | Sep 23 | Sep 25 |
+| 8 | Ops Pulse Dashboard | Sep 27–28 | Sep 30 | Oct 2 |
+| Bundle | Growth Compass | — | Oct 4 | Oct 4 |
+
+Import remaining slots: **GET `/api/hermes/calendar/live.ics`**
 
 Full list: `GET /api/hermes/calendar/live`
 
