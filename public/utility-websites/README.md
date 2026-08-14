@@ -2,6 +2,31 @@
 
 **10 free tools · static HTML · no build step · Hostinger-ready**
 
+No build system, no dependencies, no framework — pure static files. Open this folder in Cursor and edit any page immediately.
+
+## Cursor handoff (4 steps)
+
+1. Unzip / open `public/utility-websites/` in Cursor (or use this repo as-is).
+2. Replace `YOURDOMAIN.com` everywhere:
+   ```bash
+   npm run utility:replace-domain -- tools.yourdomain.com
+   ```
+   (Updates HTML, `sitemap.xml`, `robots.txt`, and `config.js`.)
+3. Upload the whole folder so `index.html` is at the subdomain root.
+4. Submit `https://tools.yourdomain.com/sitemap.xml` in Google Search Console.
+
+## Suggested Cursor prompts
+
+Copy-paste any of these when you want to extend the site:
+
+- **Dark mode** — “Add a dark mode toggle to all utility pages using shared.css and persist the choice in localStorage.”
+- **Analytics** — “Wire GA4 in config.js: set my measurement ID, enable analytics, and log tool-specific events on each calculator page.”
+- **Share buttons** — “Improve the share button on every tool page so it copies the page URL and shows a toast confirmation.”
+- **Bigger dictionary** — “Expand the word unscrambler dictionary in 1-word-unscrambler.html with more common English words and filter invalid inputs.”
+- **AdSense go-live** — “Update ads.txt with my publisher ID, enable AdSense in config.js, and verify ad slots on index.html and two tool pages.”
+- **Profit Tracker sync** — “Connect tracker.html to my Money Autopilot API using profitTrackerApiUrl in config.js.”
+- **New tool** — “Add an 11th tool (QR code generator) matching the existing page layout, meta tags, related-tools links, and ad placeholders.”
+
 ## Package contents
 
 | # | Tool | File |
