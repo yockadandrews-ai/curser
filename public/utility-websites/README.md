@@ -7,12 +7,12 @@ No build system, no dependencies, no framework — pure static files. Open this 
 ## Cursor handoff (4 steps)
 
 1. Unzip / open `public/utility-websites/` in Cursor (or use this repo as-is).
-2. Replace `YOURDOMAIN.com` everywhere:
+2. **Create your domain** (register on Hostinger, then wire the repo):
    ```bash
-   npm run utility:replace-domain -- tools.yourdomain.com
+   npm run utility:create-domain -- moneymagnettools.com
    ```
-   (Updates HTML, `sitemap.xml`, `robots.txt`, and `config.js`.)
-3. Upload the whole folder so `index.html` is at the subdomain root.
+   See **`docs/DOMAIN_SETUP.md`** for Hostinger registration + subdomain steps.
+3. Upload the whole folder so `index.html` is at the subdomain root (`tools.yourdomain.com`).
 4. Submit `https://tools.yourdomain.com/sitemap.xml` in Google Search Console.
 
 ## Suggested Cursor prompts

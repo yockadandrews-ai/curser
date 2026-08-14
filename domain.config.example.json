@@ -1,0 +1,10 @@
+{
+  "brand": "Money Magnet Tools",
+  "rootDomain": "moneymagnettools.com",
+  "subdomains": {
+    "tools": "tools.moneymagnettools.com",
+    "autopilot": "autopilot.moneymagnettools.com"
+  },
+  "registrar": "hostinger",
+  "notes": "Copy to domain.config.json and run: npm run utility:create-domain"
+}

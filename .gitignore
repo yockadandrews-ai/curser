@@ -10,4 +10,5 @@ utility-websites.zip
 *.db
 .env
 .env.local
+domain.config.json
 .DS_Store

@@ -10,6 +10,7 @@
     "build": "tsc -p tsconfig.server.json && vite build",
     "zip:utility-sites": "cd public && zip -r ../utility-websites.zip utility-websites/",
     "utility:replace-domain": "node scripts/utility-replace-domain.mjs",
+    "utility:create-domain": "node scripts/utility-create-domain.mjs",
     "utility:verify-deploy": "node scripts/utility-verify-deploy.mjs",
     "start": "node dist/server/index.js",
     "preview": "vite preview"
