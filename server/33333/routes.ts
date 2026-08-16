@@ -17,7 +17,6 @@ import { draftRepliesForPending, getEngagementPending } from './engagement.js';
 import { getN8n33333Config, verify33333Secret } from './n8nConfig.js';
 import { parsePublishBody, publishBrandContent, publishByContentId } from './publisher.js';
 import { syndicateContent } from './syndicate.js';
-import { handleStripeEvent, verifyStripeSignature } from './stripeWebhook.js';
 import { getStoreProducts, getStoreByBrand, getFeaturedCheckoutLinks, countConfiguredStripeLinks } from './stripeLinks.js';
 import { getConvertKitConfig, subscribeToWelcomeSequence, tagAbandonedCart } from './convertkit.js';
 import type { Brand33333 } from './types.js';
@@ -31,54 +30,46 @@ function require33333Secret(req: Request, res: Response): boolean {
 }
 
 export function register33333Routes(app: Express): void {
-  // n8n Fire — publish approved content
-  app.post('/api/content/publish', async (req, res) => {
+  const publishHandler: express.RequestHandler = async (req, res) => {
     if (!require33333Secret(req, res)) return;
-
     if (req.body.content_id && !req.body.content) {
       const result = await publishByContentId(String(req.body.content_id));
       if ('error' in result) return res.status(404).json(result);
       return res.json(result);
     }
-
     const parsed = parsePublishBody(req.body);
     if ('error' in parsed) return res.status(400).json(parsed);
-
     try {
-      const result = await publishBrandContent(parsed);
-      res.json(result);
+      res.json(await publishBrandContent(parsed));
     } catch (e) {
       res.status(500).json({ error: String(e) });
     }
-  });
+  };
+  app.post('/api/content/publish', publishHandler);
+  app.post('/api/33333/n8n/publish', publishHandler);
 
-  // n8n Water — pending comments/DMs
-  app.get('/api/engagement/pending', async (req, res) => {
+  const engagementHandler: express.RequestHandler = async (req, res) => {
     if (!require33333Secret(req, res)) return;
-
-    if (req.query.draft === 'true') {
-      await draftRepliesForPending();
-    }
-
+    if (req.query.draft === 'true') await draftRepliesForPending();
     const items = getEngagementPending(true);
     res.json(items.length === 1 ? items[0] : items);
-  });
+  };
+  app.get('/api/engagement/pending', engagementHandler);
+  app.get('/api/33333/n8n/engagement/pending', engagementHandler);
 
-  // n8n Earth — syndicate top performer
-  app.post('/api/content/syndicate', async (req, res) => {
+  const syndicateHandler: express.RequestHandler = async (req, res) => {
     if (!require33333Secret(req, res)) return;
-
     const contentId = String(req.body.content_id ?? req.body.contentId ?? '');
     const platforms = (req.body.platforms as string[] | undefined) ?? ['tiktok', 'twitter'];
     if (!contentId) return res.status(400).json({ error: 'content_id required' });
-
     try {
-      const result = await syndicateContent({ content_id: contentId, platforms, format: req.body.format });
-      res.json(result);
+      res.json(await syndicateContent({ content_id: contentId, platforms, format: req.body.format }));
     } catch (e) {
       res.status(500).json({ error: String(e) });
     }
-  });
+  };
+  app.post('/api/content/syndicate', syndicateHandler);
+  app.post('/api/33333/n8n/syndicate', syndicateHandler);
 
   // Dashboard API
   app.get('/api/33333/dashboard', (_req, res) => {
@@ -208,25 +199,5 @@ export function register33333Routes(app: Express): void {
     });
 
     res.json({ ok: true, config: getN8n33333Config(), publish: result });
-  });
-}
-
-export function registerStripeWebhook(app: Express): void {
-  app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), (req, res) => {
-    const rawBody = req.body as Buffer;
-    if (!verifyStripeSignature(rawBody, req.headers['stripe-signature'] as string | undefined)) {
-      return res.status(400).json({ error: 'Invalid Stripe signature' });
-    }
-
-    try {
-      const event = JSON.parse(rawBody.toString('utf8')) as {
-        type: string;
-        data: { object: Record<string, unknown> };
-      };
-      const result = handleStripeEvent(event);
-      res.json(result);
-    } catch (e) {
-      res.status(400).json({ error: String(e) });
-    }
   });
 }

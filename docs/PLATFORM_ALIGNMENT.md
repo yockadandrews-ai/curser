@@ -30,6 +30,10 @@ Last synced: **2026-08-16** (merged parallel Cursor agent branches)
 ## Shared infrastructure
 
 - **One Stripe webhook:** `POST /api/webhooks/stripe` → `server/stripeWebhookUnified.ts`
+  - `productId: money-autopilot-engine` → Outreach ($197)
+  - `productId: sovereign-solar-entry` (etc.) → Sovereign → K3 deploy
+  - `brand` metadata → 33333 consumer Payment Links
+- **33333 n8n routes:** `/api/33333/n8n/*` (legacy `/api/content/*` paths kept)
 - **Env template:** `.env.example` (all lanes documented)
 - **Sprint calendar:** Hermes Sprints 2–8 + Bundle Day Oct 4
 
