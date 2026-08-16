@@ -41,6 +41,7 @@ npm start
 | [33333 Autopilot Revenue](./docs/33333/README.md) | Consumer lane — 5 streams, n8n engine, email sequences |
 | [SOVEREIGN_SALES_AUTOPILOT.md](./docs/SOVEREIGN_SALES_AUTOPILOT.md) | Solar vertical — SG3 → Hermes → Ling → K3 loop |
 | [DOMAIN_SETUP.md](./docs/DOMAIN_SETUP.md) | Register domain + wire `tools.moneymagnettools.com` |
+| [PLATFORM_ALIGNMENT.md](./docs/PLATFORM_ALIGNMENT.md) | All lanes merged — domain map, governance, branch sync |
 | [APPLE_STORE_SETUP.md](./docs/APPLE_STORE_SETUP.md) | App Store Connect vs Shortcuts vs Profit Tracker — why analytics emails are empty |
 | [UTILITY_WEBSITES.md](./docs/UTILITY_WEBSITES.md) | Deploy calculator tools + AdSense slots |
 | [SHORTCUTS_ADSENSE.md](./docs/SHORTCUTS_ADSENSE.md) | Apple Shortcut to log AdSense payouts → Profit Tracker |
