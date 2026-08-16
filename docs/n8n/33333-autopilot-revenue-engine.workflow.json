@@ -1,0 +1,480 @@
+{
+  "name": "33333 Autopilot Revenue Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 7 * * *" }]
+        }
+      },
+      "id": "air-trigger",
+      "name": "Air 7AM — Content Draft",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "url": "https://trends.google.com/trends/api/dailytrends?geo=US",
+        "options": {}
+      },
+      "id": "pull-trends",
+      "name": "Pull Google Trends",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const trends = $input.first().json;\nconst keywords = ['music production', 'moon calendar', 'self reflection', 'resume tips', 'creative flow'];\nreturn keywords.map(k => ({ json: { keyword: k, brand: k.includes('music') ? 'vaultverse' : k.includes('moon') ? 'aurascript' : k.includes('reflection') ? 'mirrorme' : k.includes('resume') ? 'resume' : '33333' } }));"
+      },
+      "id": "map-keywords",
+      "name": "Map Brand Keywords",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Generate content for brand {{ $json.brand }} about {{ $json.keyword }}. Return JSON: { blog_outline: string, social_captions: [3 strings], email_snippet: string, lead_magnet_cta: string }\"\n    }]\n  }]\n}",
+        "options": {}
+      },
+      "id": "gemini-generate",
+      "name": "Gemini — Generate Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 0],
+      "credentials": {
+        "httpQueryAuth": { "id": "CONFIGURE_ME", "name": "Gemini API Key" }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Content Queue", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "brand": "={{ $('Map Brand Keywords').item.json.brand }}",
+            "keyword": "={{ $('Map Brand Keywords').item.json.keyword }}",
+            "status": "draft",
+            "content": "={{ JSON.stringify($json) }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "sheet-queue-draft",
+      "name": "Sheet — Queue Draft",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [880, 0],
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 10 * * *" }]
+        }
+      },
+      "id": "fire-trigger",
+      "name": "Fire 10AM — Publish",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 280]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Content Queue", "mode": "name" },
+        "filtersUI": {
+          "values": [{ "lookupColumn": "status", "lookupValue": "approved" }]
+        },
+        "options": {}
+      },
+      "id": "sheet-get-approved",
+      "name": "Sheet — Get Approved",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [220, 280],
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-rows",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "approved",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-approved",
+      "name": "Filter Approved Only",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [440, 280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.APP_BASE_URL || 'http://localhost:3001' }}/api/33333/n8n/publish",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [{ "name": "Content-Type", "value": "application/json" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"brand\": \"{{ $json.brand }}\",\n  \"content\": {{ $json.content }},\n  \"platforms\": [\"youtube\", \"instagram\", \"blog\"],\n  \"leadMagnetUrl\": \"{{ $env.LEAD_MAGNET_BASE_URL }}?utm_source={{ $json.brand }}&utm_medium=post&utm_campaign=autopilot\"\n}",
+        "options": {}
+      },
+      "id": "publish-multi",
+      "name": "Publish — YouTube/IG/Blog",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 280]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Content Queue", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": { "status": "published", "published_at": "={{ $now.toISO() }}" }
+        },
+        "options": {}
+      },
+      "id": "sheet-mark-published",
+      "name": "Sheet — Mark Published",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [880, 280],
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 14 * * *" }]
+        }
+      },
+      "id": "water-trigger",
+      "name": "Water 2PM — Engage",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 560]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.APP_BASE_URL || 'http://localhost:3001' }}/api/33333/n8n/engagement/pending",
+        "options": {}
+      },
+      "id": "fetch-engagement",
+      "name": "Fetch Comments/DMs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 560]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Draft a warm, on-brand reply to this comment/DM. Brand voice: helpful, grounded, no hype. Message: {{ $json.message }}\"\n    }]\n  }]\n}",
+        "options": {}
+      },
+      "id": "gemini-reply",
+      "name": "Gemini — Draft Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 560]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EMAIL_API_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template\": \"abandoned_cart\",\n  \"delay_hours\": 1,\n  \"stripe_session_id\": \"{{ $json.session_id }}\"\n}",
+        "options": {}
+      },
+      "id": "abandoned-cart",
+      "name": "Email — Abandoned Cart",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 560]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Metrics", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "phase": "water",
+            "engagements": "={{ $('Fetch Comments/DMs').all().length }}",
+            "cart_emails_sent": "={{ $('Email — Abandoned Cart').all().length }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "sheet-log-metrics",
+      "name": "Sheet — Log Metrics",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [880, 560],
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 18 * * *" }]
+        }
+      },
+      "id": "earth-trigger",
+      "name": "Earth 6PM — Syndicate",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 840]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Content Queue", "mode": "name" },
+        "filtersUI": {
+          "values": [{ "lookupColumn": "status", "lookupValue": "published" }]
+        },
+        "options": { "returnAllMatches": false }
+      },
+      "id": "sheet-top-performer",
+      "name": "Sheet — Top Performer",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [220, 840],
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.APP_BASE_URL || 'http://localhost:3001' }}/api/33333/n8n/syndicate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content_id\": \"{{ $json.row_number }}\",\n  \"platforms\": [\"tiktok\", \"twitter\"],\n  \"format\": \"vertical_short\"\n}",
+        "options": {}
+      },
+      "id": "syndicate-tiktok-twitter",
+      "name": "Syndicate — TikTok/Twitter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 840]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "name": "={{ $now.toFormat('yyyy-MM-dd') }}-backup",
+        "driveId": { "__rl": true, "mode": "list", "value": "My Drive" },
+        "folderId": { "__rl": true, "value": "={{ $env.GOOGLE_DRIVE_VAULT_FOLDER }}", "mode": "id" },
+        "options": {}
+      },
+      "id": "drive-backup",
+      "name": "Drive — Backup Assets",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [660, 840],
+      "credentials": {
+        "googleDriveOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Drive" }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 21 * * *" }]
+        }
+      },
+      "id": "lockdown-trigger",
+      "name": "Lockdown 9PM — Review",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 1120]
+    },
+    {
+      "parameters": {
+        "url": "https://api.stripe.com/v1/balance_transactions?limit=50",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "options": {}
+      },
+      "id": "stripe-revenue",
+      "name": "Stripe — Pull Revenue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 1120],
+      "credentials": {
+        "stripeApi": { "id": "CONFIGURE_ME", "name": "Stripe API" }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Revenue", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "gross_cents": "={{ $json.data.reduce((s, t) => s + t.amount, 0) }}",
+            "transaction_count": "={{ $json.data.length }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "sheet-revenue-log",
+      "name": "Sheet — Revenue Log",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [440, 1120],
+      "credentials": {
+        "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.N8N_API_URL || 'http://localhost:5678' }}/api/v1/workflows",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "n8nApi",
+        "options": {}
+      },
+      "id": "verify-automations",
+      "name": "Verify — Automations Health",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [660, 1120],
+      "credentials": {
+        "n8nApi": { "id": "CONFIGURE_ME", "name": "n8n API" }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "toEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "subject": "33333 Lockdown — {{ $now.toFormat('yyyy-MM-dd') }} Daily Summary",
+        "emailType": "text",
+        "message": "=Revenue today: {{ $('Sheet — Revenue Log').item.json.gross_cents / 100 }} USD\nAutomations: {{ $('Verify — Automations Health').item.json.data.filter(w => w.active).length }} active\nTomorrow Air keywords queued.\n\nLead. Flow. Rise.",
+        "options": {}
+      },
+      "id": "email-daily-summary",
+      "name": "Email — Daily Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [880, 1120],
+      "credentials": {
+        "smtp": { "id": "CONFIGURE_ME", "name": "SMTP" }
+      }
+    }
+  ],
+  "connections": {
+    "Air 7AM — Content Draft": {
+      "main": [[{ "node": "Pull Google Trends", "type": "main", "index": 0 }]]
+    },
+    "Pull Google Trends": {
+      "main": [[{ "node": "Map Brand Keywords", "type": "main", "index": 0 }]]
+    },
+    "Map Brand Keywords": {
+      "main": [[{ "node": "Gemini — Generate Content", "type": "main", "index": 0 }]]
+    },
+    "Gemini — Generate Content": {
+      "main": [[{ "node": "Sheet — Queue Draft", "type": "main", "index": 0 }]]
+    },
+    "Fire 10AM — Publish": {
+      "main": [[{ "node": "Sheet — Get Approved", "type": "main", "index": 0 }]]
+    },
+    "Sheet — Get Approved": {
+      "main": [[{ "node": "Filter Approved Only", "type": "main", "index": 0 }]]
+    },
+    "Filter Approved Only": {
+      "main": [[{ "node": "Publish — YouTube/IG/Blog", "type": "main", "index": 0 }]]
+    },
+    "Publish — YouTube/IG/Blog": {
+      "main": [[{ "node": "Sheet — Mark Published", "type": "main", "index": 0 }]]
+    },
+    "Water 2PM — Engage": {
+      "main": [[{ "node": "Fetch Comments/DMs", "type": "main", "index": 0 }]]
+    },
+    "Fetch Comments/DMs": {
+      "main": [[{ "node": "Gemini — Draft Reply", "type": "main", "index": 0 }]]
+    },
+    "Gemini — Draft Reply": {
+      "main": [[{ "node": "Email — Abandoned Cart", "type": "main", "index": 0 }]]
+    },
+    "Email — Abandoned Cart": {
+      "main": [[{ "node": "Sheet — Log Metrics", "type": "main", "index": 0 }]]
+    },
+    "Earth 6PM — Syndicate": {
+      "main": [[{ "node": "Sheet — Top Performer", "type": "main", "index": 0 }]]
+    },
+    "Sheet — Top Performer": {
+      "main": [[{ "node": "Syndicate — TikTok/Twitter", "type": "main", "index": 0 }]]
+    },
+    "Syndicate — TikTok/Twitter": {
+      "main": [[{ "node": "Drive — Backup Assets", "type": "main", "index": 0 }]]
+    },
+    "Lockdown 9PM — Review": {
+      "main": [[{ "node": "Stripe — Pull Revenue", "type": "main", "index": 0 }]]
+    },
+    "Stripe — Pull Revenue": {
+      "main": [[{ "node": "Sheet — Revenue Log", "type": "main", "index": 0 }]]
+    },
+    "Sheet — Revenue Log": {
+      "main": [[{ "node": "Verify — Automations Health", "type": "main", "index": 0 }]]
+    },
+    "Verify — Automations Health": {
+      "main": [[{ "node": "Email — Daily Summary", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1" },
+  "staticData": null,
+  "tags": [{ "name": "33333" }, { "name": "revenue" }, { "name": "autopilot" }],
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "33333 Autopilot Revenue Engine — Air/Fire/Water/Earth/Lockdown daily cycle. Configure GEMINI_API_KEY, GOOGLE_SHEET_ID, Stripe, and APP_BASE_URL."
+  }
+}

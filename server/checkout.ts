@@ -97,6 +97,52 @@ export async function createEngineCheckoutSession(input: {
   return { url: session.url, sessionId: session.id };
 }
 
+export async function processEngineCheckoutSession(session: Stripe.Checkout.Session): Promise<{ handled: boolean; message: string }> {
+  if (session.metadata?.productId !== ENGINE_PRODUCT.id) {
+    return { handled: false, message: 'Not Engine product' };
+  }
+
+  const email = session.customer_details?.email || session.customer_email || undefined;
+  const amount = (session.amount_total ?? ENGINE_PRODUCT.priceCents) / 100;
+
+  if (email) {
+    subscribeOutreach({ email, source: 'stripe' });
+    if (typeof session.customer === 'string') {
+      linkStripeCustomer(email, session.customer);
+    }
+  }
+
+  recordExternalRevenue({
+    source: 'stripe',
+    amount,
+    description: `${ENGINE_PRODUCT.name} — ${session.id}`,
+    cost: 0,
+  });
+
+  ingestHermesSignal({
+    source: 'stripe_sale',
+    title: `Sale: ${ENGINE_PRODUCT.name}`,
+    summary: email ? `Customer: ${email}` : `Session: ${session.id}`,
+    productSlug: ENGINE_PRODUCT.id,
+    payload: { sessionId: session.id, email, amount, source: 'Stripe' },
+  });
+
+  const payload: OutreachEventPayload = {
+    type: 'checkout_completed',
+    email,
+    productName: ENGINE_PRODUCT.name,
+    amount,
+    currency: session.currency ?? 'usd',
+    sessionId: session.id,
+    approveUrl: buildApproveUrl(),
+    dashboardUrl: getAppBaseUrl(),
+    timestamp: new Date().toISOString(),
+  };
+  await dispatchOutreachWebhook(payload);
+
+  return { handled: true, message: `Engine sale recorded — ${session.id}` };
+}
+
 export async function handleStripeWebhook(
   rawBody: Buffer,
   signature: string | undefined,
@@ -117,56 +163,11 @@ export async function handleStripeWebhook(
     return { handled: false, message: `Webhook signature verification failed: ${String(e)}` };
   }
 
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session;
-      if (session.metadata?.productId !== ENGINE_PRODUCT.id) {
-        return { handled: true, message: 'Ignored — not Engine product' };
-      }
-
-      const email = session.customer_details?.email || session.customer_email || undefined;
-      const amount = (session.amount_total ?? ENGINE_PRODUCT.priceCents) / 100;
-
-      if (email) {
-        subscribeOutreach({ email, source: 'stripe' });
-        if (typeof session.customer === 'string') {
-          linkStripeCustomer(email, session.customer);
-        }
-      }
-
-      recordExternalRevenue({
-        source: 'stripe',
-        amount,
-        description: `${ENGINE_PRODUCT.name} — ${session.id}`,
-        cost: 0,
-      });
-
-      ingestHermesSignal({
-        source: 'stripe_sale',
-        title: `Sale: ${ENGINE_PRODUCT.name}`,
-        summary: email ? `Customer: ${email}` : `Session: ${session.id}`,
-        productSlug: ENGINE_PRODUCT.id,
-        payload: { sessionId: session.id, email, amount, source: 'Stripe' },
-      });
-
-      const payload: OutreachEventPayload = {
-        type: 'checkout_completed',
-        email,
-        productName: ENGINE_PRODUCT.name,
-        amount,
-        currency: session.currency ?? 'usd',
-        sessionId: session.id,
-        approveUrl: buildApproveUrl(),
-        dashboardUrl: getAppBaseUrl(),
-        timestamp: new Date().toISOString(),
-      };
-      await dispatchOutreachWebhook(payload);
-
-      return { handled: true, message: `Engine sale recorded — ${session.id}` };
-    }
-    default:
-      return { handled: true, message: `Unhandled event type: ${event.type}` };
+  if (event.type === 'checkout.session.completed') {
+    return processEngineCheckoutSession(event.data.object as Stripe.Checkout.Session);
   }
+
+  return { handled: true, message: `Unhandled event type: ${event.type}` };
 }
 
 export async function getCheckoutSessionStatus(sessionId: string): Promise<{

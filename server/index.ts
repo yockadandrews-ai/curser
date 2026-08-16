@@ -100,11 +100,12 @@ import {
 import {
   createEngineCheckoutSession,
   getCheckoutSessionStatus,
-  handleStripeWebhook,
   isStripeConfigured,
   getStripePublishableKey,
   ENGINE_PRODUCT,
 } from './checkout.js';
+import { register33333Routes } from './33333/routes.js';
+import { handleUnifiedStripeWebhook } from './stripeWebhookUnified.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -122,17 +123,17 @@ if (draftsSynced > 0) console.log(`[SGOS] Synced ${draftsSynced} proposal draft(
 
 app.use(cors());
 
-// Stripe webhook — raw body required for signature verification
+// Unified Stripe webhook — Engine ($197) + 33333 consumer lane (raw body before express.json)
 app.post(
   '/api/webhooks/stripe',
   express.raw({ type: 'application/json' }),
   async (req: Request, res: Response) => {
     try {
-      const result = await handleStripeWebhook(
+      const result = await handleUnifiedStripeWebhook(
         req.body as Buffer,
         req.headers['stripe-signature'] as string | undefined,
       );
-      res.status(result.handled ? 200 : 400).json(result);
+      res.status(result.status).json(result.body);
     } catch (e) {
       res.status(500).json({ error: String(e) });
     }
@@ -830,6 +831,9 @@ app.post('/api/hermes/seed/sprint-2', (_req, res) => {
     res.status(500).json({ error: String(e) });
   }
 });
+
+// 33333 Autopilot Revenue — consumer lane (separate from SGOS/Hermes)
+register33333Routes(app);
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');
