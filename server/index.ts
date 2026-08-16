@@ -123,6 +123,7 @@ import {
   ENGINE_PRODUCT,
 } from './checkout.js';
 import { registerUnifiedStripeWebhook } from './stripeWebhookRouter.js';
+import { register33333Routes } from './33333/routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -835,6 +836,7 @@ app.post('/api/hermes/seed/sprint-2', (_req, res) => {
   }
 });
 
+
 // Sovereign Sales Autopilot — SG3 → Hermes → Ling → K3
 app.get('/api/sovereign/dashboard', (_req, res) => {
   res.json({
@@ -916,6 +918,9 @@ app.post('/api/sovereign/test/fake-lead', (_req, res) => {
     res.status(500).json({ error: String(e) });
   }
 });
+
+// 33333 Autopilot Revenue — consumer lane (separate from SGOS/Hermes/Sovereign)
+register33333Routes(app);
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');

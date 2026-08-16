@@ -31,17 +31,17 @@ npm start
 
 | Doc | Purpose |
 |-----|---------|
-| [MONEY_AUTOPILOT_OUTREACH_SYSTEM.md](./docs/outreach/MONEY_AUTOPILOT_OUTREACH_SYSTEM.md) | Complete launch blueprint — niches, scripts, ads, metrics, 24-month roadmap |
-| [DM_OUTREACH_CHEAT_SHEET.md](./docs/outreach/DM_OUTREACH_CHEAT_SHEET.md) | Copy-paste Twitter, LinkedIn, Reddit, email, and influencer scripts |
-| [LANDING_PAGE_COPY_CHEAT_SHEET.md](./docs/outreach/LANDING_PAGE_COPY_CHEAT_SHEET.md) | Hero, pricing, FAQ, and ad copy blocks for Carrd/Webflow/Framer |
-| [7_DAY_EXECUTION_CHECKLIST.md](./docs/outreach/7_DAY_EXECUTION_CHECKLIST.md) | Hour-by-hour 7-day sprint with 120 touchpoints/day |
-| [COMPETITOR_TEARDOWN.md](./docs/outreach/COMPETITOR_TEARDOWN.md) | Buffer/Hootsuite vs Money Autopilot positioning |
-| [N8N_OUTREACH_AUTOMATION.md](./docs/N8N_OUTREACH_AUTOMATION.md) | Stripe checkout + welcome/sale email automation |
+| [SOVEREIGN_SALES_AUTOPILOT.md](./docs/SOVEREIGN_SALES_AUTOPILOT.md) | SG3 → Hermes → Ling → K3 loop — Solar B2B @ $15K |
+| [MONEY_AUTOPILOT_OUTREACH_SYSTEM.md](./docs/outreach/MONEY_AUTOPILOT_OUTREACH_SYSTEM.md) | Outreach GTM — niches, scripts, 7-day sprint |
+| [33333 Autopilot Revenue](./docs/33333/README.md) | Consumer lane — 5 brands, Stripe Payment Links, ConvertKit |
+| [N8N_OUTREACH_AUTOMATION.md](./docs/N8N_OUTREACH_AUTOMATION.md) | $197 Engine checkout + welcome/sale automation |
+| [N8N_33333_WIRING.md](./docs/N8N_33333_WIRING.md) | Wire 33333 n8n workflow to API endpoints |
 | [APPLE_STORE_SETUP.md](./docs/APPLE_STORE_SETUP.md) | App Store Connect vs Shortcuts vs Profit Tracker — why analytics emails are empty |
 | [UTILITY_WEBSITES.md](./docs/UTILITY_WEBSITES.md) | Deploy calculator tools + AdSense slots |
 | [SHORTCUTS_ADSENSE.md](./docs/SHORTCUTS_ADSENSE.md) | Apple Shortcut to log AdSense payouts → Profit Tracker |
 | [SGOS_COMMAND.md](./docs/SGOS_COMMAND.md) | Apple Shortcuts root menu rebuild |
 | [SHORTCUTS_HUB.md](./docs/SHORTCUTS_HUB.md) | Proposal status shortcut governance |
+| [HERMES_ARCHITECTURE.md](./docs/HERMES_ARCHITECTURE.md) | SGOS/Hermes governance lane (separate from 33333 consumer products) |
 
 ## Environment Variables (optional — for live posting)
 

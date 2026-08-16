@@ -2,6 +2,8 @@
 
 SG3 → Hermes → Ling → K3 autonomous loop. **Active vertical: Solar @ $15K entry.**
 
+Part of the **three-lane revenue stack** (runs alongside Outreach $197 Engine and 33333 consumer lane — see `.env.example`).
+
 Founder touchpoints only: vertical selection, pricing check, partner approval, system override. Everything else is machine.
 
 ## Loop
