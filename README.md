@@ -31,8 +31,12 @@ npm start
 
 | Doc | Purpose |
 |-----|---------|
+| [33333 Autopilot Revenue](./docs/33333/README.md) | First-brain monetization — 5 streams, n8n, ConvertKit, 7-day launch |
 | [N8N_33333_WIRING.md](./docs/N8N_33333_WIRING.md) | Wire 33333 n8n workflow to API endpoints |
-| [33333 Autopilot Revenue](./docs/33333/README.md) | First-brain monetization — 5 streams, n8n engine, email sequences, 7-day launch |
+| [MONEY_AUTOPILOT_OUTREACH_SYSTEM.md](./docs/outreach/MONEY_AUTOPILOT_OUTREACH_SYSTEM.md) | Engine launch blueprint — niches, scripts, ads, 24-month roadmap |
+| [7_DAY_EXECUTION_CHECKLIST.md](./docs/outreach/7_DAY_EXECUTION_CHECKLIST.md) | Outreach 7-day sprint — 120 touchpoints/day |
+| [N8N_OUTREACH_AUTOMATION.md](./docs/N8N_OUTREACH_AUTOMATION.md) | Stripe Engine checkout + welcome/sale emails |
+| [SOVEREIGN_SALES_AUTOPILOT.md](./docs/SOVEREIGN_SALES_AUTOPILOT.md) | B2B Solar vertical — $15K Sovereign lane |
 | [APPLE_STORE_SETUP.md](./docs/APPLE_STORE_SETUP.md) | App Store Connect vs Shortcuts vs Profit Tracker — why analytics emails are empty |
 | [UTILITY_WEBSITES.md](./docs/UTILITY_WEBSITES.md) | Deploy calculator tools + AdSense slots |
 | [SHORTCUTS_ADSENSE.md](./docs/SHORTCUTS_ADSENSE.md) | Apple Shortcut to log AdSense payouts → Profit Tracker |

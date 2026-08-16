@@ -210,23 +210,3 @@ export function register33333Routes(app: Express): void {
     res.json({ ok: true, config: getN8n33333Config(), publish: result });
   });
 }
-
-export function registerStripeWebhook(app: Express): void {
-  app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), (req, res) => {
-    const rawBody = req.body as Buffer;
-    if (!verifyStripeSignature(rawBody, req.headers['stripe-signature'] as string | undefined)) {
-      return res.status(400).json({ error: 'Invalid Stripe signature' });
-    }
-
-    try {
-      const event = JSON.parse(rawBody.toString('utf8')) as {
-        type: string;
-        data: { object: Record<string, unknown> };
-      };
-      const result = handleStripeEvent(event);
-      res.json(result);
-    } catch (e) {
-      res.status(400).json({ error: String(e) });
-    }
-  });
-}
