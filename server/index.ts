@@ -141,7 +141,7 @@ if (draftsSynced > 0) console.log(`[SGOS] Synced ${draftsSynced} proposal draft(
 
 app.use(cors());
 
-// Unified Stripe webhook — Outreach Engine + 33333 consumer lanes
+// Unified Stripe webhook — routes by metadata (Engine / 33333 / abandoned cart)
 app.post(
   '/api/webhooks/stripe',
   express.raw({ type: 'application/json' }),
@@ -850,9 +850,6 @@ app.post('/api/hermes/seed/sprint-2', (_req, res) => {
   }
 });
 
-// 33333 Autopilot Revenue — consumer lane (separate from SGOS/Hermes)
-register33333Routes(app);
-
 // Sovereign Sales Autopilot — SG3 → Hermes → Ling → K3 (B2B Solar @ $15K)
 app.get('/api/sovereign/dashboard', (_req, res) => {
   res.json({
@@ -934,6 +931,9 @@ app.post('/api/sovereign/test/fake-lead', (_req, res) => {
     res.status(500).json({ error: String(e) });
   }
 });
+
+// 33333 Autopilot Revenue — consumer lane (separate from SGOS/Hermes)
+register33333Routes(app);
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');
