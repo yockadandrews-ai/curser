@@ -37,6 +37,7 @@ npm start
 | [7_DAY_EXECUTION_CHECKLIST.md](./docs/outreach/7_DAY_EXECUTION_CHECKLIST.md) | Outreach 7-day sprint — 120 touchpoints/day |
 | [N8N_OUTREACH_AUTOMATION.md](./docs/N8N_OUTREACH_AUTOMATION.md) | Stripe Engine checkout + welcome/sale emails |
 | [SOVEREIGN_SALES_AUTOPILOT.md](./docs/SOVEREIGN_SALES_AUTOPILOT.md) | B2B Solar vertical — $15K Sovereign lane |
+| [REVENUE_LANES.md](./docs/REVENUE_LANES.md) | **Alignment map** — 33333 vs Outreach vs Sovereign vs Hermes |
 | [APPLE_STORE_SETUP.md](./docs/APPLE_STORE_SETUP.md) | App Store Connect vs Shortcuts vs Profit Tracker — why analytics emails are empty |
 | [UTILITY_WEBSITES.md](./docs/UTILITY_WEBSITES.md) | Deploy calculator tools + AdSense slots |
 | [SHORTCUTS_ADSENSE.md](./docs/SHORTCUTS_ADSENSE.md) | Apple Shortcut to log AdSense payouts → Profit Tracker |
