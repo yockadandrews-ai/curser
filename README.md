@@ -63,6 +63,12 @@ npm start
 | [SGOS_COMMAND.md](./docs/SGOS_COMMAND.md) | Apple Shortcuts root menu |
 | [SHORTCUTS_HUB.md](./docs/SHORTCUTS_HUB.md) | Proposal status governance |
 
+### Sovereign Sales lane (Solar B2B)
+
+| Doc | Purpose |
+|-----|---------|
+| [SOVEREIGN_SALES_AUTOPILOT.md](./docs/SOVEREIGN_SALES_AUTOPILOT.md) | SG3 → Hermes → Ling → K3 loop |
+
 ### Utility / deploy
 
 | Doc | Purpose |

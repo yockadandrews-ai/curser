@@ -60,7 +60,7 @@ Returns pending comments/DMs. `?draft=true` runs Gemini reply drafts first.
 ### Earth — Syndicate
 
 ```
-POST /api/content/syndicate
+POST /api/33333/n8n/syndicate
 X-33333-Secret: your-secret
 ```
 

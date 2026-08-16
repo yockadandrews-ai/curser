@@ -106,6 +106,24 @@ import {
 } from './checkout.js';
 import { register33333Routes } from './33333/routes.js';
 import { handleUnifiedStripeWebhook } from './stripeWebhookUnified.js';
+import {
+  getLoopState,
+  getSovereignConfig,
+  getTickets,
+  getTicket,
+  getEmissions,
+  ingestInbound,
+  submitQualifyAnswers,
+  handleLingReply,
+  recordSignature,
+  updateDeploymentMetrics,
+  runFakeLeadTest,
+  generateWeeklyEmissions,
+  buildLingDemoPackage,
+  loadK3Template,
+} from './sovereign/loop.js';
+import { HERMES_QUALIFY_QUESTIONS } from './sovereign/hermesGate.js';
+import { getActiveVertical } from './sovereign/config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -834,6 +852,88 @@ app.post('/api/hermes/seed/sprint-2', (_req, res) => {
 
 // 33333 Autopilot Revenue — consumer lane (separate from SGOS/Hermes)
 register33333Routes(app);
+
+// Sovereign Sales Autopilot — SG3 → Hermes → Ling → K3 (Solar @ $15K)
+app.get('/api/sovereign/dashboard', (_req, res) => {
+  res.json({
+    config: getSovereignConfig(),
+    state: getLoopState(),
+    vertical: getActiveVertical(),
+    qualifyQuestions: HERMES_QUALIFY_QUESTIONS,
+    tickets: getTickets(20),
+    emissions: getEmissions(10),
+  });
+});
+app.get('/api/sovereign/config', (_req, res) => {
+  res.json(getSovereignConfig());
+});
+app.get('/api/sovereign/state', (_req, res) => {
+  res.json(getLoopState());
+});
+app.get('/api/sovereign/tickets', (_req, res) => {
+  res.json(getTickets(100));
+});
+app.get('/api/sovereign/tickets/:id', (req, res) => {
+  const ticket = getTicket(req.params.id);
+  if (!ticket) return res.status(404).json({ error: 'Ticket not found' });
+  res.json(ticket);
+});
+app.post('/api/sovereign/inbound', (req, res) => {
+  const { channel, name, email, company, message, vertical } = req.body;
+  if (!channel || !name) return res.status(400).json({ error: 'channel and name required' });
+  try {
+    res.json(ingestInbound({ channel, name, email, company, message, vertical }));
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+app.post('/api/sovereign/tickets/:id/qualify', (req, res) => {
+  try {
+    res.json(submitQualifyAnswers(req.params.id, req.body));
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
+  }
+});
+app.post('/api/sovereign/tickets/:id/reply', (req, res) => {
+  const { message } = req.body;
+  if (!message) return res.status(400).json({ error: 'message required' });
+  try {
+    res.json(handleLingReply(req.params.id, message));
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
+  }
+});
+app.post('/api/sovereign/tickets/:id/sign', (req, res) => {
+  try {
+    res.json(recordSignature(req.params.id, req.body));
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
+  }
+});
+app.post('/api/sovereign/deployments/:id/metrics', (req, res) => {
+  try {
+    res.json(updateDeploymentMetrics(req.params.id, req.body));
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
+  }
+});
+app.get('/api/sovereign/k3/template', (_req, res) => {
+  try {
+    res.json(loadK3Template(getActiveVertical().id));
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+app.get('/api/sovereign/sg3/emissions', (_req, res) => {
+  res.json(generateWeeklyEmissions(getActiveVertical().id));
+});
+app.post('/api/sovereign/test/fake-lead', (_req, res) => {
+  try {
+    res.json(runFakeLeadTest());
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');

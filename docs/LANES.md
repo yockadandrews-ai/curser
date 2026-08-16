@@ -7,7 +7,7 @@ Money Autopilot runs **three parallel revenue lanes**. Each has its own docs, la
 | **SGOS / Hermes** | Founder ops, Gumroad sprints, approval gates | Dashboard `/approve` | Gumroad + Hermes ingest | n8n calendar → Content Factory | Draft free, send gated |
 | **Money Autopilot Engine** | Affiliate founders, $197 one-time | `tools…/autopilot-landing.html` | Stripe Checkout Sessions | n8n outreach webhook or ConvertKit | Approval Inbox |
 | **33333 Consumer** | VaultVerse, AuraScript, MirrorMe | `/33333/index.html` | Stripe Payment Links | ConvertKit sequences | Separate DB, no Hermes |
-| **Sovereign Solar** (optional) | B2B solar @ $15K | — | Manual / contract | SG3 emissions | Hermes qualify → Ling → K3 |
+| **Sovereign Solar** | B2B solar @ $15K | — | Stripe checkout URLs | SG3 emissions + n8n loop | Hermes qualify → Ling → K3 |
 
 ## Which doc set to use?
 

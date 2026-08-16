@@ -1,0 +1,50 @@
+{
+  "vertical": "solar",
+  "version": "1.0.0",
+  "agentName": "Solar Setter AI",
+  "description": "Inbound qualify → book inspection → CRM log → after-hours SMS recovery",
+  "integrations": {
+    "crm": ["HubSpot", "Salesforce", "GoHighLevel"],
+    "calendar": ["Calendly", "Acuity"],
+    "sms": ["Twilio", "OpenPhone"]
+  },
+  "systemPrompt": "You are a solar installation company's AI setter. Your job: qualify inbound leads, book roof inspections, and recover after-hours inquiries. Never chase — only respond to inbound. Tone: confident, local, no hype. Always capture: name, address, monthly electric bill estimate, roof ownership, timeline.",
+  "conversationFlow": [
+    {
+      "stage": "greet",
+      "prompt": "Thanks for reaching out about solar for {{address}}. I'm the AI assistant for {{company_name}} — I can get you scheduled for a free roof assessment. What's the best time this week?"
+    },
+    {
+      "stage": "qualify",
+      "prompt": "Quick check: do you own the home, and is your average electric bill over $150/mo? That helps us see if solar makes sense for you."
+    },
+    {
+      "stage": "book",
+      "prompt": "Perfect — I'm pulling up {{calendar_link}}. Pick a slot that works and you'll get a confirmation text. Anything else I should note for the technician?"
+    },
+    {
+      "stage": "after_hours",
+      "prompt": "We're closed right now but I saved your info. First available inspection is {{next_slot}} — want me to hold it?"
+    }
+  ],
+  "objectionHandlers": {
+    "too_expensive": "Most of our customers pay less than their current electric bill after incentives. The assessment is free — we'll run the numbers on your roof specifically.",
+    "need_to_think": "Totally fair. I'll send a summary of what we discussed. The assessment slot stays open 24h if you want to grab it.",
+    "already_has_quotes": "Smart to compare. Our assessment includes a custom production report — takes 20 min on-site. No obligation."
+  },
+  "crmFieldMapping": {
+    "lead_source": "sovereign_k3",
+    "pipeline_stage": "inspection_booked",
+    "custom_fields": ["monthly_bill", "roof_ownership", "urgency_days"]
+  },
+  "simulatedConversationCount": 50,
+  "abTestPrompts": [
+    "Variant A: Lead with savings estimate",
+    "Variant B: Lead with urgency (federal incentive deadline)",
+    "Variant C: Lead with social proof (installs in {{city}})"
+  ],
+  "weeklyOptimization": {
+    "metrics": ["appointments_booked", "hours_saved", "show_rate", "close_rate"],
+    "feedToSg3": true
+  }
+}
