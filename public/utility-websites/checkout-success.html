@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Payment Successful — Money Autopilot</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="shared.css" />
+  <link rel="stylesheet" href="landing.css" />
+</head>
+<body>
+  <div class="landing-wrap">
+    <main id="main" class="hero" style="padding-top:4rem;">
+      <span class="hero-badge">Payment received</span>
+      <h1>Welcome to Money Autopilot Engine</h1>
+      <p class="subhead" id="status-text">Confirming your purchase…</p>
+      <div class="cta-row">
+        <a class="btn-hero btn-hero-primary" id="approve-link" href="#">Open Approval Inbox →</a>
+        <a class="btn-hero btn-hero-secondary" id="dashboard-link" href="#">Go to Dashboard</a>
+      </div>
+      <p style="margin-top:1.5rem;font-size:0.85rem;color:var(--muted);">Draft free, send gated — review your first batch before anything posts.</p>
+    </main>
+  </div>
+  <script src="config.js"></script>
+  <script>
+    (function () {
+      var cfg = window.SITE_CONFIG || {};
+      var apiBase = (cfg.profitTrackerApiUrl || '').replace(/\/$/, '');
+      var params = new URLSearchParams(window.location.search);
+      var sessionId = params.get('session_id');
+      var statusEl = document.getElementById('status-text');
+      var approveLink = document.getElementById('approve-link');
+      var dashboardLink = document.getElementById('dashboard-link');
+
+      var defaultApprove = apiBase ? apiBase + '/approve' : 'https://autopilot.moneymagnettools.com/approve';
+      var defaultDashboard = apiBase || 'https://autopilot.moneymagnettools.com';
+
+      approveLink.href = defaultApprove;
+      dashboardLink.href = defaultDashboard;
+
+      if (!sessionId || !apiBase) {
+        statusEl.textContent = 'Purchase complete! Open your Approval Inbox to review your first drafts.';
+        if (sessionId) {
+          setTimeout(function () { window.location.href = defaultApprove; }, 4000);
+        }
+        return;
+      }
+
+      fetch(apiBase + '/api/checkout/session/' + encodeURIComponent(sessionId))
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.approveUrl) approveLink.href = data.approveUrl;
+          if (data.dashboardUrl) dashboardLink.href = data.dashboardUrl;
+          if (data.paid) {
+            statusEl.textContent = 'You\'re all set' + (data.email ? ' — ' + data.email : '') + '. Redirecting to Approval Inbox…';
+            setTimeout(function () { window.location.href = data.approveUrl || defaultApprove; }, 2500);
+          } else {
+            statusEl.textContent = 'Payment pending. We\'ll email you when it clears.';
+          }
+        })
+        .catch(function () {
+          statusEl.textContent = 'Purchase complete! Open Approval Inbox to get started.';
+          setTimeout(function () { window.location.href = defaultApprove; }, 4000);
+        });
+    })();
+  </script>
+</body>
+</html>

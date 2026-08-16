@@ -52,6 +52,7 @@ export type HermesSignalSource =
   | 'webhook'
   | 'notion_button'
   | 'gumroad_sale'
+  | 'stripe_sale'
   | 'field_batch'
   | 'founder_stack'
   | 'manual'
