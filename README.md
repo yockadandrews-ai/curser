@@ -31,6 +31,12 @@ npm start
 
 | Doc | Purpose |
 |-----|---------|
+| [MONEY_AUTOPILOT_OUTREACH_SYSTEM.md](./docs/outreach/MONEY_AUTOPILOT_OUTREACH_SYSTEM.md) | Complete launch blueprint — niches, scripts, ads, metrics, 24-month roadmap |
+| [DM_OUTREACH_CHEAT_SHEET.md](./docs/outreach/DM_OUTREACH_CHEAT_SHEET.md) | Copy-paste Twitter, LinkedIn, Reddit, email, and influencer scripts |
+| [LANDING_PAGE_COPY_CHEAT_SHEET.md](./docs/outreach/LANDING_PAGE_COPY_CHEAT_SHEET.md) | Hero, pricing, FAQ, and ad copy blocks for Carrd/Webflow/Framer |
+| [7_DAY_EXECUTION_CHECKLIST.md](./docs/outreach/7_DAY_EXECUTION_CHECKLIST.md) | Hour-by-hour 7-day sprint with 120 touchpoints/day |
+| [COMPETITOR_TEARDOWN.md](./docs/outreach/COMPETITOR_TEARDOWN.md) | Buffer/Hootsuite vs Money Autopilot positioning |
+| [N8N_OUTREACH_AUTOMATION.md](./docs/N8N_OUTREACH_AUTOMATION.md) | Stripe checkout + welcome/sale email automation |
 | [APPLE_STORE_SETUP.md](./docs/APPLE_STORE_SETUP.md) | App Store Connect vs Shortcuts vs Profit Tracker — why analytics emails are empty |
 | [UTILITY_WEBSITES.md](./docs/UTILITY_WEBSITES.md) | Deploy calculator tools + AdSense slots |
 | [SHORTCUTS_ADSENSE.md](./docs/SHORTCUTS_ADSENSE.md) | Apple Shortcut to log AdSense payouts → Profit Tracker |

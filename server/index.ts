@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import type { Request, Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
@@ -106,6 +107,22 @@ import {
 } from './sovereign/loop.js';
 import { HERMES_QUALIFY_QUESTIONS } from './sovereign/hermesGate.js';
 import { getActiveVertical } from './sovereign/config.js';
+import {
+  subscribeOutreach,
+  dispatchOutreachWebhook,
+  getWelcomeSequenceForAutomation,
+  getRecentOutreachEvents,
+  buildApproveUrl,
+  getAppBaseUrl,
+} from './outreach.js';
+import {
+  createEngineCheckoutSession,
+  getCheckoutSessionStatus,
+  isStripeConfigured,
+  getStripePublishableKey,
+  ENGINE_PRODUCT,
+} from './checkout.js';
+import { registerUnifiedStripeWebhook } from './stripeWebhookRouter.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -122,7 +139,73 @@ const draftsSynced = syncDraftsFromDisk();
 if (draftsSynced > 0) console.log(`[SGOS] Synced ${draftsSynced} proposal draft(s) from output/`);
 
 app.use(cors());
+
+// Stripe webhook — raw body required; dispatches to outreach / 33333 / sovereign lanes
+registerUnifiedStripeWebhook(app);
+
 app.use(express.json());
+
+// Outreach — welcome sequence signup + automation hooks
+app.get('/api/outreach/welcome-sequence', (_req, res) => {
+  res.json({ steps: getWelcomeSequenceForAutomation() });
+});
+app.get('/api/outreach/events', (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 50;
+  res.json(getRecentOutreachEvents(limit));
+});
+app.post('/api/outreach/subscribe', async (req, res) => {
+  const { email, name, source } = req.body;
+  if (!email) return res.status(400).json({ error: 'email required' });
+  try {
+    const subscriber = subscribeOutreach({ email, name, source: source || 'landing' });
+    await dispatchOutreachWebhook({
+      type: 'subscribe',
+      email: subscriber.email,
+      name: subscriber.name,
+      subscriberId: subscriber.id,
+      approveUrl: buildApproveUrl(),
+      dashboardUrl: getAppBaseUrl(),
+      timestamp: new Date().toISOString(),
+    });
+    res.json({ ok: true, subscriber });
+  } catch (e) {
+    res.status(400).json({ error: String(e) });
+  }
+});
+
+// Stripe checkout — Money Autopilot Engine ($197)
+app.get('/api/checkout/config', (_req, res) => {
+  res.json({
+    configured: isStripeConfigured(),
+    publishableKey: getStripePublishableKey(),
+    product: ENGINE_PRODUCT,
+    approveUrl: buildApproveUrl(),
+    dashboardUrl: getAppBaseUrl(),
+  });
+});
+app.post('/api/checkout/engine', async (req, res) => {
+  if (!isStripeConfigured()) {
+    return res.status(503).json({
+      error: 'Stripe not configured',
+      hint: 'Set STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET in .env',
+    });
+  }
+  try {
+    const { email, customerName } = req.body;
+    const session = await createEngineCheckoutSession({ email, customerName });
+    res.json(session);
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+app.get('/api/checkout/session/:sessionId', async (req, res) => {
+  try {
+    const status = await getCheckoutSessionStatus(req.params.sessionId);
+    res.json(status);
+  } catch (e) {
+    res.status(404).json({ error: String(e) });
+  }
+});
 
 // i18n — language catalog and user preference
 app.get('/api/i18n/languages', (_req, res) => res.json(getI18nCatalog()));
