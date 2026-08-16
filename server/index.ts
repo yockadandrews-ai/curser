@@ -106,6 +106,7 @@ import {
 } from './sovereign/loop.js';
 import { HERMES_QUALIFY_QUESTIONS } from './sovereign/hermesGate.js';
 import { getActiveVertical } from './sovereign/config.js';
+import { register33333Routes, registerStripeWebhook } from './33333/routes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -122,6 +123,10 @@ const draftsSynced = syncDraftsFromDisk();
 if (draftsSynced > 0) console.log(`[SGOS] Synced ${draftsSynced} proposal draft(s) from output/`);
 
 app.use(cors());
+
+// Stripe webhook needs raw body — must register before express.json()
+registerStripeWebhook(app);
+
 app.use(express.json());
 
 // i18n — language catalog and user preference
@@ -752,6 +757,8 @@ app.post('/api/hermes/seed/sprint-2', (_req, res) => {
   }
 });
 
+});
+
 // Sovereign Sales Autopilot — SG3 → Hermes → Ling → K3
 app.get('/api/sovereign/dashboard', (_req, res) => {
   res.json({
@@ -833,6 +840,9 @@ app.post('/api/sovereign/test/fake-lead', (_req, res) => {
     res.status(500).json({ error: String(e) });
   }
 });
+
+// 33333 Autopilot Revenue — consumer lane (separate from SGOS/Hermes)
+register33333Routes(app);
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');
