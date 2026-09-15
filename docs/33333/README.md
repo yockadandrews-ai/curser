@@ -8,7 +8,9 @@
 | # | File | Description |
 |---|------|-------------|
 | 1 | [33333_AUTOPILOT_REVENUE_BLUEPRINT.md](./33333_AUTOPILOT_REVENUE_BLUEPRINT.md) | Full monetization architecture — 5 streams, targets, power-time mapping |
-| 2 | [33333-autopilot-revenue-engine.workflow.json](../n8n/33333-autopilot-revenue-engine.workflow.json) | 23-node n8n engine — content → leads → sale → delivery |
+| 2 | [bridge-33333.workflow.json](../n8n/bridge-33333.workflow.json) | **BRIDGE_33333** — master integration layer (10 workflows + elemental clock) |
+| 2b | [33333-autopilot-revenue-engine.workflow.json](../n8n/33333-autopilot-revenue-engine.workflow.json) | Legacy 23-node n8n engine — content → leads → sale → delivery |
+| 2c | [BRIDGE_INTEGRATION_LAYER.md](./BRIDGE_INTEGRATION_LAYER.md) | Full bridge spec — Doc 1 ↔ Doc 2 connector |
 | 3 | [33333_EMAIL_SEQUENCES.md](./33333_EMAIL_SEQUENCES.md) | 5 nurture sequences, 32 emails |
 | 4 | [33333_LANDING_PAGE_COPY.md](./33333_LANDING_PAGE_COPY.md) | Complete Carrd/Webflow/Framer copy |
 | 5 | [33333_ANALYTICS_DASHBOARD_SPEC.md](./33333_ANALYTICS_DASHBOARD_SPEC.md) | Google Sheets + n8n tracking spec |

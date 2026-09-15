@@ -1,0 +1,785 @@
+{
+  "name": "BRIDGE_33333 — Integration Layer",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "*/15 * * * *" }]
+        }
+      },
+      "id": "clock-watcher",
+      "name": "Clock Watcher — Every 15min ET",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 400],
+      "notes": "Runs every 15 min to catch 10:10, 14:22, 21:33 power windows. Set workflow timezone to America/New_York."
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst fmt = new Intl.DateTimeFormat('en-US', {\n  timeZone: 'America/New_York',\n  hour: 'numeric', minute: 'numeric', day: 'numeric', weekday: 'short', hour12: false,\n});\nconst parts = fmt.formatToParts(now);\nconst get = (t) => Number(parts.find(p => p.type === t)?.value ?? 0);\nconst weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };\nconst weekday = parts.find(p => p.type === 'weekday')?.value ?? 'Sun';\nconst hour = get('hour');\nconst minute = get('minute');\nconst day = get('day');\nconst dayOfWeek = weekdayMap[weekday] ?? 0;\nconst timeVal = hour * 100 + minute;\n\nlet element = 'Flow';\nlet action = 'background_ops';\nlet isPowerTime = false;\n\nif (timeVal >= 700 && timeVal < 730) {\n  element = 'Air'; action = 'content_generation'; isPowerTime = true;\n} else if (timeVal >= 1010 && timeVal < 1040) {\n  element = 'Fire'; action = 'side_hustle_execution'; isPowerTime = true;\n} else if (timeVal >= 1422 && timeVal < 1452) {\n  element = 'Water'; action = 'outreach_engagement'; isPowerTime = true;\n} else if (timeVal >= 1800 && timeVal < 1830) {\n  element = 'Earth'; action = 'publish_review'; isPowerTime = true;\n} else if (timeVal >= 2133 && timeVal < 2203) {\n  element = 'Spirit'; action = 'archive_shutdown'; isPowerTime = true;\n}\n\nconst pad = n => String(n).padStart(2, '0');\nconst dateStr = now.toISOString().split('T')[0];\n\nreturn [{\n  json: {\n    element, action, isPowerTime,\n    timestamp: now.toISOString(),\n    day, dayOfWeek, hour, minute,\n    etTimeLabel: `${pad(hour)}:${pad(minute)}`,\n    dateStr,\n    campaign: '33333',\n    runW1WeeklyBatch: dayOfWeek === 1 && hour === 9 && minute < 15,\n    runShortformPrep: (hour === 9 || hour === 13) && minute < 15,\n    runLeadScoring: !isPowerTime && minute % 15 === 0,\n  }\n}];"
+      },
+      "id": "determine-element",
+      "name": "Determine Element Block",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 400]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ $json.element }}", "rightValue": "Air", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" }, "renameOutput": true, "outputKey": "Air" },
+            { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ $json.element }}", "rightValue": "Fire", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" }, "renameOutput": true, "outputKey": "Fire" },
+            { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ $json.element }}", "rightValue": "Water", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" }, "renameOutput": true, "outputKey": "Water" },
+            { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ $json.element }}", "rightValue": "Earth", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" }, "renameOutput": true, "outputKey": "Earth" },
+            { "conditions": { "options": { "caseSensitive": true }, "conditions": [{ "leftValue": "={{ $json.element }}", "rightValue": "Spirit", "operator": { "type": "string", "operation": "equals" } }], "combinator": "and" }, "renameOutput": true, "outputKey": "Spirit" }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      },
+      "id": "route-by-element",
+      "name": "Route by Element",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [480, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "niche", "name": "niche_topic", "value": "Career & Professional Development for Junior Software Developers in AI", "type": "string" },
+            { "id": "platforms", "name": "platforms", "value": "YouTube,TikTok,Instagram Reels,LinkedIn,Newsletter", "type": "string" },
+            { "id": "brands", "name": "brands", "value": "VaultVerse,AuraFlow", "type": "string" },
+            { "id": "slot_af", "name": "slot_AF", "value": "11:11", "type": "string" },
+            { "id": "slot_vv", "name": "slot_VV", "value": "15:33", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "air-context",
+      "name": "Air — Set Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [760, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Act as the 33333 Content Generator. Given niche {{ $('Determine Element Block').item.json.campaign }} and platforms {{ $json.platforms }}, generate 5 ideas per platform. Also generate 1 AuraFlow theme (element: Air, slot 11:11) and 1 VaultVerse theme (element: Fire, slot 15:33). Return strict JSON only: { content_ideas: [{name, ideas}], auraflow_payload: {theme, element, slot}, vaultverse_payload: {theme, element, slot} }\"\n    }]\n  }]\n}"
+      },
+      "id": "air-gemini",
+      "name": "Air — Gemini Content Ideas (W1)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nlet parsed = raw;\ntry {\n  const text = raw.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}';\n  const match = text.match(/\\{[\\s\\S]*\\}/);\n  parsed = match ? JSON.parse(match[0]) : {};\n} catch (e) { parsed = {}; }\n\nconst clock = $('Determine Element Block').first().json;\nconst rows = [];\nconst ideas = parsed.content_ideas ?? [];\n\nideas.forEach(platform => {\n  (platform.ideas ?? []).forEach(topic => {\n    rows.push({\n      id: `CI_${Date.now()}_${Math.floor(Math.random()*1000)}`,\n      platform: platform.name,\n      topic,\n      status: 'idea',\n      brand: platform.name === 'YouTube' ? 'VaultVerse' : 'AuraFlow',\n      source_element: 'Air',\n      date_created: new Date().toISOString(),\n      link: null,\n    });\n  });\n});\n\nreturn [{\n  json: {\n    rows,\n    ideas_count: rows.length,\n    auraflow_payload: parsed.auraflow_payload ?? {},\n    vaultverse_payload: parsed.vaultverse_payload ?? {},\n    day: clock.day,\n    dateStr: clock.dateStr,\n  }\n}];"
+      },
+      "id": "air-normalize",
+      "name": "Air — Normalize Content_Ideas",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 0]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Content_Ideas", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.rows[0].id }}",
+            "platform": "={{ $json.rows[0].platform }}",
+            "topic": "={{ $json.rows[0].topic }}",
+            "status": "idea",
+            "brand": "={{ $json.rows[0].brand }}",
+            "source_element": "Air",
+            "date_created": "={{ $now.toISO() }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "air-sheet",
+      "name": "Air — Append Content_Ideas",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [1420, 0],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" } }
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "name": "=AURAFLOW_day{{ $('Air — Normalize Content_Ideas').item.json.day }}_payload.json",
+        "driveId": { "__rl": true, "mode": "list", "value": "My Drive" },
+        "folderId": { "__rl": true, "value": "={{ $env.GOOGLE_DRIVE_33333_DRAFTS || $env.GOOGLE_DRIVE_VAULT_FOLDER }}", "mode": "id" },
+        "options": { "binaryPropertyName": "data" }
+      },
+      "id": "air-drive-af",
+      "name": "Air — Save AuraFlow Payload",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1640, -60],
+      "credentials": { "googleDriveOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Drive" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/queue-check' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"checkDay\": {{ $('Air — Normalize Content_Ideas').item.json.day }},\n  \"triggered_by\": \"Air_Block\",\n  \"auraflow_exists\": true,\n  \"vaultverse_exists\": true\n}"
+      },
+      "id": "air-queue-check",
+      "name": "Air — Queue Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1640, 60]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/continuity' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"time\": \"07:00\",\n  \"element\": \"Air\",\n  \"action\": \"Content Generated\",\n  \"detail\": \"{{ $('Air — Normalize Content_Ideas').item.json.ideas_count }} ideas\",\n  \"status\": \"DONE\",\n  \"date\": \"{{ $('Determine Element Block').item.json.dateStr }}\"\n}"
+      },
+      "id": "air-continuity",
+      "name": "Air — Log Continuity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1860, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "rule", "name": "rule_33333", "value": "short_output:1, connection_move:1, micro_income:1", "type": "string" },
+            { "id": "products", "name": "active_products", "value": "resume_saas,coaching_chatbot,ghostwriting,digital_course", "type": "string" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fire-context",
+      "name": "Fire — Set Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [760, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/lead-scoring' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={}"
+      },
+      "id": "fire-leads",
+      "name": "Fire — Fetch Trial Leads (W7)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "id": "resume-webhook", "leftValue": "={{ $env.RESUME_API_WEBHOOK }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fire-if-resume",
+      "name": "Fire — Resume API? (W6)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1200, 120]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.RESUME_API_WEBHOOK }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"triggered_by\": \"Fire_Block\", \"element\": \"Fire\" }"
+      },
+      "id": "fire-resume",
+      "name": "Fire — W6 Resume Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, 80]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "id": "chatbot", "leftValue": "={{ $env.CHATBOT_WEBHOOK }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fire-if-chatbot",
+      "name": "Fire — Chatbot? (W8)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CHATBOT_WEBHOOK }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"triggered_by\": \"Fire_Block\" }"
+      },
+      "id": "fire-chatbot",
+      "name": "Fire — W8 Chatbot Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "id": "ghost", "leftValue": "={{ $env.GHOSTWRITING_WEBHOOK }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fire-if-ghost",
+      "name": "Fire — Ghostwriting? (W9)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1200, 280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.GHOSTWRITING_WEBHOOK }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"triggered_by\": \"Fire_Block\" }"
+      },
+      "id": "fire-ghost",
+      "name": "Fire — W9 Ghostwriting Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, 280]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "id": "monday", "leftValue": "={{ $('Determine Element Block').item.json.dayOfWeek }}", "rightValue": 1, "operator": { "type": "number", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fire-if-monday",
+      "name": "Fire — Monday? (W10 Course)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1200, 360]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/content/publish' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"brand\": \"33333\",\n  \"content\": { \"social_captions\": [\"W10 Course module assembly — Fire block Monday\"] },\n  \"platforms\": [\"blog\"]\n}"
+      },
+      "id": "fire-course",
+      "name": "Fire — W10 Course Assembly",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, 360]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/continuity' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"time\": \"10:10\",\n  \"element\": \"Fire\",\n  \"action\": \"Side Hustle\",\n  \"detail\": \"W6-W10 webhooks executed\",\n  \"status\": \"DONE\",\n  \"date\": \"{{ $('Determine Element Block').item.json.dateStr }}\"\n}"
+      },
+      "id": "fire-continuity",
+      "name": "Fire — Log Continuity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1640, 200]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Content_Ideas", "mode": "name" },
+        "filtersUI": { "values": [{ "lookupColumn": "platform", "lookupValue": "LinkedIn" }, { "lookupColumn": "status", "lookupValue": "script_ready" }] },
+        "options": { "returnAllMatches": false }
+      },
+      "id": "water-get-idea",
+      "name": "Water — Get LinkedIn Idea (W4)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [760, 400],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Write a LinkedIn post for topic: {{ $json.topic || $json.keyword || 'career growth' }}. Hook in first line. 2-3 short paragraphs. 1 CTA to check link in profile for resume/coaching tools. No emojis.\"\n    }]\n  }]\n}"
+      },
+      "id": "water-gemini",
+      "name": "Water — Gemini LinkedIn Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 400]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/bridge/connection-move' }}",
+        "options": {}
+      },
+      "id": "water-connection",
+      "name": "Water — Connection Move",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"14:22 WATER — Connection Move: {{ $json.connection_move }}. Target: {{ $json.target_count }} people.\"\n}"
+      },
+      "id": "water-slack",
+      "name": "Water — Slack Connection Move",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/continuity' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"time\": \"14:22\",\n  \"element\": \"Water\",\n  \"action\": \"LinkedIn + Connections\",\n  \"detail\": \"Post queued, connection move pushed\",\n  \"status\": \"DONE\",\n  \"date\": \"{{ $('Determine Element Block').item.json.dateStr }}\"\n}"
+      },
+      "id": "water-continuity",
+      "name": "Water — Log Continuity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1640, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/content/publish' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"brand\": \"vaultverse\",\n  \"content\": { \"social_captions\": [\"Earth block — publish queued content\"] },\n  \"platforms\": [\"youtube\", \"instagram\", \"blog\"],\n  \"leadMagnetUrl\": \"{{ $env.LEAD_MAGNET_BASE_URL }}\"\n}"
+      },
+      "id": "earth-publish",
+      "name": "Earth — W2 Publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [760, 600]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/engagement/pending' }}",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }] },
+        "options": {}
+      },
+      "id": "earth-engagement",
+      "name": "Earth — Pull Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/content/syndicate' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"platforms\": [\"tiktok\", \"twitter\"], \"format\": \"vertical_short\" }"
+      },
+      "id": "earth-syndicate",
+      "name": "Earth — Syndicate (W5 adj)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 600]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "name": "={{ $('Determine Element Block').item.json.dateStr }}-backup",
+        "driveId": { "__rl": true, "mode": "list", "value": "My Drive" },
+        "folderId": { "__rl": true, "value": "={{ $env.GOOGLE_DRIVE_VAULT_FOLDER }}", "mode": "id" },
+        "options": {}
+      },
+      "id": "earth-backup",
+      "name": "Earth — Drive Backup",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [1420, 600],
+      "credentials": { "googleDriveOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Drive" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/continuity' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"time\": \"18:00\",\n  \"element\": \"Earth\",\n  \"action\": \"Publish & Metrics\",\n  \"detail\": \"YT publish, syndicate, backup\",\n  \"status\": \"DONE\",\n  \"date\": \"{{ $('Determine Element Block').item.json.dateStr }}\"\n}"
+      },
+      "id": "earth-continuity",
+      "name": "Earth — Log Continuity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1640, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/queue-check' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"checkDay\": {{ $('Determine Element Block').item.json.day }},\n  \"triggered_by\": \"Spirit_Block\"\n}"
+      },
+      "id": "spirit-queue",
+      "name": "Spirit — Final Queue Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [760, 800]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/bridge/spirit-reflection' }}",
+        "options": {}
+      },
+      "id": "spirit-reflect",
+      "name": "Spirit — End-of-Day Reflection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 800]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/continuity' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"time\": \"21:33\",\n  \"element\": \"Spirit\",\n  \"action\": \"LOCKDOWN COMPLETE\",\n  \"detail\": \"NEXT: {{ $json.next_priority }}\",\n  \"status\": \"DONE\",\n  \"date\": \"{{ $('Determine Element Block').item.json.dateStr }}\"\n}"
+      },
+      "id": "spirit-continuity",
+      "name": "Spirit — Log Continuity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 800]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"text\": \"21:33 SPIRIT — LOCKDOWN COMPLETE. 33333 engine shutdown. See you at 07:00 Air.\" }"
+      },
+      "id": "spirit-slack",
+      "name": "Spirit — Slack Shutdown",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1420, 800]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "id": "lead-score", "leftValue": "={{ $json.runLeadScoring }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "flow-if-scoring",
+      "name": "Flow — Lead Scoring?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [760, 1000]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/lead-scoring' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={}"
+      },
+      "id": "flow-lead-scoring",
+      "name": "Flow — Lead Scoring (15min)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 960]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "id": "shortform", "leftValue": "={{ $json.runShortformPrep }}", "rightValue": true, "operator": { "type": "boolean", "operation": "true" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "flow-if-shortform",
+      "name": "Flow — Shortform Prep? (W3)",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [760, 1100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\": [{\n      \"text\": \"Write a 30-45 second TikTok/IG Reels script for junior dev career tip. Return JSON: { hook, body, cta }\"\n    }]\n  }]\n}"
+      },
+      "id": "flow-shortform",
+      "name": "Flow — W3 Short Script",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [980, 1100]
+    }
+  ],
+  "connections": {
+    "Clock Watcher — Every 15min ET": {
+      "main": [[{ "node": "Determine Element Block", "type": "main", "index": 0 }]]
+    },
+    "Determine Element Block": {
+      "main": [[{ "node": "Route by Element", "type": "main", "index": 0 }]]
+    },
+    "Route by Element": {
+      "main": [
+        [{ "node": "Air — Set Context", "type": "main", "index": 0 }],
+        [{ "node": "Fire — Set Context", "type": "main", "index": 0 }],
+        [{ "node": "Water — Get LinkedIn Idea (W4)", "type": "main", "index": 0 }],
+        [{ "node": "Earth — W2 Publish", "type": "main", "index": 0 }],
+        [{ "node": "Spirit — Final Queue Check", "type": "main", "index": 0 }],
+        [{ "node": "Flow — Lead Scoring?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Air — Set Context": {
+      "main": [[{ "node": "Air — Gemini Content Ideas (W1)", "type": "main", "index": 0 }]]
+    },
+    "Air — Gemini Content Ideas (W1)": {
+      "main": [[{ "node": "Air — Normalize Content_Ideas", "type": "main", "index": 0 }]]
+    },
+    "Air — Normalize Content_Ideas": {
+      "main": [[{ "node": "Air — Append Content_Ideas", "type": "main", "index": 0 }]]
+    },
+    "Air — Append Content_Ideas": {
+      "main": [[
+        { "node": "Air — Save AuraFlow Payload", "type": "main", "index": 0 },
+        { "node": "Air — Queue Check", "type": "main", "index": 0 }
+      ]]
+    },
+    "Air — Queue Check": {
+      "main": [[{ "node": "Air — Log Continuity", "type": "main", "index": 0 }]]
+    },
+    "Fire — Set Context": {
+      "main": [[{ "node": "Fire — Fetch Trial Leads (W7)", "type": "main", "index": 0 }]]
+    },
+    "Fire — Fetch Trial Leads (W7)": {
+      "main": [[
+        { "node": "Fire — Resume API? (W6)", "type": "main", "index": 0 },
+        { "node": "Fire — Chatbot? (W8)", "type": "main", "index": 0 },
+        { "node": "Fire — Ghostwriting? (W9)", "type": "main", "index": 0 },
+        { "node": "Fire — Monday? (W10 Course)", "type": "main", "index": 0 }
+      ]]
+    },
+    "Fire — Resume API? (W6)": {
+      "main": [[{ "node": "Fire — W6 Resume Webhook", "type": "main", "index": 0 }], []]
+    },
+    "Fire — Chatbot? (W8)": {
+      "main": [[{ "node": "Fire — W8 Chatbot Webhook", "type": "main", "index": 0 }], []]
+    },
+    "Fire — Ghostwriting? (W9)": {
+      "main": [[{ "node": "Fire — W9 Ghostwriting Webhook", "type": "main", "index": 0 }], []]
+    },
+    "Fire — Monday? (W10 Course)": {
+      "main": [[{ "node": "Fire — W10 Course Assembly", "type": "main", "index": 0 }], []]
+    },
+    "Fire — W6 Resume Webhook": {
+      "main": [[{ "node": "Fire — Log Continuity", "type": "main", "index": 0 }]]
+    },
+    "Fire — W8 Chatbot Webhook": {
+      "main": [[{ "node": "Fire — Log Continuity", "type": "main", "index": 0 }]]
+    },
+    "Fire — W9 Ghostwriting Webhook": {
+      "main": [[{ "node": "Fire — Log Continuity", "type": "main", "index": 0 }]]
+    },
+    "Fire — W10 Course Assembly": {
+      "main": [[{ "node": "Fire — Log Continuity", "type": "main", "index": 0 }]]
+    },
+    "Water — Get LinkedIn Idea (W4)": {
+      "main": [[{ "node": "Water — Gemini LinkedIn Post", "type": "main", "index": 0 }]]
+    },
+    "Water — Gemini LinkedIn Post": {
+      "main": [[{ "node": "Water — Connection Move", "type": "main", "index": 0 }]]
+    },
+    "Water — Connection Move": {
+      "main": [[{ "node": "Water — Slack Connection Move", "type": "main", "index": 0 }]]
+    },
+    "Water — Slack Connection Move": {
+      "main": [[{ "node": "Water — Log Continuity", "type": "main", "index": 0 }]]
+    },
+    "Earth — W2 Publish": {
+      "main": [[{ "node": "Earth — Pull Metrics", "type": "main", "index": 0 }]]
+    },
+    "Earth — Pull Metrics": {
+      "main": [[{ "node": "Earth — Syndicate (W5 adj)", "type": "main", "index": 0 }]]
+    },
+    "Earth — Syndicate (W5 adj)": {
+      "main": [[{ "node": "Earth — Drive Backup", "type": "main", "index": 0 }]]
+    },
+    "Earth — Drive Backup": {
+      "main": [[{ "node": "Earth — Log Continuity", "type": "main", "index": 0 }]]
+    },
+    "Spirit — Final Queue Check": {
+      "main": [[{ "node": "Spirit — End-of-Day Reflection", "type": "main", "index": 0 }]]
+    },
+    "Spirit — End-of-Day Reflection": {
+      "main": [[{ "node": "Spirit — Log Continuity", "type": "main", "index": 0 }]]
+    },
+    "Spirit — Log Continuity": {
+      "main": [[{ "node": "Spirit — Slack Shutdown", "type": "main", "index": 0 }]]
+    },
+    "Flow — Lead Scoring?": {
+      "main": [[{ "node": "Flow — Lead Scoring (15min)", "type": "main", "index": 0 }], [{ "node": "Flow — Shortform Prep? (W3)", "type": "main", "index": 0 }]]
+    },
+    "Flow — Lead Scoring (15min)": {
+      "main": [[{ "node": "Flow — Shortform Prep? (W3)", "type": "main", "index": 0 }]]
+    },
+    "Flow — Shortform Prep? (W3)": {
+      "main": [[{ "node": "Flow — W3 Short Script", "type": "main", "index": 0 }], []]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/New_York"
+  },
+  "staticData": null,
+  "tags": [{ "name": "33333" }, { "name": "bridge" }, { "name": "integration" }],
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "description": "BRIDGE_33333 — One master workflow connecting 10-Workflow Blueprint to 33333 Control Tower. Five elemental blocks + background ops. Replaces separate W1-W10 crons. Import alongside docs/N8N_BRIDGE_33333.md."
+  }
+}

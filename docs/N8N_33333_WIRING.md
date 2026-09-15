@@ -8,7 +8,9 @@ Wire the **33333 Autopilot Revenue Engine** to Money Autopilot API endpoints.
 
 ## Quick start (10 minutes)
 
-1. **Import workflow:** `docs/n8n/33333-autopilot-revenue-engine.workflow.json`
+> **Recommended:** Use **`docs/n8n/bridge-33333.workflow.json`** (BRIDGE_33333) — one master workflow with elemental clock routing. See **`docs/N8N_BRIDGE_33333.md`**.
+
+1. **Import workflow:** `docs/n8n/33333-autopilot-revenue-engine.workflow.json` *(legacy five-cron; skip if using bridge)*
 2. **Set n8n env vars** (see `.env.example` 33333 section)
 3. **Configure credentials:** Google Sheets, Gemini, Stripe, SMTP
 4. **Set server env:** `N33333_WEBHOOK_SECRET` (same value in n8n HTTP headers)
