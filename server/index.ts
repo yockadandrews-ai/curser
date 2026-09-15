@@ -109,6 +109,7 @@ import { HERMES_QUALIFY_QUESTIONS } from './sovereign/hermesGate.js';
 import { getActiveVertical } from './sovereign/config.js';
 import { register33333Routes } from './33333/routes.js';
 import { register33333BridgeRoutes } from './33333/bridgeRoutes.js';
+import { register33333ViralRoutes } from './33333/viralRoutes.js';
 import { registerUnifiedStripeWebhook } from './stripeWebhookUnified.js';
 import {
   subscribeOutreach,
@@ -922,6 +923,7 @@ app.post('/api/sovereign/test/fake-lead', (_req, res) => {
 // 33333 Autopilot Revenue — consumer lane (separate from SGOS/Hermes)
 register33333Routes(app);
 register33333BridgeRoutes(app);
+register33333ViralRoutes(app);
 
 // Serve frontend in production
 const clientPath = path.join(__dirname, '../client');

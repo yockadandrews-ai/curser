@@ -20,6 +20,7 @@ export interface N8n33333Config {
   };
   workflowImportPath: string;
   bridgeWorkflowImportPath: string;
+  viralShortsWorkflowImportPath: string;
   schedule: Record<string, string>;
   bridgeSchedule: Record<string, string>;
   envVars: string[];
@@ -80,6 +81,7 @@ export function getN8n33333Config(): N8n33333Config {
       'GHOSTWRITING_WEBHOOK',
       'SLACK_WEBHOOK_URL',
     ],
+    viralShortsWorkflowImportPath: 'docs/n8n/33333-viral-shorts-engine-v3.workflow.json',
     governance: '33333 consumer lane only · SGOS/Hermes governance stays separate',
   };
 }

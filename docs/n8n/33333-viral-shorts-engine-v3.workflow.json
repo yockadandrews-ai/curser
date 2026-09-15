@@ -1,0 +1,577 @@
+{
+  "name": "33333 Viral Shorts Engine v3.0",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [{ "field": "cronExpression", "expression": "10 10 * * 1-5" }] } },
+      "id": "n01-fire-trigger",
+      "name": "01 Fire Block 10:10 CDT",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 400]
+    },
+    {
+      "parameters": {
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/weekend-lock' }}",
+        "options": {}
+      },
+      "id": "n02-weekend-check",
+      "name": "02 Weekend Lock Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [220, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "id": "unlocked", "leftValue": "={{ $json.locked }}", "rightValue": false, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        }
+      },
+      "id": "n03-weekend-if",
+      "name": "03 Weekend Lock IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "brand", "name": "brand", "value": "vaultverse", "type": "string" },
+            { "id": "topic", "name": "topic", "value": "Career shortcuts junior devs miss in 2026", "type": "string" }
+          ]
+        }
+      },
+      "id": "n04-fire-context",
+      "name": "04 Set Fire Context",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [660, 320]
+    },
+    {
+      "parameters": {
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/prompts/hooks?topic=' + encodeURIComponent($json.topic) + '&brand=' + $json.brand }}",
+        "options": {}
+      },
+      "id": "n05-hook-prompt",
+      "name": "05 Get Hook Prompt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": {{ JSON.stringify($json.prompt) }} }] }] }"
+      },
+      "id": "n06-gemini-hooks",
+      "name": "06 Gemini 3 Hook Variants",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 320]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nlet parsed = {};\ntry {\n  const text = raw.candidates?.[0]?.content?.parts?.[0]?.text ?? '{}';\n  const m = text.match(/\\{[\\s\\S]*\\}/);\n  parsed = m ? JSON.parse(m[0]) : {};\n} catch (e) { parsed = { hooks: { A: 'Stop scrolling.', B: 'This changed my career.', C: 'Nobody talks about this.' } }; }\nconst ctx = $('04 Set Fire Context').first().json;\nreturn [{ json: { brand: ctx.brand, topic: ctx.topic, hooks: parsed.hooks || parsed } }];"
+      },
+      "id": "n07-parse-hooks",
+      "name": "07 Parse Hook Variants",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/hooks' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "n08-save-hooks",
+      "name": "08 Save Hook Set",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1540, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Write v3 viral short script variant A. Hook: \" + $('07 Parse Hook Variants').item.json.hooks.A + \". Enforce 2026 rules: 0.5s hook, [VISUAL CUE] every 3-4s, share_bait, 5+ word question, loop_bridge. JSON only.\" }] }] }"
+      },
+      "id": "n09-script-a",
+      "name": "09 Gemini Script A",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Write v3 viral short script variant B. Hook: \" + $('07 Parse Hook Variants').item.json.hooks.B + \". Enforce 2026 rules. JSON only.\" }] }] }"
+      },
+      "id": "n10-script-b",
+      "name": "10 Gemini Script B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 320]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": { "parameters": [{ "name": "key", "value": "={{ $env.GEMINI_API_KEY }}" }] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Write v3 viral short script variant C. Hook: \" + $('07 Parse Hook Variants').item.json.hooks.C + \". Enforce 2026 rules. JSON only.\" }] }] }"
+      },
+      "id": "n11-script-c",
+      "name": "11 Gemini Script C",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 440]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "n12-merge-scripts",
+      "name": "12 Merge A/B/C Scripts",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [1980, 320]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "toEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "subject": "33333 v3 — Pick Hook A/B/C",
+        "emailType": "text",
+        "message": "=Hook set {{ $('08 Save Hook Set').item.json.id }}\n\nA: {{ $('07 Parse Hook Variants').item.json.hooks.A }}\nB: {{ $('07 Parse Hook Variants').item.json.hooks.B }}\nC: {{ $('07 Parse Hook Variants').item.json.hooks.C }}\n\nReply or POST /api/33333/viral/hooks/{{ $('08 Save Hook Set').item.json.id }}/pick with variant."
+      },
+      "id": "n13-email-pick",
+      "name": "13 Email Hook Pick",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [2200, 320],
+      "credentials": { "smtp": { "id": "CONFIGURE_ME", "name": "SMTP" } }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "viral-hook-picked",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "n14-webhook-pick",
+      "name": "14 Webhook Hook Picked",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [2200, 480],
+      "webhookId": "viral-hook-picked"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "variant", "name": "selectedVariant", "value": "={{ $json.body?.variant || $json.variant || 'A' }}", "type": "string" },
+            { "id": "hookSetId", "name": "hookSetId", "value": "={{ $('08 Save Hook Set').item.json.id }}", "type": "string" }
+          ]
+        }
+      },
+      "id": "n15-set-picked",
+      "name": "15 Set Picked Variant",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [2420, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/metadata-hygiene' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"filename\": \"short_{{ $json.selectedVariant }}.mp4\", \"metadata\": {} }"
+      },
+      "id": "n16-metadata",
+      "name": "16 Metadata Hygiene",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2640, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [{ "id": "ok", "leftValue": "={{ $json.ok }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        }
+      },
+      "id": "n17-avatar-if",
+      "name": "17 AI Avatar Block IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [2860, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/optimize' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"platform\": \"youtube\", \"script\": { \"variant\": \"{{ $('15 Set Picked Variant').item.json.selectedVariant }}\", \"hook_0_5s\": \"{{ $('07 Parse Hook Variants').item.json.hooks.A }}\" } }"
+      },
+      "id": "n18-opt-yt",
+      "name": "18 Optimize YouTube 35s",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3080, 280]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/optimize' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"platform\": \"instagram\", \"script\": { \"variant\": \"{{ $('15 Set Picked Variant').item.json.selectedVariant }}\" } }"
+      },
+      "id": "n19-opt-ig",
+      "name": "19 Optimize Instagram 45s",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3080, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/optimize' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"platform\": \"tiktok\", \"script\": { \"variant\": \"{{ $('15 Set Picked Variant').item.json.selectedVariant }}\" } }"
+      },
+      "id": "n20-opt-tt",
+      "name": "20 Optimize TikTok 60s",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3080, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/publish' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"brand\": \"{{ $('04 Set Fire Context').item.json.brand }}\",\n  \"topic\": \"{{ $('04 Set Fire Context').item.json.topic }}\",\n  \"hookVariant\": \"{{ $('15 Set Picked Variant').item.json.selectedVariant }}\",\n  \"script\": { \"native_upload\": true },\n  \"platforms\": [\"youtube\", \"instagram\", \"tiktok\"]\n}"
+      },
+      "id": "n21-native-publish",
+      "name": "21 Native Publish All",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3300, 400]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "value": "={{ $env.GOOGLE_SHEET_ID }}", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Viral_Shorts", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "variant": "={{ $('15 Set Picked Variant').item.json.selectedVariant }}",
+            "platforms": "youtube,instagram,tiktok",
+            "status": "published"
+          }
+        }
+      },
+      "id": "n22-sheet-log",
+      "name": "22 Sheet Log Publish",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [3520, 400],
+      "credentials": { "googleSheetsOAuth2Api": { "id": "CONFIGURE_ME", "name": "Google Sheets" } }
+    },
+    {
+      "parameters": { "amount": 2, "unit": "hours" },
+      "id": "n23-wait-2h",
+      "name": "23 Wait 2 Hours",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [3740, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/velocity-check' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={}"
+      },
+      "id": "n24-velocity",
+      "name": "24 Velocity K-Factor Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3960, 400]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.results[0].viralTier }}", "rightValue": "VIRAL", "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "VIRAL" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.results[0].viralTier }}", "rightValue": "HIGH", "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "HIGH" },
+            { "conditions": { "conditions": [{ "leftValue": "={{ $json.results[0].viralTier }}", "rightValue": "MEDIUM", "operator": { "type": "string", "operation": "equals" } }] }, "renameOutput": true, "outputKey": "MEDIUM" }
+          ]
+        },
+        "options": { "fallbackOutput": "extra" }
+      },
+      "id": "n25-tier-switch",
+      "name": "25 Viral Tier Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [4180, 400]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "toEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "subject": "🔥 VIRAL ALERT — Boost $20-50 NOW",
+        "emailType": "text",
+        "message": "=K-factor breach. Boost immediately.\n{{ JSON.stringify($json) }}"
+      },
+      "id": "n26-viral-email",
+      "name": "26 Email VIRAL Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [4400, 200],
+      "credentials": { "smtp": { "id": "CONFIGURE_ME", "name": "SMTP" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "toEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "subject": "33333 HIGH — Respond + $10 boost",
+        "emailType": "text",
+        "message": "=High velocity. Engage all comments.\n{{ JSON.stringify($json) }}"
+      },
+      "id": "n27-high-email",
+      "name": "27 Email HIGH Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [4400, 340],
+      "credentials": { "smtp": { "id": "CONFIGURE_ME", "name": "SMTP" } }
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "toEmail": "={{ $env.FOUNDER_EMAIL }}",
+        "subject": "33333 MEDIUM — Monitor 2h",
+        "emailType": "text",
+        "message": "=Moderate velocity. Check again later."
+      },
+      "id": "n28-medium-email",
+      "name": "28 Email MEDIUM Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [4400, 480],
+      "credentials": { "smtp": { "id": "CONFIGURE_ME", "name": "SMTP" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/viral/velocity-check' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"archiveLow\": true }"
+      },
+      "id": "n29-archive-low",
+      "name": "29 Archive LOW Hooks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [4400, 620]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.APP_BASE_URL || 'http://localhost:3001') + '/api/33333/n8n/continuity' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-33333-Secret", "value": "={{ $env.N33333_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"time\": \"10:10\", \"element\": \"Fire\", \"action\": \"Viral Shorts v3\", \"detail\": \"Published + velocity checked\", \"status\": \"DONE\" }"
+      },
+      "id": "n30-continuity",
+      "name": "30 Log Continuity",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [4620, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SLACK_WEBHOOK_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"text\": \"33333 v3 Fire block complete — native publish + 2h velocity alert armed.\" }"
+      },
+      "id": "n31-slack",
+      "name": "31 Slack Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [4840, 400]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [{ "id": "stop", "name": "status", "value": "WEEKEND_LOCK — no shorts", "type": "string" }]
+        }
+      },
+      "id": "n32-weekend-stop",
+      "name": "32 Weekend Hard Stop",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [660, 520]
+    }
+  ],
+  "connections": {
+    "01 Fire Block 10:10 CDT": { "main": [[{ "node": "02 Weekend Lock Check", "type": "main", "index": 0 }]] },
+    "02 Weekend Lock Check": { "main": [[{ "node": "03 Weekend Lock IF", "type": "main", "index": 0 }]] },
+    "03 Weekend Lock IF": {
+      "main": [
+        [{ "node": "04 Set Fire Context", "type": "main", "index": 0 }],
+        [{ "node": "32 Weekend Hard Stop", "type": "main", "index": 0 }]
+      ]
+    },
+    "04 Set Fire Context": { "main": [[{ "node": "05 Get Hook Prompt", "type": "main", "index": 0 }]] },
+    "05 Get Hook Prompt": { "main": [[{ "node": "06 Gemini 3 Hook Variants", "type": "main", "index": 0 }]] },
+    "06 Gemini 3 Hook Variants": { "main": [[{ "node": "07 Parse Hook Variants", "type": "main", "index": 0 }]] },
+    "07 Parse Hook Variants": { "main": [[{ "node": "08 Save Hook Set", "type": "main", "index": 0 }]] },
+    "08 Save Hook Set": {
+      "main": [[
+        { "node": "09 Gemini Script A", "type": "main", "index": 0 },
+        { "node": "10 Gemini Script B", "type": "main", "index": 0 },
+        { "node": "11 Gemini Script C", "type": "main", "index": 0 }
+      ]]
+    },
+    "09 Gemini Script A": { "main": [[{ "node": "12 Merge A/B/C Scripts", "type": "main", "index": 0 }]] },
+    "10 Gemini Script B": { "main": [[{ "node": "12 Merge A/B/C Scripts", "type": "main", "index": 1 }]] },
+    "11 Gemini Script C": { "main": [[{ "node": "12 Merge A/B/C Scripts", "type": "main", "index": 2 }]] },
+    "12 Merge A/B/C Scripts": { "main": [[{ "node": "13 Email Hook Pick", "type": "main", "index": 0 }]] },
+    "13 Email Hook Pick": { "main": [[{ "node": "15 Set Picked Variant", "type": "main", "index": 0 }]] },
+    "14 Webhook Hook Picked": { "main": [[{ "node": "15 Set Picked Variant", "type": "main", "index": 0 }]] },
+    "15 Set Picked Variant": { "main": [[{ "node": "16 Metadata Hygiene", "type": "main", "index": 0 }]] },
+    "16 Metadata Hygiene": { "main": [[{ "node": "17 AI Avatar Block IF", "type": "main", "index": 0 }]] },
+    "17 AI Avatar Block IF": {
+      "main": [[
+        { "node": "18 Optimize YouTube 35s", "type": "main", "index": 0 },
+        { "node": "19 Optimize Instagram 45s", "type": "main", "index": 0 },
+        { "node": "20 Optimize TikTok 60s", "type": "main", "index": 0 }
+      ], []]
+    },
+    "18 Optimize YouTube 35s": { "main": [[{ "node": "21 Native Publish All", "type": "main", "index": 0 }]] },
+    "19 Optimize Instagram 45s": { "main": [[{ "node": "21 Native Publish All", "type": "main", "index": 0 }]] },
+    "20 Optimize TikTok 60s": { "main": [[{ "node": "21 Native Publish All", "type": "main", "index": 0 }]] },
+    "21 Native Publish All": { "main": [[{ "node": "22 Sheet Log Publish", "type": "main", "index": 0 }]] },
+    "22 Sheet Log Publish": { "main": [[{ "node": "23 Wait 2 Hours", "type": "main", "index": 0 }]] },
+    "23 Wait 2 Hours": { "main": [[{ "node": "24 Velocity K-Factor Check", "type": "main", "index": 0 }]] },
+    "24 Velocity K-Factor Check": { "main": [[{ "node": "25 Viral Tier Switch", "type": "main", "index": 0 }]] },
+    "25 Viral Tier Switch": {
+      "main": [
+        [{ "node": "26 Email VIRAL Alert", "type": "main", "index": 0 }],
+        [{ "node": "27 Email HIGH Alert", "type": "main", "index": 0 }],
+        [{ "node": "28 Email MEDIUM Alert", "type": "main", "index": 0 }],
+        [{ "node": "29 Archive LOW Hooks", "type": "main", "index": 0 }]
+      ]
+    },
+    "26 Email VIRAL Alert": { "main": [[{ "node": "30 Log Continuity", "type": "main", "index": 0 }]] },
+    "27 Email HIGH Alert": { "main": [[{ "node": "30 Log Continuity", "type": "main", "index": 0 }]] },
+    "28 Email MEDIUM Alert": { "main": [[{ "node": "30 Log Continuity", "type": "main", "index": 0 }]] },
+    "29 Archive LOW Hooks": { "main": [[{ "node": "30 Log Continuity", "type": "main", "index": 0 }]] },
+    "30 Log Continuity": { "main": [[{ "node": "31 Slack Summary", "type": "main", "index": 0 }]] }
+  },
+  "pinData": {},
+  "settings": { "executionOrder": "v1", "timezone": "America/Chicago" },
+  "tags": [{ "name": "33333" }, { "name": "viral" }, { "name": "v3" }],
+  "meta": {
+    "description": "33333 Viral Shorts Engine v3.0 — 32 nodes. 2026 elite tactics: A/B/C hooks, metadata hygiene, native publish, 2h K-factor alerts. Fire block 10:10 CDT weekdays."
+  }
+}
