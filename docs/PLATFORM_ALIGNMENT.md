@@ -1,6 +1,6 @@
 # Platform alignment — all lanes on `main`
 
-Last synced: **2026-08-16** (merged parallel Cursor agent branches)
+Last synced: **2026-09-27** (BRIDGE_33333 + Viral Shorts v3 — see `docs/UPDATES.md`)
 
 ## Domain map (canonical)
 
@@ -26,6 +26,9 @@ Last synced: **2026-08-16** (merged parallel Cursor agent branches)
 | `cursor/33333-autopilot-revenue-5526` | Autopilot revenue system | `server/33333/`, `Hub33333`, n8n workflow |
 | `cursor/outreach-system-package-4c1d` | Equinox autopilot system | Outreach docs, landing, Stripe checkout |
 | `cursor/solar-vertical-0a2c` | Sovereign sales autopilot | `server/sovereign/`, Solar seeds |
+| `cursor/33333-updates-sync-b1b2` | **BRIDGE + Viral v3 (combined)** | `bridge-*`, `viral*`, `docs/UPDATES.md` |
+| `cursor/bridge-33333-integration-b1b2` | 10-workflow ↔ Control Tower bridge | `docs/n8n/bridge-33333.workflow.json` |
+| `cursor/viral-shorts-engine-v3-b1b2` | 2026 shorts engine (32 nodes) | `33333-viral-shorts-engine-v3.workflow.json` |
 
 ## Shared infrastructure
 
@@ -47,5 +50,5 @@ Last synced: **2026-08-16** (merged parallel Cursor agent branches)
 
 1. Register `moneymagnettools.com` on Hostinger + upload utility zip
 2. Hermes approve at `/hermes` before Aug 19 launch
-3. Import n8n workflows (Hermes, 33333, outreach, sovereign)
+3. Import n8n workflows (Hermes, 33333, **bridge-33333**, **viral-shorts-v3**, outreach, sovereign)
 4. Set Stripe + ConvertKit keys in `.env`
