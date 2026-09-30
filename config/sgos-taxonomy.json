@@ -1,0 +1,29 @@
+{
+  "version": "2026-03-18",
+  "canonicalBlueprintDoc": "docs/SOVEREIGN_GROWTH_OS_MASTER_BLUEPRINT.md",
+  "factoryThemeSource": "server/factory/themes.ts",
+  "outputRoot": "output",
+  "outputDatePattern": "YYYY-MM-DD_Five_Themes",
+  "themeFolders": [
+    "01_Conversion_Revenue",
+    "02_Margin_Operations",
+    "03_Acquisition_Lead_Systems",
+    "04_Governance_Trust",
+    "05_Growth_Infrastructure"
+  ],
+  "requiredOutputArtifacts": ["Apps.md", "Suite_Proposal.md"],
+  "launchStagger": {
+    "leadTestPortal": "BioLink Optimizer AI",
+    "monitorHoursPostLaunch": 48,
+    "nextPortal": "Incentive Scout AI",
+    "notesDoc": "docs/TAXONOMY_AND_EFUND_APP_IDEAS.md"
+  },
+  "efundFunnel20": {
+    "label": "E-Fund / Funnel 20 — emergency lead + checkout handoff",
+    "leadCapturePath": "/api/33333/leads",
+    "stripeWebhookPath": "/api/webhooks/stripe",
+    "outreachWebhookEnv": "OUTREACH_WEBHOOK_URL",
+    "efundWebhookEnv": "EFUND_N8N_WEBHOOK_URL",
+    "trackingSheetTab": "EFundLeads"
+  }
+}

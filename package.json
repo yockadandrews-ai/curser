@@ -12,6 +12,9 @@
     "utility:replace-domain": "node scripts/utility-replace-domain.mjs",
     "utility:create-domain": "node scripts/utility-create-domain.mjs",
     "utility:verify-deploy": "node scripts/utility-verify-deploy.mjs",
+    "validate-taxonomy-paths": "node scripts/validate-taxonomy-paths.mjs",
+    "verify-efund-webhook": "node scripts/verify-webhook.mjs --lane efund",
+    "emergency-funnel:verify": "node scripts/verify-emergency-funnel.mjs",
     "start": "node dist/server/index.js",
     "preview": "vite preview"
   },

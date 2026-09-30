@@ -2,7 +2,24 @@
 
 Canonical changelog for cross-chat / Cloud Agent work. **Merge target:** `main`.
 
-Last updated: **2026-09-27**
+Last updated: **2026-09-30**
+
+---
+
+## 2026-09-30 — SGOS blueprint + validators + BioLink launch
+
+| Path | Purpose |
+|------|---------|
+| `docs/SOVEREIGN_GROWTH_OS_MASTER_BLUEPRINT.md` | Apps 1–113 canonical index |
+| `docs/SGOS_COMMAND_CENTER.md` | Command Center incl. §7.1 E-Fund webhooks |
+| `docs/TAXONOMY_AND_EFUND_APP_IDEAS.md` | Taxonomy paths + launch stagger |
+| `docs/EFUND_CONCERNS_AND_ACTIONS.md` | Funnel 20 resolution log |
+| `docs/launch/BIOLINK_OPTIMIZER_LAUNCH.md` | App #8 go-live copy |
+| `config/sgos-taxonomy.json` | Machine-readable taxonomy pointer |
+| `automations/autopilot_engine.js` | JSON pointer for n8n/cron |
+| `scripts/validate-taxonomy-paths.mjs` | `npm run validate-taxonomy-paths` |
+| `scripts/verify-webhook.mjs` | `npm run verify-efund-webhook` |
+| `scripts/verify-emergency-funnel.mjs` | `npm run emergency-funnel:verify` |
 
 ---
 
