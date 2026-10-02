@@ -2,9 +2,20 @@
 
 Canonical changelog for cross-chat / Cloud Agent work. **Merge target:** `main`.
 
-Last updated: **2026-10-02** · **`main` @ `37fb1d7`** (after SGOS + 33333 sync)
+Last updated: **2026-10-02** · **`main`** (after platform + outreach doc sync)
 
 **Quick verify:** `npm run sgos:verify`
+
+---
+
+## 2026-10-02 — Platform + outreach doc sync
+
+| Path | Purpose |
+|------|---------|
+| `docs/PLATFORM_ALIGNMENT.md` | Refreshed — BRIDGE, Viral v3, SGOS, unified Stripe routing, n8n import order |
+| `docs/outreach/MONEY_AUTOPILOT_OUTREACH_SYSTEM.md` | v1.1 — links to PLATFORM_ALIGNMENT + UPDATES |
+| `docs/outreach/7_DAY_EXECUTION_CHECKLIST.md` | Day 5 — BRIDGE + `sgos:verify` |
+| `docs/N8N_OUTREACH_AUTOMATION.md` | Multi-lane Stripe note |
 
 ---
 

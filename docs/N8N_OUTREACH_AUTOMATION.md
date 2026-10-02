@@ -4,7 +4,7 @@ Wire welcome emails and sale notifications from the Money Autopilot landing page
 
 **Governance:** Automations send **notifications only**. Never auto-post, auto-DM, or increment Sent without founder proof URL.
 
----
+> **Multi-lane Stripe:** One webhook serves Engine, 33333, and Sovereign — routing is by checkout metadata. Full map: [PLATFORM_ALIGNMENT.md](./PLATFORM_ALIGNMENT.md) · Changelog: [UPDATES.md](./UPDATES.md)
 
 ## Architecture
 
@@ -200,6 +200,9 @@ Optional n8n node logs outreach events to Hermes for audit trail.
 | [N8N_HERMES_WIRING.md](./N8N_HERMES_WIRING.md) | Calendar → Content Factory |
 | [outreach-welcome-sale.workflow.json](./n8n/outreach-welcome-sale.workflow.json) | Importable n8n workflow |
 | [MONEY_AUTOPILOT_OUTREACH_SYSTEM.md](./outreach/MONEY_AUTOPILOT_OUTREACH_SYSTEM.md) | Full GTM blueprint |
+| [PLATFORM_ALIGNMENT.md](./PLATFORM_ALIGNMENT.md) | All lanes + Stripe routing |
+| [N8N_BRIDGE_33333.md](./N8N_BRIDGE_33333.md) | 33333 master workflow (separate lane) |
+| [UPDATES.md](./UPDATES.md) | BRIDGE, Viral v3, SGOS sync log |
 
 ---
 

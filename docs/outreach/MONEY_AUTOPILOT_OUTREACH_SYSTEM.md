@@ -1,6 +1,9 @@
 # Money Autopilot — Complete Outreach System
 
-**Version:** 1.0 · **Brand:** Money Autopilot / Money Magnet Tools · **Domain:** `autopilot.moneymagnettools.com`
+**Version:** 1.1 · **Updated:** 2026-10-02 · **Brand:** Money Autopilot / Money Magnet Tools
+
+> **Repo map:** [PLATFORM_ALIGNMENT.md](../PLATFORM_ALIGNMENT.md) · **Changelog:** [UPDATES.md](../UPDATES.md)  
+> **33333 consumer (VaultVerse, etc.)** uses [BRIDGE_33333](../N8N_BRIDGE_33333.md) + Viral v3 — separate from this Engine lane. · **Domain:** `autopilot.moneymagnettools.com`
 
 > **Enterprise SGOS audit outreach** (Apollo, $2,500 audit, WF-09) is governed separately — see [SGOS_SYSTEM_ALIGNMENT.md](../SGOS_SYSTEM_ALIGNMENT.md) and Notion WATCHTOWER. This doc is the **consumer Engine ($197) + utility hub** lane only. Nothing here authorizes cold send without approve + proof (Sent=0).
 
@@ -240,7 +243,8 @@ Track in Profit Tracker + spreadsheet:
 | Database | SQLite (`autopilot.db`) | Products, sales, expenses |
 | AI | OpenAI (optional) | Enhanced content generation |
 | Payments | Stripe / Gumroad | Engine + PDF products |
-| Automation | Zapier / n8n | Welcome emails, calendar |
+| Automation | Zapier / n8n | Outreach welcome + Hermes calendar (see PLATFORM_ALIGNMENT) |
+| 33333 (optional upsell) | BRIDGE + Viral v3 | Consumer brands — `/api/33333/*`, not Engine checkout |
 | Support | Crisp (optional) | Live chat on landing page |
 | Affiliates | Rewardful | 30% on Engine + Factory |
 | Host | Vercel / Hostinger | `tools.` + `autopilot.` subdomains |
@@ -260,6 +264,8 @@ Track in Profit Tracker + spreadsheet:
 | [7_DAY_EXECUTION_CHECKLIST.md](./7_DAY_EXECUTION_CHECKLIST.md) | Hour-by-hour sprint |
 | [COMPETITOR_TEARDOWN.md](./COMPETITOR_TEARDOWN.md) | Buffer/Hootsuite positioning |
 | [N8N_OUTREACH_AUTOMATION.md](../N8N_OUTREACH_AUTOMATION.md) | Stripe + welcome/sale automation |
+| [PLATFORM_ALIGNMENT.md](../PLATFORM_ALIGNMENT.md) | All lanes — webhook routing, n8n import order |
+| [UPDATES.md](../UPDATES.md) | Newest merges (BRIDGE, Viral v3, SGOS) |
 
 ### Deployable assets
 

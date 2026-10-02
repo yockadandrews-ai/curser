@@ -151,8 +151,11 @@ Money Autopilot launch sprint — hour-by-hour tracker. Start on **Friday**. Tar
 **Revenue target:** $300
 
 ### Morning (9:00–12:00)
-- [ ] Connect Zapier: new sale → welcome email + Slack notification
+- [ ] Connect n8n/Zapier: `OUTREACH_WEBHOOK_URL` → import `docs/n8n/outreach-welcome-sale.workflow.json`
+- [ ] Confirm unified Stripe webhook routes Engine sales (`productId: money-autopilot-engine`) — see [PLATFORM_ALIGNMENT.md](../PLATFORM_ALIGNMENT.md)
+- [ ] (Optional) If running 33333 consumer too: import `docs/n8n/bridge-33333.workflow.json` — [N8N_BRIDGE_33333.md](../N8N_BRIDGE_33333.md)
 - [ ] Set up n8n Hermes calendar workflow (see `docs/N8N_HERMES_WIRING.md`)
+- [ ] Run `npm run sgos:verify`
 - [ ] Configure Rewardful for affiliate links
 - [ ] Apple Shortcut: daily Approval Inbox reminder (see `docs/SGOS_COMMAND.md`)
 
@@ -298,5 +301,7 @@ Signed: ____________________ Date: ____________________
 | Landing copy | [LANDING_PAGE_COPY_CHEAT_SHEET.md](./LANDING_PAGE_COPY_CHEAT_SHEET.md) |
 | Domain setup | [../DOMAIN_SETUP.md](../DOMAIN_SETUP.md) |
 | Utility deploy | [../UTILITY_WEBSITES.md](../UTILITY_WEBSITES.md) |
+| Platform map (all lanes) | [../PLATFORM_ALIGNMENT.md](../PLATFORM_ALIGNMENT.md) |
+| Repo changelog | [../UPDATES.md](../UPDATES.md) |
 
 **BAKU8.** Execute 7 days. Then reset. Let the field come.
