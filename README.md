@@ -42,7 +42,10 @@ npm start
 | [SOVEREIGN_SALES_AUTOPILOT.md](./docs/SOVEREIGN_SALES_AUTOPILOT.md) | Solar vertical — SG3 → Hermes → Ling → K3 loop |
 | [DOMAIN_SETUP.md](./docs/DOMAIN_SETUP.md) | Register domain + wire `tools.moneymagnettools.com` |
 | [PLATFORM_ALIGNMENT.md](./docs/PLATFORM_ALIGNMENT.md) | All lanes merged — domain map, governance, branch sync |
-| [UPDATES.md](./docs/UPDATES.md) | **Repo changelog** — BRIDGE, Viral v3, merge checklist |
+| [UPDATES.md](./docs/UPDATES.md) | **Repo changelog** — BRIDGE, Viral v3, SGOS, WATCHTOWER (start here) |
+| [SOVEREIGN_GROWTH_OS_MASTER_BLUEPRINT.md](./docs/SOVEREIGN_GROWTH_OS_MASTER_BLUEPRINT.md) | SGOS apps 1–113 index |
+| [SGOS_SYSTEM_ALIGNMENT.md](./docs/SGOS_SYSTEM_ALIGNMENT.md) | WATCHTOWER + Notion Team Mirror rules |
+| [SGOS_COMMAND_CENTER.md](./docs/SGOS_COMMAND_CENTER.md) | Command Center + E-Fund webhooks |
 | [N8N_BRIDGE_33333.md](./docs/N8N_BRIDGE_33333.md) | Master integration workflow wiring |
 | [VIRAL_SHORTS_ENGINE_v3.md](./docs/33333/VIRAL_SHORTS_ENGINE_v3.md) | Viral Shorts v3.0 deploy guide |
 | [SOCIAL_API_SETUP.md](./docs/33333/SOCIAL_API_SETUP.md) | Social tokens + brand→account map (stub until SOV guide imported) |

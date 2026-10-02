@@ -2,7 +2,9 @@
 
 Canonical changelog for cross-chat / Cloud Agent work. **Merge target:** `main`.
 
-Last updated: **2026-10-02**
+Last updated: **2026-10-02** · **`main` @ `37fb1d7`** (after SGOS + 33333 sync)
+
+**Quick verify:** `npm run sgos:verify`
 
 ---
 
@@ -34,15 +36,9 @@ Last updated: **2026-10-02**
 
 ---
 
-## 2026-09 — BRIDGE_33333 + Viral Shorts v3.0
+## 2026-09 — BRIDGE_33333 + Viral Shorts v3.0 (on `main`)
 
-### Branches (ready to merge)
-
-| Branch | Contents |
-|--------|----------|
-| `cursor/33333-updates-sync-b1b2` | **Combined** — BRIDGE + Viral v3 + this UPDATES doc |
-| `cursor/bridge-33333-integration-b1b2` | BRIDGE only |
-| `cursor/viral-shorts-engine-v3-b1b2` | BRIDGE + Viral v3 |
+Merged via `55139be` (`cursor/33333-updates-sync-b1b2`).
 
 ### Added — Integration layer (Doc 1 ↔ Doc 2)
 
@@ -94,9 +90,19 @@ Until `SOCIAL_API_SETUP_GUIDE.md` lands, social publish stays **simulated** (no 
 
 ---
 
-## Merge checklist
+## On `main` now (2026-10-02)
 
-- [ ] PR: `cursor/33333-updates-sync-b1b2` → `main`
+| Area | Status |
+|------|--------|
+| BRIDGE_33333 + Viral Shorts v3 | Merged (`55139be`) |
+| SGOS blueprint + validators + BioLink | Merged (`aa31db9` → `37fb1d7`) |
+| WATCHTOWER / AGUS alignment | Merged (`37fb1d7`) |
+| `docs/UPDATES.md` | This file |
+
+## Deploy checklist (still manual)
+
+- [x] Land BRIDGE + Viral v3 on `main`
+- [x] Land SGOS taxonomy + `npm run sgos:verify` on `main`
 - [ ] Import n8n: `bridge-33333.workflow.json` + `33333-viral-shorts-engine-v3.workflow.json`
 - [ ] Set `N33333_WEBHOOK_SECRET`, `GEMINI_API_KEY`, `SLACK_WEBHOOK_URL`
 - [ ] Add Google Sheet tabs: `Content_Ideas`, `Viral_Shorts`, `_CONTINUITY_REPORT`

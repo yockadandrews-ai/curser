@@ -35,6 +35,7 @@ Last synced: **2026-10-02** (AGUS membrane + WATCHTOWER cross-ref — see `docs/
 | `cursor/33333-updates-sync-b1b2` | **BRIDGE + Viral v3 (combined)** | `bridge-*`, `viral*`, `docs/UPDATES.md` |
 | `cursor/bridge-33333-integration-b1b2` | 10-workflow ↔ Control Tower bridge | `docs/n8n/bridge-33333.workflow.json` |
 | `cursor/viral-shorts-engine-v3-b1b2` | 2026 shorts engine (32 nodes) | `33333-viral-shorts-engine-v3.workflow.json` |
+| `cursor/sgos-biolink-validators-d838` | SGOS blueprint, taxonomy validators, BioLink | `docs/SOVEREIGN_GROWTH_OS_MASTER_BLUEPRINT.md`, `npm run sgos:verify` |
 
 ## Shared infrastructure
 
