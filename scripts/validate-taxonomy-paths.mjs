@@ -52,6 +52,13 @@ if (taxonomy.canonicalBlueprintDoc && !exists(taxonomy.canonicalBlueprintDoc)) {
   ok.push(`✓ Blueprint doc readable: ${taxonomy.canonicalBlueprintDoc}`);
 }
 
+const alignmentDoc = taxonomy.notionCanon?.alignmentDoc ?? 'docs/SGOS_SYSTEM_ALIGNMENT.md';
+if (!exists(alignmentDoc)) {
+  issues.push(`✗ Missing system alignment doc: ${alignmentDoc}`);
+} else {
+  ok.push(`✓ System alignment: ${alignmentDoc}`);
+}
+
 if (taxonomy.factoryThemeSource && !exists(taxonomy.factoryThemeSource)) {
   issues.push(`✗ Factory theme source not found: ${taxonomy.factoryThemeSource}`);
 } else if (taxonomy.factoryThemeSource) {

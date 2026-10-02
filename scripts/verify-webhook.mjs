@@ -58,31 +58,50 @@ ok.push(`✓ Lead capture path documented: ${efund.leadCapturePath}`);
 ok.push(`✓ Stripe webhook path documented: ${efund.stripeWebhookPath}`);
 ok.push(`✓ E-Fund sheet tab: ${efund.trackingSheetTab}`);
 
-const localRoutes = [
-  `${appBase}${efund.leadCapturePath}`,
-  `${appBase}/api/33333/n8n/config`,
-  `${appBase}${efund.stripeWebhookPath}`,
-];
+const leadUrl = `${appBase}${efund.leadCapturePath}`;
+const configUrl = `${appBase}/api/33333/n8n/config`;
+const stripeUrl = `${appBase}${efund.stripeWebhookPath}`;
 
 if (live) {
-  for (const url of localRoutes) {
-    try {
-      const res = await fetch(url, {
-        method: url.includes('stripe') ? 'GET' : 'GET',
-        headers: process.env.N33333_WEBHOOK_SECRET
-          ? { 'X-33333-Secret': process.env.N33333_WEBHOOK_SECRET }
-          : {},
-      });
-      if (url.includes('stripe') && res.status === 404) {
-        ok.push(`○ ${url} — GET not routed (POST-only is OK for Stripe)`);
-      } else if (res.ok) {
-        ok.push(`✓ Live ${res.status}: ${url}`);
-      } else {
-        issues.push(`✗ Live ${res.status}: ${url}`);
-      }
-    } catch (e) {
-      issues.push(`✗ Live fetch failed: ${url} — ${e.message}`);
+  try {
+    const configRes = await fetch(configUrl);
+    if (configRes.ok) ok.push(`✓ Live ${configRes.status}: ${configUrl}`);
+    else issues.push(`✗ Live ${configRes.status}: ${configUrl}`);
+  } catch (e) {
+    issues.push(`✗ Live fetch failed: ${configUrl} — ${e.message}`);
+  }
+
+  try {
+    const leadRes = await fetch(leadUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(process.env.N33333_WEBHOOK_SECRET ? { 'X-33333-Secret': process.env.N33333_WEBHOOK_SECRET } : {}) },
+      body: JSON.stringify({
+        email: `sgos-probe-${Date.now()}@example.invalid`,
+        brand: '33333',
+        lead_magnet: 'sgos-verify-probe',
+        utm_source: 'sgos-verify-live',
+      }),
+    });
+    if (leadRes.status === 201 || leadRes.ok) {
+      ok.push(`✓ Live ${leadRes.status}: POST ${leadUrl} (probe lead)`);
+    } else {
+      issues.push(`✗ Live ${leadRes.status}: POST ${leadUrl}`);
     }
+  } catch (e) {
+    issues.push(`✗ Live POST failed: ${leadUrl} — ${e.message}`);
+  }
+
+  try {
+    const stripeRes = await fetch(stripeUrl, { method: 'GET' });
+    if (stripeRes.status === 404 || stripeRes.status === 405) {
+      ok.push(`○ ${stripeUrl} — POST-only route (${stripeRes.status} on GET is OK)`);
+    } else if (stripeRes.ok) {
+      ok.push(`✓ Live ${stripeRes.status}: ${stripeUrl}`);
+    } else {
+      warnings.push(`○ Stripe path returned ${stripeRes.status}`);
+    }
+  } catch (e) {
+    issues.push(`✗ Live fetch failed: ${stripeUrl} — ${e.message}`);
   }
 
   const outreach = process.env.OUTREACH_WEBHOOK_URL?.trim();
@@ -99,8 +118,10 @@ if (live) {
     }
   }
 } else {
-  ok.push('○ Offline mode — pass --live to ping APP_BASE_URL routes');
-  localRoutes.forEach(u => ok.push(`  · ${u}`));
+  ok.push('○ Offline mode — pass --live to probe APP_BASE_URL (POST leads, GET config)');
+  ok.push(`  · POST ${leadUrl}`);
+  ok.push(`  · GET  ${configUrl}`);
+  ok.push(`  · POST ${stripeUrl} (Stripe)`);
 }
 
 ok.forEach(line => console.log(line));

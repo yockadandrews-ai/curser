@@ -2,6 +2,8 @@
 
 **Version:** 1.0 · **Brand:** Money Autopilot / Money Magnet Tools · **Domain:** `autopilot.moneymagnettools.com`
 
+> **Enterprise SGOS audit outreach** (Apollo, $2,500 audit, WF-09) is governed separately — see [SGOS_SYSTEM_ALIGNMENT.md](../SGOS_SYSTEM_ALIGNMENT.md) and Notion WATCHTOWER. This doc is the **consumer Engine ($197) + utility hub** lane only. Nothing here authorizes cold send without approve + proof (Sent=0).
+
 This is the master blueprint for launching and scaling the Money Autopilot revenue stack. Every script, checklist, and metric below is aligned to the product in this repo — not a generic SaaS template.
 
 ---

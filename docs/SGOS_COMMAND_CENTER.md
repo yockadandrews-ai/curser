@@ -2,6 +2,8 @@
 
 Operational map for Sovereign Growth OS — links factory output, n8n lanes, and launch gates.
 
+**System membrane (2026-10):** [SGOS_SYSTEM_ALIGNMENT.md](./SGOS_SYSTEM_ALIGNMENT.md) — AGUS · Sent=0 · WATCHTOWER canon · enterprise BOOKING_ONLY vs consumer lanes.
+
 Related: [SGOS Command shortcuts](./SGOS_COMMAND.md) · [Platform alignment](./PLATFORM_ALIGNMENT.md) · [E-Fund actions](./EFUND_CONCERNS_AND_ACTIONS.md)
 
 ## §1 Governance

@@ -1,5 +1,13 @@
 {
-  "version": "2026-03-18",
+  "version": "2026-10-02",
+  "notionCanon": {
+    "watchtowerLog": "https://app.notion.com/p/3e4def76bd2981709b06fa60f39daa03",
+    "teamMirror": "https://app.notion.com/p/3ebdef76bd29814e8ab1e9175cd0bff1",
+    "sgosAuditBookingUrl": "https://calendar.notion.so/meet/yockad/sgos-audit",
+    "alignmentDoc": "docs/SGOS_SYSTEM_ALIGNMENT.md",
+    "governedSentDefault": 0,
+    "apollo23Status": "VOID_2026-09-14"
+  },
   "canonicalBlueprintDoc": "docs/SOVEREIGN_GROWTH_OS_MASTER_BLUEPRINT.md",
   "factoryThemeSource": "server/factory/themes.ts",
   "outputRoot": "output",

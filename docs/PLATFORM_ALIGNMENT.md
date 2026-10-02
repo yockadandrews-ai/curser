@@ -1,6 +1,6 @@
 # Platform alignment — all lanes on `main`
 
-Last synced: **2026-09-27** (BRIDGE_33333 + Viral Shorts v3 — see `docs/UPDATES.md`)
+Last synced: **2026-10-02** (AGUS membrane + WATCHTOWER cross-ref — see `docs/SGOS_SYSTEM_ALIGNMENT.md`, `docs/UPDATES.md`)
 
 ## Domain map (canonical)
 
@@ -10,7 +10,13 @@ Last synced: **2026-09-27** (BRIDGE_33333 + Viral Shorts v3 — see `docs/UPDATE
 | `autopilot.moneymagnettools.com` | Express API — Hermes, SGOS, 33333, outreach, sovereign |
 | `moneymagnettools.com` | Root / brand (optional redirect to tools) |
 
-## Three revenue lanes (do not cross wires)
+## Governance (all lanes)
+
+- **Sent = 0** until human approve + proof URL (Hermes / Approval Queue). Cloud agents: observe + draft only.
+- **Enterprise SGOS audit outreach:** BOOKING_ONLY → [sgos-audit calendar](https://calendar.notion.so/meet/yockad/sgos-audit) · **APOLLO23 VOID** — not driven from this repo.
+- **Notion WATCHTOWER** wins over local agent scratch if they conflict: [Action Log](https://app.notion.com/p/3e4def76bd2981709b06fa60f39daa03).
+
+## Revenue lanes (do not cross wires)
 
 | Lane | Path | Governance | Stripe |
 |------|------|------------|--------|

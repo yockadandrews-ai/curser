@@ -2,7 +2,18 @@
 
 Canonical changelog for cross-chat / Cloud Agent work. **Merge target:** `main`.
 
-Last updated: **2026-09-30**
+Last updated: **2026-10-02**
+
+---
+
+## 2026-10-02 — WATCHTOWER / AGUS alignment
+
+| Path | Purpose |
+|------|---------|
+| `docs/SGOS_SYSTEM_ALIGNMENT.md` | Notion Team Mirror + WATCHTOWER rules for this repo |
+| `config/sgos-taxonomy.json` | `notionCanon` block (Watchtower URL, BOOKING_ONLY, APOLLO VOID) |
+| `scripts/sgos-verify-all.mjs` | `npm run sgos:verify` — one-shot local checks |
+| `scripts/verify-webhook.mjs` | Live mode uses **POST** on `/api/33333/leads` (not GET) |
 
 ---
 

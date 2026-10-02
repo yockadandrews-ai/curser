@@ -15,6 +15,7 @@
     "validate-taxonomy-paths": "node scripts/validate-taxonomy-paths.mjs",
     "verify-efund-webhook": "node scripts/verify-webhook.mjs --lane efund",
     "emergency-funnel:verify": "node scripts/verify-emergency-funnel.mjs",
+    "sgos:verify": "node scripts/sgos-verify-all.mjs",
     "start": "node dist/server/index.js",
     "preview": "vite preview"
   },

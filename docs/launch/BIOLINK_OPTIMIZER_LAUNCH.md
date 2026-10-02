@@ -2,7 +2,9 @@
 
 **Role:** Conversion / Social · **UI focus:** Contextual real-time link re-ordering based on campaigns.
 
-Paste into Carrd, Framer, `public/33333/brand-pages/`, or a dedicated subdomain. Pair with **Lead-Magnet Logic** (#28) for “AI app → interactive product” upsells.
+**Lane:** Consumer / 33333 test portal — not enterprise SGOS audit outreach. Follow [SGOS_SYSTEM_ALIGNMENT.md](../SGOS_SYSTEM_ALIGNMENT.md): capture + Hermes before any automated Shorts; Sent=0 until approve.
+
+Paste into Carrd, Framer, `public/33333/brand-pages/`, or a dedicated subdomain. Pair with **Lead-Magnet Logic** (#28) for “AI app → interactive product” upsells. Do **not** mix with Chip Foundry / private canon from Team Mirror.
 
 ---
 
