@@ -140,6 +140,32 @@ export default function Hub33333() {
         </div>
       )}
 
+      <div className="card">
+        <h2 className="text-sm font-semibold text-white mb-2">Quick links — other revenue lanes</h2>
+        <p className="text-xs text-gray-500 mb-3">
+          Cross-lane map:{' '}
+          <code className="text-gray-300">docs/PLATFORM_ALIGNMENT.md</code>
+          {' '}— Outreach and Sovereign run on this server; keep Stripe metadata and webhooks lane-specific.
+        </p>
+        <ul className="text-sm space-y-2 text-gray-300">
+          <li>
+            <a href="/utility-websites/autopilot-landing.html" className="text-sky-400 hover:underline">
+              Money Autopilot Engine landing
+            </a>
+            <span className="text-gray-500 text-xs ml-2">Outreach · Stripe Checkout $197</span>
+          </li>
+          <li>
+            <span className="text-gray-400">Sovereign Solar dashboard API</span>
+            {' '}
+            <code className="text-xs text-gray-300 bg-dark-800 px-1.5 py-0.5 rounded">GET /api/sovereign/dashboard</code>
+          </li>
+          <li>
+            <a href="/hermes" className="text-sky-400 hover:underline">Hermes / SGOS</a>
+            <span className="text-gray-500 text-xs ml-2">separate governance lane</span>
+          </li>
+        </ul>
+      </div>
+
       {(data.stripeLinksConfigured === 0 || !data.convertkit?.configured) && (
         <div className="text-sm text-amber-400/90 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2 space-y-1">
           <p className="font-medium">Setup to collect revenue:</p>

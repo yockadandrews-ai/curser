@@ -3,6 +3,8 @@
 **First brain monetization** — Music · Balance · Reflection  
 **SGOS stays in its own lane.** Consumer products only; no Hermes governance overlap.
 
+**Cross-lane map:** [PLATFORM_ALIGNMENT.md](../PLATFORM_ALIGNMENT.md) — Outreach and Sovereign are separate revenue lanes on the same Express server as 33333.
+
 ## What's Included
 
 | # | File | Description |

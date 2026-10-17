@@ -90,6 +90,8 @@ import {
   recordExternalRevenue,
 } from './profitTracker.js';
 import { register33333Routes } from './33333/routes.js';
+import { countConfiguredStripeLinks } from './33333/stripeLinks.js';
+import { getConvertKitConfig } from './33333/convertkit.js';
 import {
   subscribeOutreach,
   dispatchOutreachWebhook,
@@ -220,6 +222,22 @@ app.get('/api/checkout/session/:sessionId', async (req, res) => {
   } catch (e) {
     res.status(404).json({ error: String(e) });
   }
+});
+
+app.get('/api/platform/status', (_req, res) => {
+  const vertical = getActiveVertical();
+  res.json({
+    lanes: {
+      '33333': { ui: '/33333', api: '/api/33333' },
+      outreach: { ui: '/utility-websites/autopilot-landing.html', api: '/api/outreach' },
+      sovereign: { dashboard: '/api/sovereign/dashboard', api: '/api/sovereign' },
+      hermes: { ui: '/hermes', api: '/api/hermes' },
+    },
+    stripeConfigured: isStripeConfigured(),
+    convertkitConfigured: getConvertKitConfig().configured,
+    stripeLinksCount: countConfiguredStripeLinks(),
+    sovereignVertical: vertical.id,
+  });
 });
 
 // i18n — language catalog and user preference
