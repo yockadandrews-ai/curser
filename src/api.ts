@@ -235,4 +235,38 @@ export const api = {
     request<{ ok: boolean; lead: Record<string, unknown> }>('/33333/leads', {
       method: 'POST', body: JSON.stringify(data),
     }),
+
+  getSalesCommandCenter: () => request<{
+    scannedAt: string;
+    summary: {
+      profitTrackerMonthlyUsd: number;
+      consumerMtdRevenueUsd: number;
+      consumerMtdLeads: number;
+      consumerConversionRate: number;
+      outreachSubscribers: number;
+      sovereignTotalTickets: number;
+      sovereignLiveDeployments: number;
+      sovereignPipelineValueUsd: number;
+      engineProduct: { name: string; priceCents: number };
+    };
+    lanes: {
+      sovereign: {
+        verticalLabel: string;
+        pricing: { entryUsd: number };
+        recentTickets: Array<{ id: string; name: string; company?: string; status: string }>;
+        pendingSg3Emissions: Array<{ id: string; title: string; sent: number }>;
+      };
+      outreach: { recentEvents: unknown[] };
+      consumer33333: {
+        recentRevenue: Array<{ id: string; brand: string; product: string; grossCents: number }>;
+      };
+    };
+    bridge: {
+      clock: { element: string; action: string; windowLabel: string };
+    };
+    env: { stripeLinksConfigured: number; stripeLinksTotal: number };
+    deployChecklist: Array<{ id: string; label: string; done: boolean; hint?: string }>;
+    deployChecklistComplete: number;
+    deployChecklistTotal: number;
+  }>('/sales/command-center'),
 };
