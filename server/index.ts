@@ -110,6 +110,7 @@ import { getActiveVertical } from './sovereign/config.js';
 import { register33333Routes } from './33333/routes.js';
 import { register33333BridgeRoutes } from './33333/bridgeRoutes.js';
 import { register33333ViralRoutes } from './33333/viralRoutes.js';
+import { getSalesCommandCenter } from './salesCommandCenter.js';
 import { registerUnifiedStripeWebhook } from './stripeWebhookUnified.js';
 import {
   subscribeOutreach,
@@ -915,6 +916,15 @@ app.get('/api/sovereign/sg3/emissions', (_req, res) => {
 app.post('/api/sovereign/test/fake-lead', (_req, res) => {
   try {
     res.json(runFakeLeadTest());
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+// Sales command center — all revenue lanes + deploy readiness
+app.get('/api/sales/command-center', (_req, res) => {
+  try {
+    res.json(getSalesCommandCenter());
   } catch (e) {
     res.status(500).json({ error: String(e) });
   }

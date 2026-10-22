@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BioLink Optimizer AI | 33333</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="wrap">
+    <nav>
+      <a href="../index.html">33333</a>
+      <a href="biolink.html">BioLink</a>
+      <a href="vaultverse.html">VaultVerse</a>
+      <a href="aurascript.html">AuraScript</a>
+      <a href="mirrorme.html">MirrorMe</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    <section class="hero brand-fire">
+      <h1>Your bio link is a billboard.</h1>
+      <p>Stop sending everyone to the same dead link. BioLink Optimizer AI re-orders your outbound links in real time — campaign-aware, mobile-first, no code swap.</p>
+    </section>
+
+    <div class="card brand-fire">
+      <h2>Start free link audit</h2>
+      <p class="muted">Email + primary platform. Leads flow to <code>POST /api/33333/leads</code> with magnet <code>biolink-optimizer</code>.</p>
+      <form id="biolink-form" class="stack" style="margin-top:1rem;max-width:28rem">
+        <label>
+          First name
+          <input type="text" id="name" name="name" required autocomplete="given-name" />
+        </label>
+        <label>
+          Email
+          <input type="email" id="email" name="email" required autocomplete="email" />
+        </label>
+        <label>
+          Primary platform
+          <select id="platform" name="platform" required>
+            <option value="instagram">Instagram</option>
+            <option value="tiktok">TikTok</option>
+            <option value="youtube">YouTube</option>
+            <option value="email">Email / newsletter</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <button type="submit" class="btn btn-primary">Start free link audit</button>
+      </form>
+      <p id="success" class="success" style="display:none;margin-top:1rem">You're in — check your inbox for next steps.</p>
+      <p id="error" class="error" style="display:none;margin-top:1rem;color:#f87171"></p>
+    </div>
+
+    <div class="card">
+      <h2>Why it wins</h2>
+      <ul>
+        <li>Campaign context — UTM + platform signals rank the right CTA first.</li>
+        <li>Live reorder — booking links up for email; free tools up for cold social.</li>
+        <li>Proof loop — Win Cards when reorder beats baseline CTR.</li>
+      </ul>
+    </div>
+  </main>
+  <footer class="wrap">Lead. Flow. Rise. · BioLink Optimizer · portal=biolink-optimizer</footer>
+  <script>
+    document.getElementById('biolink-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const success = document.getElementById('success');
+      const error = document.getElementById('error');
+      success.style.display = 'none';
+      error.style.display = 'none';
+      const params = new URLSearchParams(location.search);
+      try {
+        const res = await fetch('/api/33333/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('email').value,
+            firstName: document.getElementById('name').value,
+            brand: '33333',
+            leadMagnet: 'biolink-optimizer',
+            utmSource: params.get('utm_source') || document.getElementById('platform').value,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        success.style.display = 'block';
+        if (data.email?.simulated) {
+          success.textContent = "You're in! Lead saved — connect ConvertKit to start email sequences automatically.";
+        }
+        e.target.reset();
+      } catch (err) {
+        error.textContent = err.message || 'Something went wrong. Try again.';
+        error.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
