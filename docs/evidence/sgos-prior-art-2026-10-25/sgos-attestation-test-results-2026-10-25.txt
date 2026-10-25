@@ -1,0 +1,60 @@
+TAP version 13
+# Subtest: allows a valid signed hardware, console, and route attestation
+ok 1 - allows a valid signed hardware, console, and route attestation
+  ---
+  duration_ms: 12.141686
+  ...
+# Subtest: denies an unapproved hardware measurement
+ok 2 - denies an unapproved hardware measurement
+  ---
+  duration_ms: 2.837553
+  ...
+# Subtest: denies an unapproved console measurement
+ok 3 - denies an unapproved console measurement
+  ---
+  duration_ms: 2.096107
+  ...
+# Subtest: denies a disallowed model-jurisdiction route
+ok 4 - denies a disallowed model-jurisdiction route
+  ---
+  duration_ms: 2.381646
+  ...
+# Subtest: denies expired evidence
+ok 5 - denies expired evidence
+  ---
+  duration_ms: 1.910394
+  ...
+# Subtest: denies a bad signature
+ok 6 - denies a bad signature
+  ---
+  duration_ms: 1.902937
+  ...
+# Subtest: denies an unknown hardware key
+ok 7 - denies an unknown hardware key
+  ---
+  duration_ms: 0.842775
+  ...
+# Subtest: denies replay of the same signed nonce
+ok 8 - denies replay of the same signed nonce
+  ---
+  duration_ms: 2.950805
+  ...
+# Subtest: fails closed when the replay store fails
+ok 9 - fails closed when the replay store fails
+  ---
+  duration_ms: 2.371624
+  ...
+# Subtest: denial preserves the input and writes no ledger reference
+ok 10 - denial preserves the input and writes no ledger reference
+  ---
+  duration_ms: 2.080992
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 534.861605
